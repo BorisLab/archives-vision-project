@@ -1,0 +1,178 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}
+	Accueil &middot;
+	{{ parent() }}
+{% endblock %}
+
+{% block stylesheets %}
+	<link rel="stylesheet" href="{{ asset('assets/css/theme.bundle.css') }}">
+
+	<style>
+
+		body {
+			background-color: #f9fbfd;
+			overflow-x: hidden;
+		}
+	</style>
+{% endblock %}
+
+{% block body %}
+	{{ include('layouts/partials/_logout.html.twig') }}
+	<div class="load-div" style="display:none">
+		<div id="loading-overlay" class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="display: none; background-color: rgba(255, 255, 255, 0.8);">
+			<div class="text-center">
+				<div class="spinner-border text-primary" role="status">
+					<span class="visually-hidden">Loading...</span>
+				</div>
+				<p class="mt-2">Veuillez patienter...</p>
+			</div>
+		</div>
+	</div>
+	<div class="main-content">
+		{{ include('layouts/partials/admin/_navbar-admin.html.twig') }}
+
+		<div class="header">
+			<div
+				class="container">
+				<!-- Body -->
+				<div class="header-body border-bottom mt-4 mb-4" style="border-color:rgba(18, 38, 63, 0.175)">
+					<div class="row align-items-end">
+						<div
+							class="col pb-3">
+
+							<!-- Title -->
+							<h4 class="header-title">
+								Tableau de bord
+							</h1>
+
+						</div>
+					</div>
+					<!-- / .row -->
+				</div>
+				<!-- / .header-body -->
+			</div>
+		</div>
+	</div>
+	<div class="container">
+		<div class="row row-cols-1 row-cols-md-3 g-4">
+			<div class="col-12 col-lg-6 col-xl">
+
+				<a href="#" draggable="false" style="text-decoration:none">
+					<div class="card">
+						<div class="card-body">
+							<div class="row align-items-center gx-0">
+								<div
+									class="col">
+
+									<!-- Title -->
+									<h6 class="text-uppercase text-muted mb-2">
+										Fonds d'archives
+									</h6>
+
+									<!-- Heading -->
+									<span class="h2 mb-0">
+										0
+									</span>
+
+								</div>
+								<div
+									class="col-auto">
+
+									<!-- Icon -->
+									<span class="h2">
+										<box-icon color="blue" type='solid' animation='tada-hover' name='box'></box-icon>
+									</span>
+
+								</div>
+							</div>
+							<!-- / .row -->
+						</div>
+					</div>
+				</a>
+
+			</div>
+			<div class="col-12 col-lg-6 col-xl">
+
+				<a href="#" draggable="false" style="text-decoration:none">
+					<div class="card">
+						<div class="card-body">
+							<div class="row align-items-center gx-0">
+								<div
+									class="col">
+
+									<!-- Title -->
+									<h6 class="text-uppercase text-muted mb-2">
+										Demandes
+									</h6>
+
+									<!-- Heading -->
+									<span class="h2 mb-0">
+										0
+									</span>
+
+								</div>
+								<div
+									class="col-auto">
+
+									<!-- Icon -->
+									<span class="h2">
+										<box-icon color="blue" type='solid' animation='tada-hover' name='envelope'></box-icon>
+									</span>
+
+								</div>
+							</div>
+							<!-- / .row -->
+						</div>
+					</div>
+				</a>
+
+			</div>
+			<div class="col-12 col-lg-6 col-xl">
+
+				<a href="#" draggable="false" style="text-decoration:none">
+					<div class="card">
+						<div class="card-body">
+							<div class="row align-items-center gx-0">
+								<div
+									class="col">
+
+									<!-- Title -->
+									<h6 class="text-uppercase text-muted mb-2">
+										Départements
+									</h6>
+
+									<!-- Heading -->
+									<span class="h2 mb-0">
+										0
+									</span>
+
+								</div>
+								<div
+									class="col-auto">
+
+									<!-- Icon -->
+									<span class="h2">
+										<box-icon color="blue" name='group' animation='tada-hover' type='solid'></box-icon>
+									</span>
+
+								</div>
+							</div>
+							<!-- / .row -->
+						</div>
+					</div>
+				</a>
+
+			</div>
+		</div>
+		<div class="row row-cols-1 row-cols-md-3 g-4">
+			<div class="col-12 col-lg-6 col-xl"></div>
+			<div class="col-12 col-lg-6 col-xl"></div>
+		</div>
+	</div>
+	{% for flashMessage in app.flashes('success') %}
+		{{ include('layouts/partials/_success_login_flash_msg.html.twig')}}
+	{% endfor %}
+	<script src="{{ asset('assets/js/gime-toast.js') }}"></script>
+
+{% endblock %}

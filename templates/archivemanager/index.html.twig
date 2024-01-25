@@ -1,0 +1,229 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}
+	Accueil &middot;
+	{{ parent() }}
+{% endblock %}
+
+{% block stylesheets %}
+	<link rel="stylesheet" href="{{ asset('assets/css/theme.bundle.css') }}">
+
+	<style>
+
+		body {
+			background-color: #F9FBFD;
+			overflow-x: hidden;
+		}
+
+		#notifcart:hover {
+			background-color: #A3E3FA;
+			box-shadow: 0 0 20px 2px #E1EBEE;
+		}
+	</style>
+{% endblock %}
+
+{% block body %}
+	{{ include('layouts/partials/_logout.html.twig') }}
+	<div class="load-div" style="display:none">
+		<div id="loading-overlay" class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="display: none; background-color: rgba(255, 255, 255, 0.8);">
+			<div class="text-center">
+				<div class="spinner-border text-primary" role="status">
+					<span class="visually-hidden">Loading...</span>
+				</div>
+				<p class="mt-2">Veuillez patienter...</p>
+			</div>
+		</div>
+	</div>
+	<div class="main-content">
+		{{ include('layouts/partials/archivman/_navbar-archivman.html.twig') }}
+
+		<div class="header">
+			<div
+				class="container">
+
+				<!-- Body -->
+				<div class="header-body border-bottom mt-4" style="border-color:rgba(18, 38, 63, 0.175)">
+					<div class="row align-items-end">
+						<div
+							class="col pb-3">
+
+							<!-- Title -->
+							<h4 class="header-title">
+								Tableau de notifications
+							</h4>
+
+						</div>
+					</div>
+					<!-- / .row -->
+				</div>
+				<!-- / .header-body -->
+			</div>
+		</div>
+	</div>
+	<div class="container">
+		<div class="row row-cols-1 row-cols-md-3 g-4">
+			<div class="col-12 col-lg-6 col-xl">
+
+				<a href="#" draggable="false" style="text-decoration:none">
+					<div class="card border border-secondary-subtle" id="notifcart">
+						<div class="card-body">
+							<div class="row align-items-center gx-0">
+								<div
+									class="col">
+
+									<!-- Title -->
+									<h6 class="text-uppercase text-muted mb-2">
+										Demandes non traitées
+									</h6>
+
+									<!-- Heading -->
+									<span class="h2 mb-0">
+										0
+									</span>
+
+								</div>
+								<div
+									class="col-auto">
+
+									<!-- Icon -->
+									<span class="h2">
+										<box-icon color="#007FFF" type='solid' animation='tada-hover' name='flag'></box-icon>
+									</span>
+
+								</div>
+							</div>
+							<!-- / .row -->
+						</div>
+					</div>
+				</a>
+
+			</div>
+			<div class="col-12 col-lg-6 col-xl">
+
+				<a href="#" draggable="false" style="text-decoration:none">
+					<div class="card border border-secondary-subtle" id="notifcart">
+						<div class="card-body">
+							<div class="row align-items-center gx-0">
+								<div
+									class="col">
+
+									<!-- Title -->
+									<h6 class="text-uppercase text-muted mb-2">
+										Messages non lus
+									</h6>
+
+									<!-- Heading -->
+									<span class="h2 mb-0">
+										0
+									</span>
+
+								</div>
+								<div
+									class="col-auto">
+
+									<!-- Icon -->
+									<span class="h2">
+										<box-icon color="#007FFF" type='solid' animation='tada-hover' name='envelope'></box-icon>
+									</span>
+
+								</div>
+							</div>
+							<!-- / .row -->
+						</div>
+					</div>
+				</a>
+
+			</div>
+
+		</div>
+		<div
+			class="container">
+			<!-- Body -->
+			<div class="header-body mt-4 mb-4" style="border-color:rgba(18, 38, 63, 0.175)">
+				<div class="row align-items-end">
+					<div
+						class="col pb-3">
+
+						<!-- Title -->
+						<h4 class="header-title">
+							<ul class="nav nav-tabs" id="myTab" role="tabList">
+								<li class="nav-item" role="presentation">
+									<button class="nav-link active" id="docphys-tab" data-bs-toggle="tab" data-bs-target="#docphys-tab-pane" type="button" role="tab" aria-controls="docphys-tab-pane" aria-selected="true">
+										Documents physiques
+									</button>
+								</li>
+								<li class="nav-item" role="presentation">
+									<button class="nav-link" id="docnum-tab" data-bs-toggle="tab" data-bs-target="#docnum-tab-pane" type="button" role="tab" aria-controls="docnum-tab-pane" aria-selected="true">
+										Documents numériques
+									</button>
+								</li>
+							</ul>
+						</h4>
+
+					</div>
+				</div>
+				<!-- / .row -->
+			</div>
+			<!-- / .header-body -->
+		</div>
+		<div class="card mb-2 shadow">
+			<div class="card-body text-center">
+				<div class="row justify-content-center">
+					<div class="tab-content" id="myTabContent">
+						<div class="tab-pane fade show active" id="docphys-tab-pane" role="tabpanel" aria-labelledby="docphys-tab" tabindex="0">
+							<div
+								class="col-12">
+
+								<!-- Image -->
+								<img
+								draggable="false" src="{{ asset('assets/imgs/empty-box.gif') }}" alt="..." class="img-fluid mb-4" style="max-width: 272px;">
+
+								<!-- Title -->
+								<h4 class="mb-2">
+									Votre historique est vide
+								</h4>
+
+								<!-- Content -->
+								<p class="text-muted">
+									Toutes les documents physiques envoyés/ramenés.
+								</p>
+
+							</div>
+						</div>
+						<div class="tab-pane fade" id="docnum-tab-pane" role="tabpanel" aria-labelledby="docnum-tab" tabindex="0">
+							<div
+								class="col-12">
+
+								<!-- Image -->
+								<img
+								draggable="false" src="{{ asset('assets/imgs/empty-box.gif') }}" alt="..." class="img-fluid mb-4" style="max-width: 272px;">
+
+								<!-- Title -->
+								<h4 class="mb-2">
+									Votre historique est vide
+								</h4>
+
+								<!-- Content -->
+								<p class="text-muted">
+									Toutes les documents numériques téléchargés.
+								</p>
+
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- / .row -->
+			</div>
+		</div>
+		<div class="mt-4">
+			{{ include('layouts/partials/_footer.html.twig')}}
+		</div>
+	</div>
+	<div style="margin-top:-50px;">
+		{% for flashMessage in app.flashes('success') %}
+			{{ include('layouts/partials/_success_login_flash_msg.html.twig')}}
+		{% endfor %}
+	</div>
+	<script src="{{ asset('assets/js/gime-toast.js') }}"></script>
+
+{% endblock %}

@@ -1,0 +1,342 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}
+	Départements &middot;
+	{{ parent() }}
+{% endblock %}
+
+{% block stylesheets %}
+	<link rel="stylesheet" href="{{ asset('assets/css/theme.bundle.css') }}">
+
+	<style>
+
+		body {
+			background-color: #f9fbfd;
+		}
+
+		input.form-control:focus,
+		.form-select:focus {
+			border-color: #0d6efd;
+			outline: 0;
+			box-shadow: 0 0 0 0;
+		}
+
+		#save {
+			background-color: #fff;
+			color: #2c7be5;
+			font-size: smaller;
+		}
+
+		#save:hover {
+			background-color: #2c7be5;
+			color: #fff;
+		}
+
+		#cancel {
+			font-size: smaller;
+		}
+
+		#cancel:hover {
+			background-color: #6e84a3;
+		}
+
+		button.btn-close {
+			background: transparent url("data:image/svg+xml;charset=utf-8, %3Csvg xmlns='http://www.w3.org / 2000/svg' viewBox='0 0 16 16' fill='%2312263F'%3E%3Cpath d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414z'/%3E%3C/svg%3E") 50%/.5em auto no-repeat;
+		}
+
+		button.btn-close:focus {
+			border: none;
+			outline: none;
+			box-shadow: none !important;
+		}
+	</style>
+{% endblock %}
+
+{% block body %}
+	<div class="main-content">
+		{{ include('layouts/partials/admin/_navbar-admin.html.twig')}}
+
+		<div class="header">
+			<div
+				class="container">
+				<!-- Body -->
+				<div class="header-body border-bottom mt-4 mb-4" style="border-color:rgba(18, 38, 63, 0.175)">
+					<div class="row align-items-end">
+						<div
+							class="col pb-3">
+
+							<!-- Title -->
+							<h4 class="header-title">
+								Départements
+							</h1>
+
+						</div>
+						<div
+							class="col-auto pb-3">
+
+							<!-- Button -->
+							<a href="#!" draggable="false" class="btn btn-primary lift">
+								Ajouter un département
+							</a>
+
+						</div>
+					</div>
+					<!-- / .row -->
+				</div>
+				<!-- / .header-body -->
+			</div>
+		</div>
+	</div>
+	<div class="container">
+		<div class="row mb-3">
+			<div class="col-md-12">
+				<div class="mb-3">
+					<label for="formGroupExampleInput" class="form-label autofocus">Rechercher</label>
+					<input type="search" class="form-control list-search" id="formGroupExampleInput" autofocus placeholder="Quel département recherchez-vous?">
+				</div>
+			</div>
+
+		</div>
+
+		<div class="card" id="lists" data-list="">
+
+			<div
+				class="card-body">
+
+				<!-- List group -->
+				<ul class="list-group list-group-flush list my-n3">
+					<li class="list-group-item">
+						<div class="row align-items-center">
+							<div class="col-auto">
+								<box-icon name='calculator' type='solid' color='blue'></box-icon>
+							</div>
+							<div
+								class="col ms-n2">
+
+								<!-- Title -->
+								<h5 class="mb-1 name">
+									<span>Comptabilité</span>
+								</h5>
+
+								<!-- Time -->
+								<p class="small mb-0">
+									<a href="#" draggable="false" style="text-decoration:none;">compta1@entreprise.com</a>
+								</p>
+								<p class="small mb-0">
+									<a href="#" draggable="false" style="text-decoration:none;">compta2@entreprise.com</a>
+								</p>
+
+							</div>
+							<div
+								class="col-auto">
+
+								<!-- Button -->
+								<a href="#!" class="btn btn-sm btn-light" data-bs-toggle="modal" data-bs-target="#exampleModal1" style="border: 1px solid grey">
+									Editer
+								</a>
+
+								<!-- Modal -->
+								<div class="modal fade" id="exampleModal1" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+									<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-card">
+										<div class="modal-content">
+											<div class="modal-header">
+												<h6 class="card-header-title" id="exampleModalLabel">Editer un département</h6>
+												<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+											</div>
+											<div class="modal-body">
+												<form action="" method="post">
+													<div class="mb-3">
+														<label for="exampleFormControlInput1" class="form-label">Nom du département</label>
+														<input type="text" readonly class="form-control" id="exampleFormControlInput1" value="Comptabilité">
+													</div>
+
+													<div class="mb-3">
+														<label for="email1Group" class="form-label">Email</label>
+														<div class="input-group mb-3">
+															<input type="text" class="form-control" id="email1Group" value="compta1" aria-label="Recipient's username" aria-describedby="basic-addon2">
+															<span class="input-group-text" id="basic-addon2">@entreprise.com</span>
+														</div>
+													</div>
+
+													<div class="mb-3">
+														<label for="email2Group" class="form-label">Autre Email (optionnel)</label>
+														<div class="input-group mb-3">
+															<input type="text" class="form-control" id="email2Group" value="compta2" aria-label="Recipient's username" aria-describedby="basic-addon2">
+															<span class="input-group-text" id="basic-addon2">@entreprise.com</span>
+														</div>
+													</div>
+												</form>
+											</div>
+											<div class="modal-footer" style="border-top: 0;">
+												<button type="button" id="cancel" class="btn btn-outline-secondary mb-2" style="border-color: var(--bs-gray-400);" data-bs-dismiss="modal">Annuler</button>
+												<button type="button" id="save" class="btn btn-outline-primary mb-2">Enregistrer</button>
+											</div>
+										</div>
+									</div>
+								</div>
+
+							</div>
+						</div>
+						<!-- / .row -->
+					</li>
+					<li class="list-group-item">
+						<div class="row align-items-center">
+							<div
+								class="col-auto">
+
+								<!-- Avatar -->
+								<box-icon name='keyboard' type='solid' color='blue'></box-icon>
+
+							</div>
+							<div
+								class="col ms-n2">
+
+								<!-- Title -->
+								<h5 class="mb-1 name">
+									<span>Informatique</span>
+								</h5>
+
+								<!-- Time -->
+								<p class="small mb-0">
+									<a href="#" draggable="false" style="text-decoration:none;">infotech@entreprise.com</a>
+								</p>
+
+							</div>
+							<div
+								class="col-auto">
+
+								<!-- Button -->
+								<a type="button" draggable="false" href="#!" class="btn btn-sm btn-light" data-bs-toggle="modal" data-bs-target="#exampleModal2" style="border: 1px solid grey">
+									Editer
+								</a>
+
+								<!-- Modal -->
+								<div class="modal fade" id="exampleModal2" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+									<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-card">
+										<div class="modal-content">
+											<div class="modal-header">
+												<h6 class="card-header-title" id="exampleModalLabel">Editer un département</h6>
+												<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+											</div>
+											<div class="modal-body">
+												<form action="" method="post">
+													<div class="mb-3">
+														<label for="exampleFormControlInput1" class="form-label">Nom du département</label>
+														<input type="text" readonly class="form-control" id="exampleFormControlInput1" value="Informatique">
+													</div>
+
+													<div class="mb-3">
+														<label for="email1Group" class="form-label">Email</label>
+														<div class="input-group mb-3">
+															<input type="text" class="form-control" id="email1Group" value="infotech" aria-label="Recipient's username" aria-describedby="basic-addon2">
+															<span class="input-group-text" id="basic-addon2">@entreprise.com</span>
+														</div>
+													</div>
+
+													<div class="mb-3">
+														<label for="email2Group" class="form-label">Autre Email (optionnel)</label>
+														<div class="input-group mb-3">
+															<input type="text" class="form-control" id="email2Group" value="" aria-label="Recipient's username" aria-describedby="basic-addon2">
+															<span class="input-group-text" id="basic-addon2">@entreprise.com</span>
+														</div>
+													</div>
+												</form>
+											</div>
+											<div class="modal-footer" style="border-top: 0;">
+												<button type="button" id="cancel" class="btn btn-outline-secondary mb-2" style="border-color: var(--bs-gray-400);" data-bs-dismiss="modal">Annuler</button>
+												<button type="button" id="save" class="btn btn-outline-primary mb-2">Enregistrer</button>
+											</div>
+										</div>
+									</div>
+								</div>
+
+							</div>
+						</div>
+						<!-- / .row -->
+					</li>
+					<li class="list-group-item">
+						<div class="row align-items-center">
+							<div
+								class="col-auto">
+
+								<!-- Avatar -->
+								<box-icon name='group' type='solid' color='blue'></box-icon>
+
+							</div>
+							<div
+								class="col ms-n2">
+
+								<!-- Title -->
+								<h5 class="mb-1 name">
+									<span>Ressources Humaines</span>
+								</h5>
+
+								<!-- Time -->
+								<p class="small mb-0">
+									<a href="#" draggable="false" style="text-decoration:none;">rh@entreprise.com</a>
+								</p>
+
+							</div>
+							<div
+								class="col-auto">
+
+								<!-- Button -->
+								<a href="#!" class="btn btn-sm btn-light" class="btn btn-sm btn-light" data-bs-toggle="modal" data-bs-target="#exampleModal3" style="border: 1px solid grey">
+									Editer
+								</a>
+
+								<!-- Modal -->
+								<div class="modal fade" id="exampleModal3" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+									<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-card">
+										<div class="modal-content">
+											<div class="modal-header">
+												<h6 class="card-header-title" id="exampleModalLabel">Editer un département</h6>
+												<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+											</div>
+											<div class="modal-body">
+												<form action="" method="post">
+													<div class="mb-3">
+														<label for="exampleFormControlInput1" class="form-label">Nom du département</label>
+														<input type="text" readonly class="form-control" id="exampleFormControlInput1" value="Ressources Humaines">
+													</div>
+
+													<div class="mb-3">
+														<label for="email1Group" class="form-label">Email</label>
+														<div class="input-group mb-3">
+															<input type="text" class="form-control" id="email1Group" value="rh@entreprise.com" aria-label="Recipient's username" aria-describedby="basic-addon2">
+															<span class="input-group-text" id="basic-addon2">@entreprise.com</span>
+														</div>
+													</div>
+
+													<div class="mb-3">
+														<label for="email2Group" class="form-label">Autre Email (optionnel)</label>
+														<div class="input-group mb-3">
+															<input type="text" class="form-control" id="email1Group" value="" aria-label="Recipient's username" aria-describedby="basic-addon2">
+															<span class="input-group-text" id="basic-addon2">@entreprise.com</span>
+														</div>
+													</div>
+												</form>
+											</div>
+											<div class="modal-footer" style="border-top: 0;">
+												<button type="button" id="cancel" class="btn btn-outline-secondary mb-2" style="border-color: var(--bs-gray-400);" data-bs-dismiss="modal">Annuler</button>
+												<button type="button" id="save" class="btn btn-outline-primary mb-2">Enregistrer</button>
+											</div>
+										</div>
+									</div>
+								</div>
+
+							</div>
+						</div>
+						<!-- / .row -->
+					</li>
+				</ul>
+
+			</div>
+		</div>
+
+	</div>
+	{% for flashMessage in app.flashes('success') %}
+		{{ include('layouts/partials/_success_login_flash_msg.html.twig')}}
+	{% endfor %}
+
+{% endblock %}

@@ -1,0 +1,126 @@
+/* Styles de base */
+body {
+    font-family: Arial, sans-serif;
+}
+
+.accordion {
+    border: none;
+    margin: 10px;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.label-doc, .label-sub, .label-file {
+    display: flex;
+    margin-left: 10px;
+}
+
+.label-doc span {
+    background-color: white;
+}
+
+.icon-doc, .icon-sub {
+    display: flex;
+}
+
+.icon-file {
+    margin-left: 10px;
+}
+
+.accordion-btn, .accordion-sub, .file-sub {
+    text-align: left;
+    padding: 10px 20px;
+    background-color: white;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid gray;
+    border-radius: 10px;
+    outline: none;
+    cursor: auto;
+    margin-bottom: 5px;
+}
+
+.accordion-btn {
+    width: 100%;
+}
+
+.accordion-sub, .file-sub {
+    width: 98%;
+    margin: auto;
+    margin-bottom: 5px;
+}
+
+div.file-sub {
+    background-color: #FFF891;
+}
+
+.accordion-badge, .sub-badge {
+    font-size: 12px;
+    padding: 6px 12px;
+    border-radius: 3px;
+    margin-left: 50px;
+    width: 130px;
+    word-spacing: 3px;
+}
+
+.accordion-icons, .sub-icons {
+    display: flex;
+    color: black;
+    margin-left: auto;
+    margin-right: 40px;
+}
+
+.sub-file-icons {
+    display: flex;
+    color: black;
+    margin-left: auto;
+    margin-right: 20px;
+}
+
+.accordion-item-add, .sub-item-add {
+    color: black;
+}
+
+.accordion-item-add:hover, .sub-item-add:hover {
+    color: gray;
+}
+
+/* Styles pour l'icône de flèche vers le bas (déroulement) */
+.accordion-content {
+    display: none;
+}
+
+.sub-content {
+    display: none;
+}
+
+.accordion-icon-rename, .sub-icon-edit {
+    margin-right: 1px;
+}
+
+.accordion-btn-edit, .sub-btn-edit {
+    border: none;
+}
+
+.accordion-btn.active .accordion-badge, .accordion-sub.active .sub-badge {
+    background-color: #28a745;
+}
+
+span.accordion-badge, span.sub-badge {
+    border: 1px solid black;
+}
+
+/* Styles pour l'icône de flèche vers le bas (déroulement) */
+/*.accordion-btn.active + .accordion-content {
+    display: block;
+}*/
+
+/* Styles pour le bouton Dérouler/Enrouler (à l'extrême droite) */
+.accordion-icon-expand, .sub-icon-expand {
+    font-size: 10px;
+    margin-left: 10px; /* Pour le placer à l'extrême droite */
+    margin-right: 0px;
+}
+

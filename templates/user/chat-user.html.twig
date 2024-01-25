@@ -1,0 +1,204 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}
+	Messagerie &middot;
+	{{ parent() }}
+{% endblock %}
+
+{% block stylesheets %}
+	<link rel="stylesheet" href="{{ asset('assets/css/theme.bundle.css') }}">
+
+	<style>
+
+		body {
+			background-color: #f9fbfd;
+			overflow: hidden;
+		}
+
+		input.form-control:focus,
+		.form-select:focus {
+			border-color: #0d6efd;
+			outline: 0;
+			box-shadow: 0 0 0 0;
+		}
+	</style>
+{% endblock %}
+
+{% block body %}
+	<div class="main-content">
+		{{ include('layouts/partials/user/_navbar-user.html.twig')}}
+	</div>
+	<div class="logout-div" style="display:none;position:absolute;z-index:2">
+		<div id="loading-overlay" class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="display: none; background-color: rgba(173, 173, 173, 0.7)">
+			<div class="text-center" style="background-color: white;padding: 35px 175px 20px 175px;border-radius: 5px">
+				<div class="spinner-border text-primary" role="status">
+					<span class="visually-hidden">Loading...</span>
+				</div>
+				<p class="mt-2">Déconnexion en cours...</p>
+			</div>
+		</div>
+	</div>
+	<div class="load-div" style="display:none">
+		<div id="loading-overlay" class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="display: none; background-color: rgba(255, 255, 255, 0.8);">
+			<div class="text-center">
+				<div class="spinner-border text-primary" role="status">
+					<span class="visually-hidden">Loading...</span>
+				</div>
+				<p class="mt-2">Veuillez patienter...</p>
+			</div>
+		</div>
+	</div>
+	<div class="container mt-5 mb-3">
+
+		<div class="mb-2 border shadow rounded" style="background:url({{ asset('assets/imgs/pattern.png') }})">
+			<div>
+				<div class="row justify-content-center">
+					<div class="shadow-sm rounded" style="width: calc(100% - 22px);background-color:#fff">
+						<div class="row align-items-center pt-4 pb-2 ps-5 mb-3">
+							<div
+								class="col-auto">
+								<!-- Avatar -->
+								<a href="#" class="avatar">
+									<img src="{{ asset('assets/imgs/default-image-user.jpg') }}" alt="..." class="avatar-img rounded-circle">
+								</a>
+							</div>
+							<div
+								class="col ms-n2">
+								<!-- Title -->
+								<h4 class="mb-1 name">
+									<span href="#">Archiviste</span>
+								</h4>
+
+								<!-- Time -->
+								<p class="small mb-0">
+									<span class="text-secondary">En ligne</span>
+								</p>
+
+							</div>
+							<button class="btn btn-secondary" style="width:95px;height:40px;margin-right:25px">
+								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-backspace" viewbox="0 0 16 16">
+									<path d="M5.83 5.146a.5.5 0 0 0 0 .708L7.975 8l-2.147 2.146a.5.5 0 0 0 .707.708l2.147-2.147 2.146 2.147a.5.5 0 0 0 .707-.708L9.39 8l2.146-2.146a.5.5 0 0 0-.707-.708L8.683 7.293 6.536 5.146a.5.5 0 0 0-.707 0z"/>
+									<path d="M13.683 1a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-7.08a2 2 0 0 1-1.519-.698L.241 8.65a1 1 0 0 1 0-1.302L5.084 1.7A2 2 0 0 1 6.603 1zm-7.08 1a1 1 0 0 0-.76.35L1 8l4.844 5.65a1 1 0 0 0 .759.35h7.08a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1z"/>
+								</svg>
+								Retour
+							</button>
+						</div>
+						<!-- / .row -->
+					</div>
+				</div>
+				<div style="height:400px;overflow-y:auto;padding:20px 30px 20px 30px">
+					<div id="msg">
+						<div id="msg-sent" style="display:flex">
+							<div id="details" style="max-width:calc(100% - 210px);margin-left:auto">
+								<p class="text-bg-dark" style="padding:8px 16px;word-wrap:break-word;border-radius:18px 18px 0 18px;">Salut Monsieur l'archiviste</p>
+							</div>
+						</div>
+					</div>
+					<div id="msg">
+						<div id="msg-coming" style="display:flex;align-items:flex-end">
+							<img class="avatar-img rounded-circle" src="{{ asset('assets/imgs/default-image-user.jpg') }}" alt="" style="height:40px;width:40px"/>
+							<div id="details" style="max-width:calc(100% - 210px);margin-left:10px;margin-right:auto">
+								<p class="text-bg-light" style="padding:8px 16px;word-wrap:break-word;border-radius:18px 18px 18px 0;">Bonjour Monsieur Hazard. J'espère que vous vous portez bien. En quoi puis-je vous aider ?</p>
+							</div>
+						</div>
+					</div>
+					<div id="msg">
+						<div id="msg-sent" style="display:flex">
+							<div id="details" style="max-width:calc(100% - 210px);margin-left:auto">
+								<p class="text-bg-dark" style="padding:8px 16px;word-wrap:break-word;border-radius:18px 18px 0 18px;">Je n'arrive pas à télécharger le document "Bilan des activités agro-économiques 2021-2022". Pouvez-vous m'aider ?</p>
+							</div>
+						</div>
+					</div>
+					<div id="msg">
+						<div id="msg-coming" style="display:flex;align-items:flex-end">
+							<img class="avatar-img rounded-circle" src="{{ asset('assets/imgs/default-image-user.jpg') }}" alt="" style="height:40px;width:40px"/>
+							<div id="details" style="max-width:calc(100% - 210px);margin-left:10px;margin-right:auto">
+								<p class="text-bg-light" style="padding:8px 16px;word-wrap:break-word;border-radius:18px 18px 18px 0;">Ok Monsieur Hazard. Un instant, je vais le rechercher et vous l'envoyer directement.</p>
+							</div>
+						</div>
+					</div>
+					<div id="msg">
+						<div id="msg-sent" style="display:flex">
+							<div id="details" style="max-width:calc(100% - 210px);margin-left:auto">
+								<p class="text-bg-dark" style="padding:8px 16px;word-wrap:break-word;border-radius:18px 18px 0 18px;">Ok, je suis en attente.</p>
+							</div>
+						</div>
+					</div>
+					<div id="msg">
+						<div id="msg-coming" style="display:flex;align-items:flex-end">
+							<img class="avatar-img rounded-circle" src="{{ asset('assets/imgs/default-image-user.jpg') }}" alt="" style="height:40px;width:40px"/>
+							<div id="details" style="max-width:calc(100% - 210px);margin-left:10px;margin-right:auto">
+								<p class="text-bg-light" style="padding:8px 16px;word-wrap:break-word;border-radius:18px 18px 18px 0;">
+									<strong>
+										<a href="#">Bilan des activités agro-économiques 2021-2022.pdf</a>
+									</strong>
+								</p>
+							</div>
+						</div>
+					</div>
+					<div id="msg">
+						<div id="msg-sent" style="display:flex">
+							<div id="details" style="max-width:calc(100% - 210px);margin-left:auto">
+								<p class="text-bg-dark" style="padding:8px 16px;word-wrap:break-word;border-radius:18px 18px 0 18px;">Bien reçu, merci beaucoup.</p>
+							</div>
+						</div>
+					</div>
+					<div id="msg">
+						<div id="msg-coming" style="display:flex;align-items:flex-end">
+							<img class="avatar-img rounded-circle" src="{{ asset('assets/imgs/default-image-user.jpg') }}" alt="" style="height:40px;width:40px"/>
+							<div id="details" style="max-width:calc(100% - 210px);margin-left:10px;margin-right:auto">
+								<p class="text-bg-light" style="padding:8px 16px;word-wrap:break-word;border-radius:18px 18px 18px 0;">Je vous en prie, Monsieur Hazard. Avez-vous d'autres besoins ?</p>
+							</div>
+						</div>
+					</div>
+					<div id="msg">
+						<div id="msg-sent" style="display:flex">
+							<div id="details" style="max-width:calc(100% - 210px);margin-left:auto">
+								<p class="text-bg-dark" style="padding:8px 16px;word-wrap:break-word;border-radius:18px 18px 0 18px;">Non, ce sera tout.</p>
+							</div>
+						</div>
+					</div>
+					<div id="msg">
+						<div id="msg-coming" style="display:flex;align-items:flex-end">
+							<img class="avatar-img rounded-circle" src="{{ asset('assets/imgs/default-image-user.jpg') }}" alt="" style="height:40px;width:40px"/>
+							<div id="details" style="max-width:calc(100% - 210px);margin-left:10px;margin-right:auto">
+								<p class="text-bg-light" style="padding:8px 16px;word-wrap:break-word;border-radius:18px 18px 18px 0;">Ok. N'hésitez pas à m'écrire si vous avez besoin d'assistance.</p>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="pt-0 pb-2" style="background-color:#EDEDED;border-bottom-left-radius:5px;border-bottom-right-radius:5px">
+					<div class="row align-items-center pt-3 pb-2 pe-4 ps-4">
+						<form class="col-auto" id="typing-area" style="display:flex">
+							<input
+							type="text" style="width:955px;margin-right:10px;border:none" class="form-control" id="formGroupExampleInput" autofocus placeholder="Ecrivez votre message ici..."/>
+							<!-- Button -->
+							<button class="btn btn-light" style="width:350px;margin-right:10px">
+								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-paperclip" viewbox="0 0 16 16">
+									<path d="M4.5 3a2.5 2.5 0 0 1 5 0v9a1.5 1.5 0 0 1-3 0V5a.5.5 0 0 1 1 0v7a.5.5 0 0 0 1 0V3a1.5 1.5 0 1 0-3 0v9a2.5 2.5 0 0 0 5 0V5a.5.5 0 0 1 1 0v7a3.5 3.5 0 1 1-7 0z"/>
+								</svg>
+								Joindre un fichier
+							</button>
+							<!-- Button -->
+							<button class="btn btn-info" style="width:175px">
+								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-send" viewbox="0 0 16 16">
+									<path d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.75.75 0 0 1-1.329.124l-3.178-4.995L.643 7.184a.75.75 0 0 1 .124-1.33L15.314.037a.5.5 0 0 1 .54.11ZM6.636 10.07l2.761 4.338L14.13 2.576zm6.787-8.201L1.591 6.602l4.339 2.76 7.494-7.493Z"/>
+								</svg>
+								Envoyer
+							</button>
+						</form>
+					</div>
+				</div>
+			</div>
+			<!-- / .row -->
+		</div>
+	</div>
+	<div class="mt-4">
+		{{ include('layouts/partials/_footer.html.twig')}}
+	</div>
+</div>
+{% for flashMessage in app.flashes('success') %}
+	{{ include('layouts/partials/_success_login_flash_msg.html.twig')}}
+{% endfor %}
+<script src="{{ asset('assets/js/gime-toast.js') }}"></script>
+<script src="{{ asset('assets/js/chat.js') }}"></script>{% endblock %}

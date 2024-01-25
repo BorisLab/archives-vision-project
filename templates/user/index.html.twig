@@ -1,0 +1,134 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}
+	Accueil &middot;
+	{{ parent() }}
+{% endblock %}
+
+{% block stylesheets %}
+	<link rel="stylesheet" href="{{ asset('assets/css/theme.bundle.css') }}">
+
+	<style>
+
+		body {
+			background-color: #f9fbfd;
+			overflow-x: hidden;
+		}
+
+		input.form-control:focus,
+		.form-select:focus {
+			border-color: #0d6efd;
+			outline: 0;
+			box-shadow: 0 0 0 0;
+		}
+	</style>
+{% endblock %}
+
+{% block body %}
+	<div class="logout-div" style="display:none;position:absolute;z-index:2">
+		<div id="loading-overlay" class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="display: none; background-color: rgba(173, 173, 173, 0.7)">
+			<div class="text-center" style="background-color: white;padding: 35px 175px 20px 175px;border-radius: 5px">
+				<div class="spinner-border text-primary" role="status">
+					<span class="visually-hidden">Loading...</span>
+				</div>
+				<p class="mt-2">Déconnexion en cours...</p>
+			</div>
+		</div>
+	</div>
+	<div class="load-div" style="display:none">
+		<div id="loading-overlay" class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="display: none; background-color: rgba(173, 173, 173, 0.7);">
+			<div class="text-center" style="background-color: white;padding: 35px 175px 20px 175px;border-radius: 5px">
+				<div class="spinner-border text-primary" role="status">
+					<span class="visually-hidden">Loading...</span>
+				</div>
+				<p class="mt-2">Veuillez patienter...</p>
+			</div>
+		</div>
+	</div>
+	<div class="main-content">
+		{{ include('layouts/partials/user/_navbar-user.html.twig')}}
+
+		<div class="header">
+			<div
+				class="container">
+				<!-- Body -->
+				<div class="header-body border-bottom mt-4 mb-4" style="border-color:rgba(18, 38, 63, 0.175)">
+					<div class="row align-items-end">
+						<div
+							class="col pb-3">
+
+							<!-- Title -->
+							<h4 class="header-title">
+								Mes documents
+							</h1>
+
+						</div>
+
+					</div>
+					<!-- / .row -->
+				</div>
+				<!-- / .header-body -->
+			</div>
+		</div>
+	</div>
+	<div class="container">
+
+		<div class="row mb-3">
+			<div class="col-md-4">
+				<div class="mb-3">
+					<label for="formGroupExampleInput" class="form-label">Rechercher</label>
+					<input type="text" class="form-control" id="formGroupExampleInput" autofocus placeholder="Quel document recherchez-vous?">
+				</div>
+			</div>
+			<div class="col-md-2">
+				<label for="inputSelect" class="form-label">Format</label>
+				<select id="inputSelect" class="form-select">
+					<option selected>--Choisir--</option>
+					<option>Physique</option>
+					<option>Numérique</option>
+				</select>
+			</div>
+			<div class="col">
+				<label for="dateMin" class="form-label">Du</label>
+				<input type="date" id="dateMin" class="form-control" placeholder="Date minimale">
+			</div>
+			<div class="col">
+				<label for="dateMax" class="form-label">Au</label>
+				<input type="date" id="dateMax" class="form-control" placeholder="Date maximale">
+			</div>
+
+		</div>
+
+		<div class="card mb-2 border border-primary-subtle shadow" style="z-index:1">
+			<div class="card-body text-center" id="empty-card" style="display:#">
+				<div class="row justify-content-center">
+					<div
+						class="col-12 col-xl-10">
+
+						<!-- Image -->
+						<img
+						draggable="false" src="{{ asset('assets/imgs/empty-box.gif') }}" alt="..." class="img-fluid mt-2 mb-2" style="max-width: 272px;">
+
+						<!-- Title -->
+						<h4 class="mb-2">
+							Vous n'avez produit aucun document pour l'instant
+						</h4>
+
+						<!-- Content -->
+						<p class="text-muted">
+							Tous vos documents d'archives produits s'afficheront ici.
+						</p>
+
+					</div>
+				</div>
+				<!-- / .row -->
+			</div>
+		</div>
+
+	</div>
+	{% for flashMessage in app.flashes('success') %}
+		{{ include('layouts/partials/_success_login_flash_msg.html.twig')}}
+	{% endfor %}
+	<script src="{{ asset('assets/js/gime-toast.js') }}"></script>
+
+{% endblock %}

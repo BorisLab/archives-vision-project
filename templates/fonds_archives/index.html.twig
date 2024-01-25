@@ -1,0 +1,1177 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}
+	Fonds d'archives &middot;
+	{{ parent() }}
+{% endblock %}
+
+{% block stylesheets %}
+	<link rel="stylesheet" href="{{ asset('assets/css/theme.bundle.css') }}">
+	<link rel="stylesheet" href="{{ asset('assets/css/docman.css') }}">
+
+	<style>
+
+		body {
+			background-color: #f9fbfd;
+			overflow-x: hidden;
+		}
+
+		input.form-control:focus,
+		.form-select:focus {
+			border-color: #0d6efd;
+			outline: 0;
+			box-shadow: 0 0 0 0;
+		}
+
+		.icon-sub {
+			margin-left: 10px;
+		}
+
+		.custom-tooltip-edit {
+			--bs-tooltip-bg: var(--bs-blue);
+			--bs-tooltip-color: var(--bs-white);
+		}
+
+		.custom-tooltip-delete {
+			--bs-tooltip-bg: var(--bs-red);
+			--bs-tooltip-color: var(--bs-white);
+		}
+
+		.custom-tooltip-collapse {
+			--bs-tooltip-bg: var(--bs-cyan);
+			--bs-tooltip-color: var(--bs-white);
+		}
+	</style>
+
+{% endblock %}
+
+{% block body %}
+	{{ include('layouts/partials/_logout.html.twig') }}
+	<div class="load-div" style="display:none">
+		<div id="loading-overlay" class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="display: none; background-color: rgba(255, 255, 255, 0.8);">
+			<div class="text-center">
+				<div class="spinner-border text-primary" role="status">
+					<span class="visually-hidden">Loading...</span>
+				</div>
+				<p class="mt-2">Veuillez patienter...</p>
+			</div>
+		</div>
+	</div>
+	<div class="main-content">
+		{{ include('layouts/partials/archivman/_navbar-archivman.html.twig')}}
+
+		<div class="header">
+			<div
+				class="container">
+				<!-- Body -->
+				<div class="header-body border-bottom mt-4 mb-4" style="border-color:rgba(18, 38, 63, 0.175)">
+					<div class="row align-items-end">
+						<div
+							class="col pb-3">
+
+							<!-- Title -->
+							<h4 class="header-title">
+								Fonds d'archives
+							</h1>
+
+						</div>
+						<div
+							class="col-auto pb-3">
+
+							<!-- Button -->
+							<button type="button" class="btn" data-bs-target="#newFolder" style="border:none" data-bs-toggle="modal" data-bs-title="Nouveau dossier">
+								<a href="#!" draggable="false" class="btn btn-info lift">
+									Créer un nouveau dossier
+								</a>
+							</button>
+							<!-- Modal -->
+							<div class="modal fade" id="newFolder" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+								<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-card">
+									<div class="modal-content">
+										<div class="modal-header">
+											<h6 class="card-header-title" id="exampleModalLabel" style="font-size:15px">Créer un nouveau dossier</h6>
+											<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+										</div>
+										<div class="modal-body">
+											<form action="" method="post">
+												<div class="mb-3">
+													<label for="exampleFormControlInput1" class="form-label">Nom du dossier</label>
+													<input type="text" class="form-control" id="exampleFormControlInput1" value="Dossier Archives X">
+												</div>
+												<div class="mb-3">
+													<label for="exampleFormControlSelect1" class="form-label">Département - Index</label>
+													<select name="" id="exampleFormControlSelect1" class="form-control">
+														<option value="">Comptabilité</option>
+														<option value="">Informatique</option>
+														<option value="">Ressources Humaines</option>
+													</select>
+												</div>
+												<div class="mb-3">
+													<label class="form-label" for="typeNumber">Nombre de sous-dossiers</label>
+													<input min="0" value="0" type="number" id="typeNumber" class="form-control" style="padding-right:7px"/>
+												</div>
+												<div class="mb-3">
+													<label class="form-label" for="typeNumber">Date de création</label>
+													<input value="date()" type="date" id="dateCreation" class="form-control" style="padding-right:7px"/>
+												</div>
+											</form>
+										</div>
+										<div class="row modal-footer">
+											<div class="col" style="align-items:center">
+												<button type="button" style="display:flex;width:100%;justify-content:center" id="" class="btn btn-light mb-2" data-bs-dismiss="modal">Annuler</button>
+											</div>
+											<div class="col" style="align-items:center">
+												<button type="button" style="display:flex;width:100%;justify-content:center" id="" class="btn btn-success mb-2">Valider</button>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+						</div>
+
+					</div>
+					<!-- / .row -->
+				</div>
+				<!-- / .header-body -->
+			</div>
+		</div>
+	</div>
+	<div class="container">
+		<div class="row mb-3">
+			<div class="col-md-4">
+				<div class="mb-3">
+					<label for="formGroupExampleInput" class="form-label">Rechercher</label>
+					<input type="text" class="form-control" id="formGroupExampleInput" autofocus placeholder="Quel document recherchez-vous?">
+				</div>
+			</div>
+			<div class="col-md-2">
+				<div class="mb-3">
+					<label for="formGroupExampleInput" class="form-label">Département</label>
+					<input type="text" class="form-control" id="formGroupExampleInput" autofocus placeholder="Nom du département">
+				</div>
+			</div>
+			<div class="col-md-2">
+				<label for="inputSelect" class="form-label">Format</label>
+				<select id="inputSelect" class="form-select">
+					<option selected>--Choisir--</option>
+					<option>Physique</option>
+					<option>Numérique</option>
+				</select>
+			</div>
+			<div class="col-md-2">
+				<label for="dateMin" class="form-label">Du</label>
+				<input type="date" id="dateMin" class="form-control" placeholder="Date minimale">
+			</div>
+			<div class="col-md-2">
+				<label for="dateMax" class="form-label">Au</label>
+				<input type="date" id="dateMax" class="form-control" placeholder="Date maximale">
+			</div>
+
+		</div>
+
+		<div class="card border shadow mb-2" id="empty-card" style="display:none">
+			<div class="card-body text-center">
+				<div class="row justify-content-center">
+					<div
+						class="col-12 col-xl-10">
+
+						<!-- Image -->
+						<img
+						draggable="false" src="{{ asset('assets/imgs/empty-box.gif') }}" alt="..." class="img-fluid mb-4" style="max-width: 272px;">
+
+						<!-- Title -->
+						<h4 class="mb-2">
+							Le fonds d'archives est vide
+						</h4>
+
+						<!-- Content -->
+						<p class="text-muted">
+							Tous les documents ajoutés s'afficheront ici.
+						</p>
+
+					</div>
+				</div>
+				<!-- / .row -->
+			</div>
+		</div>
+
+		<div class="card border shadow mb-2" style="display:#">
+			<div class="card-body text-center">
+				<div class="row justify-content-center">
+					<div class="col-12">
+
+						<div class="accordion">
+							<div class="accordion-btn">
+								<span class="icon-doc">
+									<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-folder" viewbox="0 0 16 16">
+										<path d="M.54 3.87.5 3a2 2 0 0 1 2-2h3.672a2 2 0 0 1 1.414.586l.828.828A2 2 0 0 0 9.828 3h3.982a2 2 0 0 1 1.992 2.181l-.637 7A2 2 0 0 1 13.174 14H2.826a2 2 0 0 1-1.991-1.819l-.637-7a1.99 1.99 0 0 1 .342-1.31zM2.19 4a1 1 0 0 0-.996 1.09l.637 7a1 1 0 0 0 .995.91h10.348a1 1 0 0 0 .995-.91l.637-7A1 1 0 0 0 13.81 4H2.19zm4.69-1.707A1 1 0 0 0 6.172 2H2.5a1 1 0 0 0-1 .981l.006.139C1.72 3.042 1.95 3 2.19 3h5.396l-.707-.707z"/>
+									</svg>
+								</span>
+								<span class="label-doc" style="border:none;outline:none;font-weight:bold;word-wrap:break-word">Dossier Archives 1</span>
+								<span class="accordion-icons">
+									<span class="accordion-icon-rename">
+										<button type="button" class="btn accordion-edit" style="font-size:13px;border:none" data-bs-target="#renameD1" data-bs-toggle="modal" data-bs-placement="top" data-bs-title="Modifier">
+											<a class="accordion-icon-rename icon-link-hover" style="--bs-link-hover-color: blue;--bs-link-color: black;">
+												Modifier
+											</a>
+										</button>
+									</span>
+									<!-- Modal -->
+									<div class="modal fade" id="renameD1" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+										<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-card">
+											<div class="modal-content">
+												<div class="modal-header">
+													<h6 class="card-header-title" id="exampleModalLabel" style="font-size:15px">Modifier un dossier</h6>
+													<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+												</div>
+												<div class="modal-body">
+													<form action="" method="post">
+														<div class="mb-3">
+															<label for="exampleFormControlInput1" class="form-label">Nom du dossier</label>
+															<input type="text" readonly class="form-control" id="exampleFormControlInput1" value="Dossier Archives 1">
+														</div>
+													</form>
+												</div>
+												<div class="row modal-footer">
+													<div class="col" style="align-items:center">
+														<button type="button" style="display:flex;width:100%;justify-content:center" id="" class="btn btn-light mb-2" data-bs-dismiss="modal">Annuler</button>
+													</div>
+													<div class="col" style="align-items:center">
+														<button type="button" style="display:flex;width:100%;justify-content:center" id="" class="btn btn-success mb-2">Enregistrer</button>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+									<span class="accordion-icon-delete">
+										<button type="button" class="btn accordion-delete" style="font-size:13px;border:none" data-bs-target="#deleteD1" data-bs-toggle="modal" data-bs-placement="top" data-bs-title="Supprimer">
+											<a class="accordion-icon-delete icon-link-hover" style="--bs-link-hover-color: red;--bs-link-color: black;">
+												Supprimer
+											</a>
+										</button>
+									</span>
+									<!-- Modal -->
+									<div class="modal fade" id="deleteD1" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+										<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-card">
+											<div class="modal-content">
+												<div class="modal-header">
+													<h6 class="card-header-title" id="exampleModalLabel" style="font-size:15px">Supprimer un dossier</h6>
+													<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+												</div>
+												<div class="modal-body">
+													<form action="" method="post">
+														<div class="mb-3">
+															<label for="exampleFormControlInput1" class="form-label">Voulez-vous vraiment supprimer le dossier "Dossier Archives 1" ?</label>
+														</div>
+													</form>
+												</div>
+												<div class="row modal-footer">
+													<div class="col" style="align-items:center">
+														<button type="button" style="display:flex;width:100%;justify-content:center" id="" class="btn btn-light mb-2" data-bs-dismiss="modal">Annuler</button>
+													</div>
+													<div class="col" style="align-items:center">
+														<button type="button" style="display:flex;width:100%;justify-content:center" id="" class="btn btn-danger mb-2">Supprimer</button>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</span>
+								<span class="accordion-item-add fw-bold">
+									<button id="btn-add" data-bs-target="#addElement" type="button" data-bs-toggle="modal" data-bs-title="Ajouter un élément" class="btn btn-sm rounded-5">
+										<span style="width: 150px;font-size: 17px">
+											<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewbox="0 0 16 16">
+												<path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z"/>
+											</svg>
+											Ajouter
+										</span>
+									</button>
+									<!-- Modal -->
+									<div class="modal fade" id="addElement" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" style="font-weight:normal;color:black">
+										<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-card">
+											<div class="modal-content">
+												<div class="modal-header">
+													<h6 class="card-header-title" id="exampleModalLabel2" style="font-size:15px">Ajouter un élément</h6>
+													<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+												</div>
+
+												<form action="" method="post">
+													<div id="form1">
+														<div class="modal-body">
+															<div class="mb-3">
+																<span>Que souhaitez-vous ajouter à "Dossier Archives 1" ?</span>
+															</div>
+														</div>
+														<div class="row modal-footer">
+															<div class="col" style="align-items:center">
+																<button type="button" style="display:flex;width:100%;justify-content:center" id="" class="btn btn-outline-info mb-2">Sous-Dossier(s)</button>
+															</div>
+															<div class="col" style="align-items:center">
+																<button type="button" style="display:flex;width:100%;justify-content:center" id="" class="btn btn-outline-warning mb-2">Fichier(s)</button>
+															</div>
+														</div>
+													</div>
+													<div id="form-sd">
+														<div class="modal-body">
+															<div class="mb-3">
+																<span>Combien de sous-dossiers voulez-vous ajouter à "Dossier Archives 1" ?</span>
+															</div>
+															<div class="mb-3">
+																<input min="0" value="0" type="number" id="typeNumberSD" class="form-control" style="padding-right:7px"/>
+															</div>
+														</div>
+														<div class="row modal-footer">
+															<div class="col" style="align-items:center">
+																<button type="button" style="display:flex;width:100%;justify-content:center" id="" class="btn btn-light mb-2">Précédent</button>
+															</div>
+															<div class="col" style="align-items:center">
+																<button type="button" style="display:flex;width:100%;justify-content:center" id="" class="btn btn-success mb-2">Valider</button>
+															</div>
+														</div>
+													</div>
+												</form>
+											</div>
+										</div>
+									</div>
+								</span>
+								<span class="accordion-badge fw-bolder text-center text-bg-dark rounded-pill">
+									<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-calendar e-4" viewbox="0 0 16 16">
+										<path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
+									</svg>
+									11/09/2023
+								</span>
+								<span class="accordion-icon-expand fw-bolder">
+									<button type="button" class="btn accordion-exp btn-sm rounded-circle" style="font-size:13px" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip-collapse" data-bs-title="Déplier/Plier">
+										<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-arrows-collapse" viewbox="0 0 16 16">
+											<path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13A.5.5 0 0 1 1 8Zm7-8a.5.5 0 0 1 .5.5v3.793l1.146-1.147a.5.5 0 0 1 .708.708l-2 2a.5.5 0 0 1-.708 0l-2-2a.5.5 0 1 1 .708-.708L7.5 4.293V.5A.5.5 0 0 1 8 0Zm-.5 11.707-1.146 1.147a.5.5 0 0 1-.708-.708l2-2a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1-.708.708L8.5 11.707V15.5a.5.5 0 0 1-1 0v-3.793Z"/>
+										</svg>
+									</button>
+								</span>
+							</div>
+							<div class="accordion-content">
+								<div class="accordion-sub">
+									<span class="icon-sub">
+										<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-subtract" viewbox="0 0 16 16">
+											<path d="M0 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2h2a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2H2a2 2 0 0 1-2-2V2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H2z"/>
+										</svg>
+									</span>
+									<span class="label-sub" style="border:none;outline:none;font-weight:bold;word-wrap:break-word">Sous-Dossier Archives 1.1</span>
+									<span class="sub-icons">
+										<span class="accordion-icon-rename">
+											<button type="button" class="btn accordion-edit" style="font-size:13px;border:none" data-bs-target="#renameSD11" data-bs-toggle="modal" data-bs-placement="top" data-bs-title="Modifier">
+												<a class="accordion-icon-rename icon-link-hover" style="--bs-link-hover-color: blue;--bs-link-color: black;">
+													Modifier
+												</a>
+											</button>
+										</span>
+										<!-- Modal -->
+										<div class="modal fade" id="renameSD11" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+											<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-card">
+												<div class="modal-content">
+													<div class="modal-header">
+														<h6 class="card-header-title" id="exampleModalLabel" style="font-size:15px">Modifier un dossier</h6>
+														<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+													</div>
+													<div class="modal-body">
+														<form action="" method="post">
+															<div class="mb-3">
+																<label for="exampleFormControlInput1" class="form-label">Nom du dossier</label>
+																<input type="text" readonly class="form-control" id="exampleFormControlInput1" value="Sous-Dossier Archives 1.1">
+															</div>
+														</form>
+													</div>
+													<div class="row modal-footer">
+														<div class="col" style="align-items:center">
+															<button type="button" style="display:flex;width:100%;justify-content:center" id="" class="btn btn-light mb-2" data-bs-dismiss="modal">Annuler</button>
+														</div>
+														<div class="col" style="align-items:center">
+															<button type="button" style="display:flex;width:100%;justify-content:center" id="" class="btn btn-success mb-2">Enregistrer</button>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+										<span class="accordion-icon-delete">
+											<button type="button" class="btn accordion-delete" style="font-size:13px;border:none" data-bs-target="#deleteSD11" data-bs-toggle="modal" data-bs-placement="top" data-bs-title="Supprimer">
+												<a class="accordion-icon-delete icon-link-hover" style="--bs-link-hover-color: red;--bs-link-color: black;">
+													Supprimer
+												</a>
+											</button>
+										</span>
+										<!-- Modal -->
+										<div class="modal fade" id="deleteSD11" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+											<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-card">
+												<div class="modal-content">
+													<div class="modal-header">
+														<h6 class="card-header-title" id="exampleModalLabel" style="font-size:15px">Supprimer un dossier</h6>
+														<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+													</div>
+													<div class="modal-body">
+														<form action="" method="post">
+															<div class="mb-3">
+																<label for="exampleFormControlInput1" class="form-label">Voulez-vous vraiment supprimer le dossier "Sous-Dossier Archives 1.1" ?</label>
+															</div>
+														</form>
+													</div>
+													<div class="row modal-footer">
+														<div class="col" style="align-items:center">
+															<button type="button" style="display:flex;width:100%;justify-content:center" id="" class="btn btn-light mb-2" data-bs-dismiss="modal">Annuler</button>
+														</div>
+														<div class="col" style="align-items:center">
+															<button type="button" style="display:flex;width:100%;justify-content:center" id="" class="btn btn-danger mb-2">Supprimer</button>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</span>
+									<span class="sub-item-add fw-bold">
+										<button type="button" class="btn btn-sm rounded-5">
+											<span style="width: 150px;font-size: 17px">
+												<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewbox="0 0 16 16">
+													<path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z"/>
+												</svg>
+												Ajouter
+											</span>
+										</button>
+									</span>
+									<span class="sub-badge fw-bolder text-center text-bg-dark rounded-pill">
+										<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-calendar e-4" viewbox="0 0 16 16">
+											<path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
+										</svg>
+										11/09/2023
+									</span>
+									<span class="sub-icon-expand fw-bolder">
+										<button type="button" class="btn sub-exp btn-sm rounded-circle" style="font-size:13px" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip-collapse" data-bs-title="Déplier/Plier">
+											<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-arrows-collapse" viewbox="0 0 16 16">
+												<path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13A.5.5 0 0 1 1 8Zm7-8a.5.5 0 0 1 .5.5v3.793l1.146-1.147a.5.5 0 0 1 .708.708l-2 2a.5.5 0 0 1-.708 0l-2-2a.5.5 0 1 1 .708-.708L7.5 4.293V.5A.5.5 0 0 1 8 0Zm-.5 11.707-1.146 1.147a.5.5 0 0 1-.708-.708l2-2a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1-.708.708L8.5 11.707V15.5a.5.5 0 0 1-1 0v-3.793Z"/>
+											</svg>
+										</button>
+									</span>
+								</div>
+								<div class="sub-content" style="padding-top:15px;padding-bottom:15px">Contenu Vide</div>
+							</div>
+							<div class="accordion-btn">
+								<span class="icon-doc">
+									<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-folder" viewbox="0 0 16 16">
+										<path d="M.54 3.87.5 3a2 2 0 0 1 2-2h3.672a2 2 0 0 1 1.414.586l.828.828A2 2 0 0 0 9.828 3h3.982a2 2 0 0 1 1.992 2.181l-.637 7A2 2 0 0 1 13.174 14H2.826a2 2 0 0 1-1.991-1.819l-.637-7a1.99 1.99 0 0 1 .342-1.31zM2.19 4a1 1 0 0 0-.996 1.09l.637 7a1 1 0 0 0 .995.91h10.348a1 1 0 0 0 .995-.91l.637-7A1 1 0 0 0 13.81 4H2.19zm4.69-1.707A1 1 0 0 0 6.172 2H2.5a1 1 0 0 0-1 .981l.006.139C1.72 3.042 1.95 3 2.19 3h5.396l-.707-.707z"/>
+									</svg>
+								</span>
+								<span class="label-doc" type="text" style="border:none;outline:none;font-weight:bold;word-wrap:break-word">Dossier Archives Exemple 2</span>
+								<span class="accordion-icons">
+									<span class="accordion-icon-rename">
+										<button type="button" class="btn accordion-edit" style="font-size:13px;border:none" data-bs-target="#renameD2" data-bs-toggle="modal" data-bs-placement="top" data-bs-title="Modifier">
+											<a class="accordion-icon-rename icon-link-hover" style="--bs-link-hover-color: blue;--bs-link-color: black;">
+												Modifier
+											</a>
+										</button>
+									</span>
+									<!-- Modal -->
+									<div class="modal fade" id="renameD2" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+										<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-card">
+											<div class="modal-content">
+												<div class="modal-header">
+													<h6 class="card-header-title" id="exampleModalLabel" style="font-size:15px">Modifier un dossier</h6>
+													<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+												</div>
+												<div class="modal-body">
+													<form action="" method="post">
+														<div class="mb-3">
+															<label for="exampleFormControlInput1" class="form-label">Nom du dossier</label>
+															<input type="text" readonly class="form-control" id="exampleFormControlInput1" value="Dossier Archives 2">
+														</div>
+													</form>
+												</div>
+												<div class="row modal-footer">
+													<div class="col" style="align-items:center">
+														<button type="button" style="display:flex;width:100%;justify-content:center" id="" class="btn btn-light mb-2" data-bs-dismiss="modal">Annuler</button>
+													</div>
+													<div class="col" style="align-items:center">
+														<button type="button" style="display:flex;width:100%;justify-content:center" id="" class="btn btn-success mb-2">Enregistrer</button>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+									<span class="accordion-icon-delete">
+										<button type="button" class="btn accordion-delete" style="font-size:13px;border:none" data-bs-target="#deleteD2" data-bs-toggle="modal" data-bs-placement="top" data-bs-title="Supprimer">
+											<a class="accordion-icon-delete icon-link-hover" style="--bs-link-hover-color: red;--bs-link-color: black;">
+												Supprimer
+											</a>
+										</button>
+									</span>
+									<!-- Modal -->
+									<div class="modal fade" id="deleteD2" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+										<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-card">
+											<div class="modal-content">
+												<div class="modal-header">
+													<h6 class="card-header-title" id="exampleModalLabel" style="font-size:15px">Supprimer un dossier</h6>
+													<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+												</div>
+												<div class="modal-body">
+													<form action="" method="post">
+														<div class="mb-3">
+															<label for="exampleFormControlInput1" class="form-label">Voulez-vous vraiment supprimer le dossier "Dossier Archives 2" ?</label>
+														</div>
+													</form>
+												</div>
+												<div class="row modal-footer">
+													<div class="col" style="align-items:center">
+														<button type="button" style="display:flex;width:100%;justify-content:center" id="" class="btn btn-light mb-2" data-bs-dismiss="modal">Annuler</button>
+													</div>
+													<div class="col" style="align-items:center">
+														<button type="button" style="display:flex;width:100%;justify-content:center" id="" class="btn btn-danger mb-2">Supprimer</button>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</span>
+								<span class="accordion-item-add fw-bold">
+									<button type="button" class="btn btn-sm rounded-5">
+										<span style="width: 150px;font-size: 17px">
+											<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewbox="0 0 16 16">
+												<path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z"/>
+											</svg>
+											Ajouter
+										</span>
+									</button>
+								</span>
+								<span class="accordion-badge fw-bolder text-center text-bg-dark rounded-pill">
+									<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-calendar e-4" viewbox="0 0 16 16">
+										<path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
+									</svg>
+									11/09/2023
+								</span>
+								<span class="accordion-icon-expand fw-bolder">
+									<button type="button" class="btn accordion-exp btn-sm rounded-circle" style="font-size:13px" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip-collapse" data-bs-title="Déplier/Plier">
+										<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-arrows-collapse" viewbox="0 0 16 16">
+											<path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13A.5.5 0 0 1 1 8Zm7-8a.5.5 0 0 1 .5.5v3.793l1.146-1.147a.5.5 0 0 1 .708.708l-2 2a.5.5 0 0 1-.708 0l-2-2a.5.5 0 1 1 .708-.708L7.5 4.293V.5A.5.5 0 0 1 8 0Zm-.5 11.707-1.146 1.147a.5.5 0 0 1-.708-.708l2-2a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1-.708.708L8.5 11.707V15.5a.5.5 0 0 1-1 0v-3.793Z"/>
+										</svg>
+									</button>
+								</span>
+							</div>
+							<div class="accordion-content">
+								<div class="accordion-sub">
+									<span class="icon-sub">
+										<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-subtract" viewbox="0 0 16 16">
+											<path d="M0 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2h2a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2H2a2 2 0 0 1-2-2V2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H2z"/>
+										</svg>
+									</span>
+									<span class="label-sub" type="text" style="border:none;outline:none;font-weight:bold;word-wrap:break-word">Sous-Dossier Archives 2.1</span>
+									<span class="sub-icons">
+										<span class="accordion-icon-rename">
+											<button type="button" class="btn accordion-edit" style="font-size:13px;border:none" data-bs-target="#renameSD21" data-bs-toggle="modal" data-bs-placement="top" data-bs-title="Modifier">
+												<a class="accordion-icon-rename icon-link-hover" style="--bs-link-hover-color: blue;--bs-link-color: black;">
+													Modifier
+												</a>
+											</button>
+										</span>
+										<!-- Modal -->
+										<div class="modal fade" id="renameSD21" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+											<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-card">
+												<div class="modal-content">
+													<div class="modal-header">
+														<h6 class="card-header-title" id="exampleModalLabel" style="font-size:15px">Modifier un dossier</h6>
+														<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+													</div>
+													<div class="modal-body">
+														<form action="" method="post">
+															<div class="mb-3">
+																<label for="exampleFormControlInput1" class="form-label">Nom du dossier</label>
+																<input type="text" readonly class="form-control" id="exampleFormControlInput1" value="Sous-Dossier Archives 2.1">
+															</div>
+														</form>
+													</div>
+													<div class="row modal-footer">
+														<div class="col" style="align-items:center">
+															<button type="button" style="display:flex;width:100%;justify-content:center" id="" class="btn btn-light mb-2" data-bs-dismiss="modal">Annuler</button>
+														</div>
+														<div class="col" style="align-items:center">
+															<button type="button" style="display:flex;width:100%;justify-content:center" id="" class="btn btn-success mb-2">Enregistrer</button>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+										<span class="accordion-icon-delete">
+											<button type="button" class="btn accordion-delete" style="font-size:13px;border:none" data-bs-target="#deleteSD21" data-bs-toggle="modal" data-bs-placement="top" data-bs-title="Supprimer">
+												<a class="accordion-icon-delete icon-link-hover" style="--bs-link-hover-color: red;--bs-link-color: black;">
+													Supprimer
+												</a>
+											</button>
+										</span>
+										<!-- Modal -->
+										<div class="modal fade" id="deleteSD21" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+											<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-card">
+												<div class="modal-content">
+													<div class="modal-header">
+														<h6 class="card-header-title" id="exampleModalLabel" style="font-size:15px">Supprimer un dossier</h6>
+														<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+													</div>
+													<div class="modal-body">
+														<form action="" method="post">
+															<div class="mb-3">
+																<label for="exampleFormControlInput1" class="form-label">Voulez-vous vraiment supprimer le dossier "Sous-Dossier Archives 2.1" ?</label>
+															</div>
+														</form>
+													</div>
+													<div class="row modal-footer">
+														<div class="col" style="align-items:center">
+															<button type="button" style="display:flex;width:100%;justify-content:center" id="" class="btn btn-light mb-2" data-bs-dismiss="modal">Annuler</button>
+														</div>
+														<div class="col" style="align-items:center">
+															<button type="button" style="display:flex;width:100%;justify-content:center" id="" class="btn btn-danger mb-2">Supprimer</button>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</span>
+									<span class="sub-item-add fw-bold">
+										<button type="button" class="btn btn-sm rounded-5">
+											<span style="width: 150px;font-size: 17px">
+												<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewbox="0 0 16 16">
+													<path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z"/>
+												</svg>
+												Ajouter
+											</span>
+										</button>
+									</span>
+									<span class="sub-badge fw-bolder text-center text-bg-dark rounded-pill">
+										<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-calendar e-4" viewbox="0 0 16 16">
+											<path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
+										</svg>
+										11/09/2023
+									</span>
+									<span class="sub-icon-expand fw-bolder">
+										<button type="button" class="btn sub-exp btn-sm rounded-circle" style="font-size:13px" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip-collapse" data-bs-title="Déplier/Plier">
+											<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-arrows-collapse" viewbox="0 0 16 16">
+												<path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13A.5.5 0 0 1 1 8Zm7-8a.5.5 0 0 1 .5.5v3.793l1.146-1.147a.5.5 0 0 1 .708.708l-2 2a.5.5 0 0 1-.708 0l-2-2a.5.5 0 1 1 .708-.708L7.5 4.293V.5A.5.5 0 0 1 8 0Zm-.5 11.707-1.146 1.147a.5.5 0 0 1-.708-.708l2-2a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1-.708.708L8.5 11.707V15.5a.5.5 0 0 1-1 0v-3.793Z"/>
+											</svg>
+										</button>
+									</span>
+								</div>
+								<div class="sub-content">
+									<div class="accordion-sub">
+										<span class="icon-sub">
+											<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-subtract" viewbox="0 0 16 16">
+												<path d="M0 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2h2a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2H2a2 2 0 0 1-2-2V2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H2z"/>
+											</svg>
+										</span>
+										<span class="label-sub" type="text" style="border:none;outline:none;font-weight:bold;word-wrap:break-word">Sous-Dossier Archives 2.1.1</span>
+										<span class="sub-icons">
+											<span class="accordion-icon-rename">
+												<button type="button" class="btn accordion-edit" style="font-size:13px;border:none" data-bs-target="#renameSD211" data-bs-toggle="modal" data-bs-placement="top" data-bs-title="Modifier">
+													<a class="accordion-icon-rename icon-link-hover" style="--bs-link-hover-color: blue;--bs-link-color: black;">
+														Modifier
+													</a>
+												</button>
+											</span>
+											<!-- Modal -->
+											<div class="modal fade" id="renameSD211" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+												<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-card">
+													<div class="modal-content">
+														<div class="modal-header">
+															<h6 class="card-header-title" id="exampleModalLabel" style="font-size:15px">Modifier un dossier</h6>
+															<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+														</div>
+														<div class="modal-body">
+															<form action="" method="post">
+																<div class="mb-3">
+																	<label for="exampleFormControlInput1" class="form-label">Nom du dossier</label>
+																	<input type="text" readonly class="form-control" id="exampleFormControlInput1" value="Sous-Dossier Archives 2.1.1">
+																</div>
+															</form>
+														</div>
+														<div class="row modal-footer">
+															<div class="col" style="align-items:center">
+																<button type="button" style="display:flex;width:100%;justify-content:center" id="" class="btn btn-light mb-2" data-bs-dismiss="modal">Annuler</button>
+															</div>
+															<div class="col" style="align-items:center">
+																<button type="button" style="display:flex;width:100%;justify-content:center" id="" class="btn btn-success mb-2">Enregistrer</button>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+											<span class="accordion-icon-delete">
+												<button type="button" class="btn accordion-delete" style="font-size:13px;border:none" data-bs-target="#deleteSD211" data-bs-toggle="modal" data-bs-placement="top" data-bs-title="Supprimer">
+													<a class="accordion-icon-delete icon-link-hover" style="--bs-link-hover-color: red;--bs-link-color: black;">
+														Supprimer
+													</a>
+												</button>
+											</span>
+											<!-- Modal -->
+											<div class="modal fade" id="deleteSD211" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+												<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-card">
+													<div class="modal-content">
+														<div class="modal-header">
+															<h6 class="card-header-title" id="exampleModalLabel" style="font-size:15px">Supprimer un dossier</h6>
+															<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+														</div>
+														<div class="modal-body">
+															<form action="" method="post">
+																<div class="mb-3">
+																	<label for="exampleFormControlInput1" class="form-label">Voulez-vous vraiment supprimer le dossier "Sous-Dossier Archives 2.1.1" ?</label>
+																</div>
+															</form>
+														</div>
+														<div class="row modal-footer">
+															<div class="col" style="align-items:center">
+																<button type="button" style="display:flex;width:100%;justify-content:center" id="" class="btn btn-light mb-2" data-bs-dismiss="modal">Annuler</button>
+															</div>
+															<div class="col" style="align-items:center">
+																<button type="button" style="display:flex;width:100%;justify-content:center" id="" class="btn btn-danger mb-2">Supprimer</button>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</span>
+										<span class="sub-item-add fw-bold">
+											<button type="button" class="btn btn-sm rounded-5">
+												<span style="width: 150px;font-size: 17px">
+													<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewbox="0 0 16 16">
+														<path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z"/>
+													</svg>
+													Ajouter
+												</span>
+											</button>
+										</span>
+										<span class="sub-badge fw-bolder text-center text-bg-dark rounded-pill">
+											<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-calendar e-4" viewbox="0 0 16 16">
+												<path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
+											</svg>
+											11/09/2023
+										</span>
+										<span class="sub-icon-expand fw-bolder">
+											<button type="button" class="btn sub-exp btn-sm rounded-circle" style="font-size:13px" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip-collapse" data-bs-title="Déplier/Plier">
+												<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-arrows-collapse" viewbox="0 0 16 16">
+													<path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13A.5.5 0 0 1 1 8Zm7-8a.5.5 0 0 1 .5.5v3.793l1.146-1.147a.5.5 0 0 1 .708.708l-2 2a.5.5 0 0 1-.708 0l-2-2a.5.5 0 1 1 .708-.708L7.5 4.293V.5A.5.5 0 0 1 8 0Zm-.5 11.707-1.146 1.147a.5.5 0 0 1-.708-.708l2-2a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1-.708.708L8.5 11.707V15.5a.5.5 0 0 1-1 0v-3.793Z"/>
+												</svg>
+											</button>
+										</span>
+									</div>
+									<div class="sub-content">
+										<div class="accordion-sub">
+											<span class="icon-sub">
+												<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-subtract" viewbox="0 0 16 16">
+													<path d="M0 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2h2a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2H2a2 2 0 0 1-2-2V2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H2z"/>
+												</svg>
+											</span>
+											<span class="label-sub" type="text" style="border:none;outline:none;font-weight:bold;word-wrap:break-word">Sous-Dossier Archives 2.1.1.1</span>
+											<span class="sub-icons">
+												<span class="accordion-icon-rename">
+													<button type="button" class="btn accordion-edit" style="font-size:13px;border:none" data-bs-target="#renameSD2111" data-bs-toggle="modal" data-bs-placement="top" data-bs-title="Modifier">
+														<a class="accordion-icon-rename icon-link-hover" style="--bs-link-hover-color: blue;--bs-link-color: black;">
+															Modifier
+														</a>
+													</button>
+												</span>
+												<!-- Modal -->
+												<div class="modal fade" id="renameSD2111" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+													<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-card">
+														<div class="modal-content">
+															<div class="modal-header">
+																<h6 class="card-header-title" id="exampleModalLabel" style="font-size:15px">Modifier un dossier</h6>
+																<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+															</div>
+															<div class="modal-body">
+																<form action="" method="post">
+																	<div class="mb-3">
+																		<label for="exampleFormControlInput1" class="form-label">Nom du dossier</label>
+																		<input type="text" readonly class="form-control" id="exampleFormControlInput1" value="Sous-Dossier Archives 2.1.1.1">
+																	</div>
+																</form>
+															</div>
+															<div class="row modal-footer">
+																<div class="col" style="align-items:center">
+																	<button type="button" style="display:flex;width:100%;justify-content:center" id="" class="btn btn-light mb-2" data-bs-dismiss="modal">Annuler</button>
+																</div>
+																<div class="col" style="align-items:center">
+																	<button type="button" style="display:flex;width:100%;justify-content:center" id="" class="btn btn-success mb-2">Enregistrer</button>
+																</div>
+															</div>
+														</div>
+													</div>
+												</div>
+												<span class="accordion-icon-delete">
+													<button type="button" class="btn accordion-delete" style="font-size:13px;border:none" data-bs-target="#deleteSD2111" data-bs-toggle="modal" data-bs-placement="top" data-bs-title="Supprimer">
+														<a class="accordion-icon-delete icon-link-hover" style="--bs-link-hover-color: red;--bs-link-color: black;">
+															Supprimer
+														</a>
+													</button>
+												</span>
+												<!-- Modal -->
+												<div class="modal fade" id="deleteSD2111" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+													<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-card">
+														<div class="modal-content">
+															<div class="modal-header">
+																<h6 class="card-header-title" id="exampleModalLabel" style="font-size:15px">Supprimer un dossier</h6>
+																<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+															</div>
+															<div class="modal-body">
+																<form action="" method="post">
+																	<div class="mb-3">
+																		<label for="exampleFormControlInput1" class="form-label">Voulez-vous vraiment supprimer le dossier "Sous-Dossier Archives 2.1.1.1" ?</label>
+																	</div>
+																</form>
+															</div>
+															<div class="row modal-footer">
+																<div class="col" style="align-items:center">
+																	<button type="button" style="display:flex;width:100%;justify-content:center" id="" class="btn btn-light mb-2" data-bs-dismiss="modal">Annuler</button>
+																</div>
+																<div class="col" style="align-items:center">
+																	<button type="button" style="display:flex;width:100%;justify-content:center" id="" class="btn btn-danger mb-2">Supprimer</button>
+																</div>
+															</div>
+														</div>
+													</div>
+												</div>
+											</span>
+											<span class="sub-item-add fw-bold">
+												<button type="button" class="btn btn-sm rounded-5">
+													<span style="width: 150px;font-size: 17px">
+														<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewbox="0 0 16 16">
+															<path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z"/>
+														</svg>
+														Ajouter
+													</span>
+												</button>
+											</span>
+											<span class="sub-badge fw-bolder text-center text-bg-dark rounded-pill">
+												<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-calendar e-4" viewbox="0 0 16 16">
+													<path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
+												</svg>
+												11/09/2023
+											</span>
+											<span class="sub-icon-expand fw-bolder">
+												<button type="button" class="btn sub-exp btn-sm rounded-circle" style="font-size:13px" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip-collapse" data-bs-title="Déplier/Plier">
+													<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-arrows-collapse" viewbox="0 0 16 16">
+														<path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13A.5.5 0 0 1 1 8Zm7-8a.5.5 0 0 1 .5.5v3.793l1.146-1.147a.5.5 0 0 1 .708.708l-2 2a.5.5 0 0 1-.708 0l-2-2a.5.5 0 1 1 .708-.708L7.5 4.293V.5A.5.5 0 0 1 8 0Zm-.5 11.707-1.146 1.147a.5.5 0 0 1-.708-.708l2-2a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1-.708.708L8.5 11.707V15.5a.5.5 0 0 1-1 0v-3.793Z"/>
+													</svg>
+												</button>
+											</span>
+										</div>
+										<div class="sub-content" style="padding-top:15px;padding-bottom:15px">Contenu Vide</div>
+									</div>
+								</div>
+								<div class="accordion-sub">
+									<span class="icon-sub">
+										<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-subtract" viewbox="0 0 16 16">
+											<path d="M0 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2h2a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2H2a2 2 0 0 1-2-2V2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H2z"/>
+										</svg>
+									</span>
+									<span class="label-sub" type="text" style="border:none;outline:none;font-weight:bold;word-wrap:break-word">Sous-Dossier Archives 2.2</span>
+									<span class="sub-icons">
+										<span class="accordion-icon-rename">
+											<button type="button" class="btn accordion-edit" style="font-size:13px;border:none" data-bs-target="#renameSD22" data-bs-toggle="modal" data-bs-placement="top" data-bs-title="Modifier">
+												<a class="accordion-icon-rename icon-link-hover" style="--bs-link-hover-color: blue;--bs-link-color: black;">
+													Modifier
+												</a>
+											</button>
+										</span>
+										<!-- Modal -->
+										<div class="modal fade" id="renameSD22" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+											<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-card">
+												<div class="modal-content">
+													<div class="modal-header">
+														<h6 class="card-header-title" id="exampleModalLabel" style="font-size:15px">Modifier un dossier</h6>
+														<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+													</div>
+													<div class="modal-body">
+														<form action="" method="post">
+															<div class="mb-3">
+																<label for="exampleFormControlInput1" class="form-label">Nom du dossier</label>
+																<input type="text" readonly class="form-control" id="exampleFormControlInput1" value="Sous-Dossier Archives 2.2">
+															</div>
+														</form>
+													</div>
+													<div class="row modal-footer">
+														<div class="col" style="align-items:center">
+															<button type="button" style="display:flex;width:100%;justify-content:center" id="" class="btn btn-light mb-2" data-bs-dismiss="modal">Annuler</button>
+														</div>
+														<div class="col" style="align-items:center">
+															<button type="button" style="display:flex;width:100%;justify-content:center" id="" class="btn btn-success mb-2">Enregistrer</button>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+										<span class="accordion-icon-delete">
+											<button type="button" class="btn accordion-delete" style="font-size:13px;border:none" data-bs-target="#deleteSD22" data-bs-toggle="modal" data-bs-placement="top" data-bs-title="Supprimer">
+												<a class="accordion-icon-delete icon-link-hover" style="--bs-link-hover-color: red;--bs-link-color: black;">
+													Supprimer
+												</a>
+											</button>
+										</span>
+										<!-- Modal -->
+										<div class="modal fade" id="deleteSD22" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+											<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-card">
+												<div class="modal-content">
+													<div class="modal-header">
+														<h6 class="card-header-title" id="exampleModalLabel" style="font-size:15px">Supprimer un dossier</h6>
+														<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+													</div>
+													<div class="modal-body">
+														<form action="" method="post">
+															<div class="mb-3">
+																<label for="exampleFormControlInput1" class="form-label">Voulez-vous vraiment supprimer le dossier "Sous-Dossier Archives 2.2" ?</label>
+															</div>
+														</form>
+													</div>
+													<div class="row modal-footer">
+														<div class="col" style="align-items:center">
+															<button type="button" style="display:flex;width:100%;justify-content:center" id="" class="btn btn-light mb-2" data-bs-dismiss="modal">Annuler</button>
+														</div>
+														<div class="col" style="align-items:center">
+															<button type="button" style="display:flex;width:100%;justify-content:center" id="" class="btn btn-danger mb-2">Supprimer</button>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</span>
+									<span class="sub-item-add fw-bold">
+										<button type="button" class="btn btn-sm rounded-5">
+											<span style="width: 150px;font-size: 17px">
+												<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewbox="0 0 16 16">
+													<path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z"/>
+												</svg>
+												Ajouter
+											</span>
+										</button>
+									</span>
+									<span class="sub-badge fw-bolder text-center text-bg-dark rounded-pill">
+										<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-calendar e-4" viewbox="0 0 16 16">
+											<path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
+										</svg>
+										11/09/2023
+									</span>
+									<span class="sub-icon-expand fw-bolder">
+										<button type="button" class="btn sub-exp btn-sm rounded-circle" style="font-size:13px" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip-collapse" data-bs-title="Déplier/Plier">
+											<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-arrows-collapse" viewbox="0 0 16 16">
+												<path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13A.5.5 0 0 1 1 8Zm7-8a.5.5 0 0 1 .5.5v3.793l1.146-1.147a.5.5 0 0 1 .708.708l-2 2a.5.5 0 0 1-.708 0l-2-2a.5.5 0 1 1 .708-.708L7.5 4.293V.5A.5.5 0 0 1 8 0Zm-.5 11.707-1.146 1.147a.5.5 0 0 1-.708-.708l2-2a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1-.708.708L8.5 11.707V15.5a.5.5 0 0 1-1 0v-3.793Z"/>
+											</svg>
+										</button>
+									</span>
+								</div>
+								<div class="sub-content">
+									<div class="accordion-sub">
+										<span class="icon-sub">
+											<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-subtract" viewbox="0 0 16 16">
+												<path d="M0 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2h2a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2H2a2 2 0 0 1-2-2V2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H2z"/>
+											</svg>
+										</span>
+										<span class="label-sub" type="text" style="border:none;outline:none;font-weight:bold;word-wrap:break-word">Sous-Dossier Archives 2.2.1</span>
+										<span class="sub-icons">
+											<span class="accordion-icon-rename">
+												<button type="button" class="btn accordion-edit" style="font-size:13px;border:none" data-bs-target="#renameSD221" data-bs-toggle="modal" data-bs-placement="top" data-bs-title="Modifier">
+													<a class="accordion-icon-rename icon-link-hover" style="--bs-link-hover-color: blue;--bs-link-color: black;">
+														Modifier
+													</a>
+												</button>
+											</span>
+											<!-- Modal -->
+											<div class="modal fade" id="renameSD221" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+												<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-card">
+													<div class="modal-content">
+														<div class="modal-header">
+															<h6 class="card-header-title" id="exampleModalLabel" style="font-size:15px">Modifier un dossier</h6>
+															<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+														</div>
+														<div class="modal-body">
+															<form action="" method="post">
+																<div class="mb-3">
+																	<label for="exampleFormControlInput1" class="form-label">Nom du dossier</label>
+																	<input type="text" readonly class="form-control" id="exampleFormControlInput1" value="Sous-Dossier Archives 2.2.1">
+																</div>
+															</form>
+														</div>
+														<div class="row modal-footer">
+															<div class="col" style="align-items:center">
+																<button type="button" style="display:flex;width:100%;justify-content:center" id="" class="btn btn-light mb-2" data-bs-dismiss="modal">Annuler</button>
+															</div>
+															<div class="col" style="align-items:center">
+																<button type="button" style="display:flex;width:100%;justify-content:center" id="" class="btn btn-success mb-2">Enregistrer</button>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+											<span class="accordion-icon-delete">
+												<button type="button" class="btn accordion-delete" style="font-size:13px;border:none" data-bs-target="#deleteSD221" data-bs-toggle="modal" data-bs-placement="top" data-bs-title="Supprimer">
+													<a class="accordion-icon-delete icon-link-hover" style="--bs-link-hover-color: red;--bs-link-color: black;">
+														Supprimer
+													</a>
+												</button>
+											</span>
+											<!-- Modal -->
+											<div class="modal fade" id="deleteSD221" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+												<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-card">
+													<div class="modal-content">
+														<div class="modal-header">
+															<h6 class="card-header-title" id="exampleModalLabel" style="font-size:15px">Supprimer un dossier</h6>
+															<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+														</div>
+														<div class="modal-body">
+															<form action="" method="post">
+																<div class="mb-3">
+																	<label for="exampleFormControlInput1" class="form-label">Voulez-vous vraiment supprimer le dossier "Sous-Dossier Archives 2.2.1" ?</label>
+																</div>
+															</form>
+														</div>
+														<div class="row modal-footer">
+															<div class="col" style="align-items:center">
+																<button type="button" style="display:flex;width:100%;justify-content:center" id="" class="btn btn-light mb-2" data-bs-dismiss="modal">Annuler</button>
+															</div>
+															<div class="col" style="align-items:center">
+																<button type="button" style="display:flex;width:100%;justify-content:center" id="" class="btn btn-danger mb-2">Supprimer</button>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</span>
+										<span class="sub-item-add fw-bold">
+											<button type="button" class="btn btn-sm rounded-5">
+												<span style="width: 150px;font-size: 17px">
+													<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewbox="0 0 16 16">
+														<path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z"/>
+													</svg>
+													Ajouter
+												</span>
+											</button>
+										</span>
+										<span class="sub-badge fw-bolder text-center text-bg-dark rounded-pill">
+											<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-calendar e-4" viewbox="0 0 16 16">
+												<path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
+											</svg>
+											11/09/2023
+										</span>
+										<span class="sub-icon-expand fw-bolder">
+											<button type="button" class="btn sub-exp btn-sm rounded-circle" style="font-size:13px" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="custom-tooltip-collapse" data-bs-title="Déplier/Plier">
+												<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-arrows-collapse" viewbox="0 0 16 16">
+													<path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13A.5.5 0 0 1 1 8Zm7-8a.5.5 0 0 1 .5.5v3.793l1.146-1.147a.5.5 0 0 1 .708.708l-2 2a.5.5 0 0 1-.708 0l-2-2a.5.5 0 1 1 .708-.708L7.5 4.293V.5A.5.5 0 0 1 8 0Zm-.5 11.707-1.146 1.147a.5.5 0 0 1-.708-.708l2-2a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1-.708.708L8.5 11.707V15.5a.5.5 0 0 1-1 0v-3.793Z"/>
+												</svg>
+											</button>
+										</span>
+									</div>
+									{# <div class="sub-content" style="padding-top:15px;padding-bottom:15px">Contenu Vide</div> #}
+									<div class="sub-content">
+										<div class="file-sub">
+											<span class="icon-file">
+												<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark" viewbox="0 0 16 16">
+													<path d="M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h5.5zm-3 0A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V4.5z"/>
+												</svg>
+											</span>
+											<span class="label-file" type="text" style="border:none;outline:none;font-weight:bold;word-wrap:break-word">Fichier 2.2.1.A</span>
+											<span class="sub-file-icons">
+												<span class="file-icon-preview">
+													<button type="button" class="btn btn-light file-preview" style="font-size:13px;font-weight:bold;border:1px solid black;border-radius:25px;margin-right:10px" data-bs-target="#deleteF221A" data-bs-toggle="modal" data-bs-placement="top" data-bs-title="Supprimer">
+														<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-fill" viewbox="0 0 16 16">
+															<path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0"/>
+															<path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8m8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7"/>
+														</svg>
+														Aperçu
+													</button>
+												</span>
+												<span class="file-icon-rename">
+													<button type="button" class="btn btn-primary file-rename" style="font-size:13px;border:1px solid black;border-radius:25px;margin-right:10px" data-bs-target="#renameF221A" data-bs-toggle="modal" data-bs-placement="top" data-bs-title="Modifier">
+														<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cursor-text" viewbox="0 0 16 16">
+															<path d="M5 2a.5.5 0 0 1 .5-.5c.862 0 1.573.287 2.06.566.174.099.321.198.44.286.119-.088.266-.187.44-.286A4.165 4.165 0 0 1 10.5 1.5a.5.5 0 0 1 0 1c-.638 0-1.177.213-1.564.434a3.49 3.49 0 0 0-.436.294V7.5H9a.5.5 0 0 1 0 1h-.5v4.272c.1.08.248.187.436.294.387.221.926.434 1.564.434a.5.5 0 0 1 0 1 4.165 4.165 0 0 1-2.06-.566A4.561 4.561 0 0 1 8 13.65a4.561 4.561 0 0 1-.44.285 4.165 4.165 0 0 1-2.06.566.5.5 0 0 1 0-1c.638 0 1.177-.213 1.564-.434.188-.107.335-.214.436-.294V8.5H7a.5.5 0 0 1 0-1h.5V3.228a3.49 3.49 0 0 0-.436-.294A3.166 3.166 0 0 0 5.5 2.5.5.5 0 0 1 5 2m-.704 9.29"/>
+														</svg>
+														Modifier
+													</button>
+												</span>
+												<!-- Modal -->
+												<div class="modal fade" id="renameF221A" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+													<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-card">
+														<div class="modal-content">
+															<div class="modal-header">
+																<h6 class="card-header-title" id="exampleModalLabel" style="font-size:15px">Modifier un dossier</h6>
+																<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+															</div>
+															<div class="modal-body">
+																<form action="" method="post">
+																	<div class="mb-3">
+																		<label for="exampleFormControlInput1" class="form-label">Nom du dossier</label>
+																		<input type="text" readonly class="form-control" id="exampleFormControlInput1" value="Sous-Dossier Archives 2.2.1">
+																	</div>
+																</form>
+															</div>
+															<div class="row modal-footer">
+																<div class="col" style="align-items:center">
+																	<button type="button" style="display:flex;width:100%;justify-content:center" id="" class="btn btn-light mb-2" data-bs-dismiss="modal">Annuler</button>
+																</div>
+																<div class="col" style="align-items:center">
+																	<button type="button" style="display:flex;width:100%;justify-content:center" id="" class="btn btn-success mb-2">Enregistrer</button>
+																</div>
+															</div>
+														</div>
+													</div>
+												</div>
+												<span class="file-icon-delete">
+													<button type="button" class="btn btn-danger file-delete" style="font-size:13px;border:1px solid black;border-radius:25px;margin-right:10px" data-bs-target="#deleteF221A" data-bs-toggle="modal" data-bs-placement="top" data-bs-title="Supprimer">
+														<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash2" viewbox="0 0 16 16">
+															<path d="M14 3a.702.702 0 0 1-.037.225l-1.684 10.104A2 2 0 0 1 10.305 15H5.694a2 2 0 0 1-1.973-1.671L2.037 3.225A.703.703 0 0 1 2 3c0-1.105 2.686-2 6-2s6 .895 6 2M3.215 4.207l1.493 8.957a1 1 0 0 0 .986.836h4.612a1 1 0 0 0 .986-.836l1.493-8.957C11.69 4.689 9.954 5 8 5c-1.954 0-3.69-.311-4.785-.793"/>
+														</svg>
+														Supprimer
+													</button>
+												</span>
+												<!-- Modal -->
+												<div class="modal fade" id="deleteF221A" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+													<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-card">
+														<div class="modal-content">
+															<div class="modal-header">
+																<h6 class="card-header-title" id="exampleModalLabel" style="font-size:15px">Supprimer un dossier</h6>
+																<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+															</div>
+															<div class="modal-body">
+																<form action="" method="post">
+																	<div class="mb-3">
+																		<label for="exampleFormControlInput1" class="form-label">Voulez-vous vraiment supprimer le dossier "Sous-Dossier Archives 2.2.1" ?</label>
+																	</div>
+																</form>
+															</div>
+															<div class="row modal-footer">
+																<div class="col" style="align-items:center">
+																	<button type="button" style="display:flex;width:100%;justify-content:center" id="" class="btn btn-light mb-2" data-bs-dismiss="modal">Annuler</button>
+																</div>
+																<div class="col" style="align-items:center">
+																	<button type="button" style="display:flex;width:100%;justify-content:center" id="" class="btn btn-danger mb-2">Supprimer</button>
+																</div>
+															</div>
+														</div>
+													</div>
+												</div>
+												<span class="file-icon-send">
+													<button type="button" class="btn btn-success file-send" style="font-size:13px;border:1px solid black;border-radius:25px;margin-right:10px" data-bs-target="#deleteF221A" data-bs-toggle="modal" data-bs-placement="top" data-bs-title="Supprimer">
+														<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-send-fill" viewbox="0 0 16 16">
+															<path d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855H.766l-.452.18a.5.5 0 0 0-.082.887l.41.26.001.002 4.995 3.178 3.178 4.995.002.002.26.41a.5.5 0 0 0 .886-.083l6-15Zm-1.833 1.89L6.637 10.07l-.215-.338a.5.5 0 0 0-.154-.154l-.338-.215 7.494-7.494 1.178-.471-.47 1.178Z"/>
+														</svg>
+														Envoyer
+													</button>
+												</span>
+											</span>
+										</div>
+									</div>
+								</div>
+							</div>
+
+						</div>
+					</div>
+					<!-- / .row -->
+				</div>
+			</div>
+		</div>
+		<div class="mt-4">
+			{{ include('layouts/partials/_footer.html.twig')}}
+		</div>
+		<script src="{{ asset('assets/js/docman.js') }}"></script>
+		{% for flashMessage in app.flashes('success') %}
+			{{ include('layouts/partials/_success_login_flash_msg.html.twig')}}
+		{% endfor %}
+	{% endblock %}

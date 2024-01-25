@@ -1,0 +1,129 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}
+	Mon Profil &middot;
+	{{ parent() }}
+{% endblock %}
+
+{% block stylesheets %}
+	<link rel="stylesheet" href="{{ asset('assets/css/theme.bundle.css') }}">
+
+	<style>
+
+		body {
+			background-color: #f9fbfd;
+			overflow: hidden;
+		}
+
+		input.form-control:focus,
+		.form-select:focus {
+			border-color: #0d6efd;
+			outline: 0;
+			box-shadow: 0 0 0 0;
+		}
+	</style>
+{% endblock %}
+
+{% block body %}
+	<div class="main-content">
+		{{ include('layouts/partials/user/_navbar-user.html.twig')}}
+	</div>
+	<div class="logout-div" style="display:none">
+		<div id="loading-overlay" class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="display: none; background-color: rgba(255, 255, 255, 0.8);">
+			<div class="text-center">
+				<div class="spinner-border text-primary" role="status">
+					<span class="visually-hidden">Loading...</span>
+				</div>
+				<p class="mt-2">Déconnexion en cours...</p>
+			</div>
+		</div>
+	</div>
+	<div class="load-div" style="display:none">
+		<div id="loading-overlay" class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="display: none; background-color: rgba(255, 255, 255, 0.8);">
+			<div class="text-center">
+				<div class="spinner-border text-primary" role="status">
+					<span class="visually-hidden">Loading...</span>
+				</div>
+				<p class="mt-2">Veuillez patienter...</p>
+			</div>
+		</div>
+	</div>
+	<div class="container" style="margin-top: 30px">
+		<div class="card shadow border">
+			<div class="card-body">
+				<div class="row justify-content-center">
+					<div class="col-12">
+						<div class="col-md-12 mx-auto">
+							<div class="card-header">
+								<h3 class="card-title text-center text-body-secondary mb-3">Modifier mon profil</h3>
+							</div>
+							<div class="card-body">
+								<form>
+									<div class="row">
+										<div class="col mt-4 mb-5">
+											<span href="../profile-posts.html" class="avatar avatar-xl card-avatar card-avatar-top mb-4" style="width:75px;height:75px">
+												<img src="{{ asset('assets/imgs/default-image-user.jpg') }}" class="avatar-img rounded-circle border border-2 border-card" alt="...">
+											</span>
+											<button class="btn btn-outline-light position-absolute start-50 translate-middle">
+												Changer votre photo
+											</button>
+										</div>
+									</div>
+									<div class="row mb-3">
+										<div class="col">
+											<label for="firstName" class="form-label">Nom</label>
+											<input type="text" class="form-control" id="firstName" placeholder="Entrez votre nom">
+										</div>
+										<div class="col">
+											<label for="lastName" class="form-label">Prénom(s)</label>
+											<input type="text" class="form-control" id="lastName" placeholder="Entrez votre/vos prénom(s)">
+										</div>
+									</div>
+									<div class="row mb-3">
+										<div class="col">
+											<label for="emailAddress" class="form-label">Email
+												<small class="form-text text-muted">(contactez l'administrateur si besoin de modification)</small>
+											</label>
+											<span class="form-control" id="emailAddress">hazard@example.com</span>
+										</div>
+										<div class="col">
+											<label for="departement" class="form-label">Département
+												<small class="form-text text-muted">(contactez l'administrateur si besoin de modification)</small>
+											</label>
+											<span type="text" class="form-control" id="departement">Comptabilité</span>
+										</div>
+									</div>
+									<div class="row mb-5">
+										<div class="col">
+											<label for="password" class="form-label">Ancien mot de passe</label>
+											<input type="password" class="form-control" id="password" placeholder="Entrez votre ancien mot de passe">
+										</div>
+										<div class="col">
+											<label for="password" class="form-label">Nouveau mot de passe</label>
+											<input type="password" class="form-control" id="password" placeholder="Entrez votre nouveau mot de passe">
+										</div>
+									</div>
+
+									<div class="d-grid gap-2">
+										<button type="submit" class="btn btn-lg btn-info mb-3">
+											<span style="font-size:17px">Enregistrer les modifications</span>
+										</button>
+									</div>
+									{# <button type="submit" class="btn btn-primary">Enregistrer les modifications</button> #}
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="mt-3">
+			{{ include('layouts/partials/_footer.html.twig')}}
+		</div>
+	</div>
+	{% for flashMessage in app.flashes('success') %}
+		{{ include('layouts/partials/_success_login_flash_msg.html.twig')}}
+	{% endfor %}
+	<script src="{{ asset('assets/js/gime-toast.js') }}"></script>
+	<script src="{{ asset('assets/js/chat.js') }}"></script>
+{% endblock %}

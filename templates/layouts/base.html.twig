@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>{% block title project.name %}</title>
+		<link
+		rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>🎃</text></svg>">
+		{# Run `composer require symfony/webpack-encore-bundle` to start using Symfony UX #}
+
+		<link href="{{ asset('assets/css/styles.css') }}" rel="stylesheet">
+		<link href="{{ asset('assets/css/bootstrap.min.css') }}" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous"> {% block stylesheets %}{% endblock %}
+		<script src="{{ asset('assets/js/bootstrap.bundle.min.js') }}"></script>
+		<script src="{{ asset('assets/js/popper.min.js') }}"></script>
+		<script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
+		<script src="{{ asset('assets/js/jquery.min.js') }}"></script>
+		<script src="https://cdn.jsdelivr.net/npm/chart.js@4.2.1/dist/chart.umd.min.js"></script>
+		<script src="{{ asset('assets/js/shortcodes/logout.js') }}"></script>
+		{% block javascripts %}{% endblock %}
+
+	</head>
+	<body>
+		<main role="main"> {% block body %}{% endblock %}
+			</main>
+		</body>
+	</html>

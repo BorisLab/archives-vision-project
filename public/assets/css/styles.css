@@ -1,0 +1,24 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap');
+
+
+* {
+    font-family: 'Roboto', sans-serif;
+}
+
+.alert {
+    padding: 10px;
+    text-align: center;
+    color: white;
+}
+
+.alert-error {
+    background-color: red;
+}
+
+.alert-success {
+    background-color: green;
+}
+
+.alert-info {
+    background-color: cyan;
+}

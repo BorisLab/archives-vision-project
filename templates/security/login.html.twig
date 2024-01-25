@@ -1,0 +1,88 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}
+	Connexion &middot;
+	{{ parent() }}
+{% endblock %}
+
+{% block stylesheets %}
+	<link rel="stylesheet" href="{{ asset('assets/css/theme.bundle.css') }}"/>
+	<link rel="stylesheet" href="{{ asset('assets/css/styles.css') }}"/>
+
+	<style>
+		* {
+			overflow: hidden;
+		}
+	</style>
+{% endblock %}
+
+{% block body %}
+	{{ include('layouts/partials/_login-load.html.twig') }}
+	<div class="row">
+		<div class="container mx-auto">
+			<img class="rounded mx-auto d-block" src="{{ asset('assets/imgs/logo.png') }}" style="margin-bottom: -50px;" width="250" height="250" alt=""/>
+		</div>
+		<div class="col-md-5 mx-auto">
+			<h1 class="text-center">
+				Accédez à votre compte
+			</h1>
+			<p class="mt-3 mb-3 text-center text-info">
+				Vos documents d'archives n'attendent que vous !
+			</p>
+			<form id="auth-form" method="post">
+				{% if error %}
+					<div class="rounded mb-3 alert text-danger-emphasis bg-danger-subtle" style="z-index:-100" role="alert">
+						{{ error.messageKey|trans(error.messageData, 'security') }}
+					</div>
+				{% endif %}
+
+				{% if app.user %}
+					<div class="mb-3">
+						Vous êtes connecté en tant que
+						{{ app.user.userIdentifier }},
+						<a href="{{ path('app_logout') }}">Se déconnecter</a>
+					</div>
+				{% endif %}
+
+				<div class="container">
+					<div class="mb-3">
+						<label for="inputEmail">Email</label>
+						<input type="email" value="{{ last_username }}" name="email" id="inputEmail" placeholder="Entrez votre adresse email" class="form-control" autocomplete="email" required autofocus/>
+					</div>
+
+					<div class="mb-3">
+						<label for="inputPassword">Mot de passe</label>
+						<input type="password" name="password" id="inputPassword" placeholder="Entrez votre mot de passe" class="form-control" autocomplete="current-password" required/>
+					</div>
+
+					<input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}"/>
+
+					<div class="mb-3 d-flex justify-content-between">
+						<div class="form-check">
+							<input class="form-check-input" name="_remember_me" type="checkbox" value="" id="remember_me"/>
+							<label class="form-check-label" for="remember_me">
+								Garder ma session active
+							</label>
+						</div>
+						<a href="#" draggable="false">Mot de passe oublié ?</a>
+					</div>
+
+					<div class="d-grid gap-2 mb-4">
+						<button class="btn btn-lg btn-primary" type="submit">
+							Se connecter
+						</button>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+	<div class="b-example-divider"></div>
+
+	<div>
+		{{ include('layouts/partials/_footer.html.twig') }}
+	</div>
+{% endblock %}
+
+{% block javascripts %}
+	<script src="{{ asset('assets/js/shortcodes/_login-load.js') }}"></script>
+{% endblock %}
