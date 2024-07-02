@@ -18,9 +18,15 @@ class AccueilController extends AbstractController
             'user_home' => 'UserHomePage',
         ]);
 
-        $userHomeResponse->headers->set('Cache-Control', 'no-cache, no-store, must-revalidate');    
-        $userHomeResponse->headers->set('Pragma', 'no-cache');    
-        $userHomeResponse->headers->set('Expires', '0');  
+        $userHomeResponse->setCache([
+            'must_revalidate'  => true,
+            'no_cache'         => true,
+            'no_store'         => true,
+            'no_transform'     => false,
+            'public'           => false,
+            'private'          => true,
+            'max_age'          => 0,
+        ]);   
 
         return $userHomeResponse;
     }
@@ -33,9 +39,15 @@ class AccueilController extends AbstractController
             'archivist_home' => 'ArchivistHomePage',
         ]);
 
-        $archivistHomeResponse->headers->set('Cache-Control', 'no-cache, no-store, must-revalidate');    
-        $archivistHomeResponse->headers->set('Pragma', 'no-cache');    
-        $archivistHomeResponse->headers->set('Expires', '0');  
+        $archivistHomeResponse->setCache([
+            'must_revalidate'  => true,
+            'no_cache'         => true,
+            'no_store'         => true,
+            'no_transform'     => false,
+            'public'           => false,
+            'private'          => true,
+            'max_age'          => 0,
+        ]);   
 
         return $archivistHomeResponse;
     }
@@ -48,9 +60,15 @@ class AccueilController extends AbstractController
             'admin_home' => 'AdminHomePage',
         ]);
 
-        $adminHomeResponse->headers->set('Cache-Control', 'no-cache, no-store, must-revalidate');    
-        $adminHomeResponse->headers->set('Pragma', 'no-cache');    
-        $adminHomeResponse->headers->set('Expires', '0');  
+        $adminHomeResponse->setCache([
+            'must_revalidate'  => true,
+            'no_cache'         => true,
+            'no_store'         => true,
+            'no_transform'     => false,
+            'public'           => false,
+            'private'          => true,
+            'max_age'          => 0,
+        ]); 
 
         return $adminHomeResponse;
     }

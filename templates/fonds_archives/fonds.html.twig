@@ -1,0 +1,226 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}
+	Fonds d'archives &middot;
+	{{ parent() }}
+{% endblock %}
+
+{% block stylesheets %}
+	<link rel="stylesheet" href="{{ asset('assets/css/theme.bundle.css') }}">
+	<link rel="stylesheet" href="{{ asset('assets/css/scrollbar.css') }}">
+
+	<style>
+		body {
+			background-color: #f9fbfd;
+			overflow: hidden;
+		}
+
+		#folder-files-container {
+			flex: 1;
+			display: flex;
+			flex-direction: column;
+			height: 600px;
+		}
+
+		#form-container form {
+			width: 300%;
+		}
+
+		#form-container form .page {
+			width: 100%;
+			transition: margin-left 0.2s ease-in-out;
+		}
+
+		#form-container form #form-choice {
+			width: 33%;
+		}
+
+		#form-container form #form-sd {
+			width: 33%;
+		}
+
+		#form-container form #form-fic {
+			width: 33%;
+		}
+
+		.item-row:hover {
+			background-color: #F2F3F4;
+		}
+
+		.item-row #item-name:hover {
+			text-decoration: underline;
+		}
+
+		.breadcrumb-item + .breadcrumb-item::before {
+			display: inline-block;
+			padding-right: 0.5rem;
+			padding-top: 0.19rem;
+			content: url("data:image/svg+xml, %3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath d='M9.29 6.71a.996.996 0 0 0 0 1.41L13.17 12l-3.88 3.88a.996.996 0 1 0 1.41 1.41l4.59-4.59a.996.996 0 0 0 0-1.41L10.7 6.7c-.38-.38-1.02-.38-1.41.01'/%3E%3C/svg%3E");
+		}
+
+		/* Champ des mots-clés */
+		.keywords-input {
+			display: flex;
+			flex-wrap: wrap;
+			padding: 0.5rem;
+			border: 1px solid #ced4da;
+			border-radius: 0.25rem;
+		}
+		.keywords-input input {
+			border: none;
+			outline: none;
+			flex-grow: 1;
+		}
+		.keyword {
+			background-color: #e9ecef;
+			padding: 0.5rem;
+			margin: 0.2rem;
+			border-radius: 0.2rem;
+			display: flex;
+			align-items: center;
+		}
+		.keyword .remove-keyword {
+			margin-left: 0.5rem;
+			cursor: pointer;
+		}
+
+		.searchable-select {
+			position: relative;
+			width: 100%;
+		}
+		.searchable-select input {
+			width: 100%;
+			box-sizing: border-box;
+		}
+		.searchable-select ul {
+			position: absolute;
+			top: 100%;
+			left: 0;
+			width: 100%;
+			max-height: 200px;
+			overflow-y: auto;
+			background: white;
+			border: 1px solid #ced4da;
+			border-top: none;
+			z-index: 1050; /* Plus grand que celui de la modal */
+			list-style: none;
+			padding: 0;
+			margin: 0;
+		}
+		.searchable-select ul li {
+			padding: 0.5rem;
+			cursor: pointer;
+		}
+		.searchable-select ul li:hover {
+			background-color: #f1f1f1;
+		}
+		.hidden {
+			display: none;
+		}
+	</style>
+{% endblock %}
+
+{% block body %}
+	{{ include('layouts/partials/_logout-loading.html.twig') }}
+	<div class="load-div" style="display:none">
+		<div id="loading-overlay" class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="display: none; background-color: rgba(255, 255, 255, 0.8);">
+			<div class="text-center">
+				<div class="spinner-border text-primary" role="status">
+					<span class="visually-hidden">Loading...</span>
+				</div>
+				<p class="mt-2">Veuillez patienter...</p>
+			</div>
+		</div>
+	</div>
+	<div style="width:100%">
+		{{ include('layouts/partials/archivman/_navbar-archivman.html.twig') }}
+	</div>
+
+	<!-- Conteneur principal des documents -->
+	<div class="main-content" id="folder-files-container" style="max-height:100%">
+
+		<div>
+			<div>
+				<!-- Modal -->
+				{{ include('fonds_archives/composants/modals/_create_folder_modal.html.twig') }}
+			</div>
+		</div>
+
+		<div class="container-fluid">
+			<div class="row p-3">
+
+				<div class="col-sm-4">
+					<div class="mb-3">
+						<label for="inputSelect" class="form-label">Rechercher</label>
+						<input type="text" class="form-control" id="formGroupExampleInput" autofocus placeholder="Quel dossier ou fichier recherchez-vous?">
+					</div>
+				</div>
+				<div class="col-sm-2">
+					<label for="inputSelect" class="form-label">Format</label>
+					<select id="inputSelect" class="form-select">
+						<option selected>---Choisir---</option>
+						<option>Physique</option>
+						<option>Numérique</option>
+						<option>Mixte</option>
+					</select>
+				</div>
+				<div class="col-sm-2">
+					<div class="mb-3">
+						<label for="formGroupExampleInput" class="form-label">Département</label>
+						<input type="text" class="form-control" id="formGroupExampleInput" autofocus placeholder="Nom du département">
+					</div>
+				</div>
+				<div class="col-sm-2">
+					<label for="dateMin" class="form-label">Du</label>
+					<input type="date" id="dateMin" class="form-control"/>
+				</div>
+				<div class="col-sm-2">
+					<label for="dateMax" class="form-label">Au</label>
+					<input type="date" id="dateMax" class="form-control"/>
+				</div>
+
+			</div>
+		</div>
+		<!-- / .row -->
+		<div class="row">
+			<div class="col-12 col-xl-12">
+
+				<div class="row mx-auto align-items-center">
+					<div class="col">
+
+						<nav>
+							<ol class="breadcrumb">
+								<li class="breadcrumb-item">
+									<span class="link-dark" href="#!">Tous les sous-fonds</span>
+								</li>
+							</ol>
+						</nav>
+
+					</div>
+					<div
+						class="col-auto">
+
+						<!-- Button -->
+						<button type="button" href="#!" id="newFolderBtn" data-bs-target="#newFolder" class="btn btn-sm me-3 mb-2 btn-white" data-bs-toggle="modal" data-bs-title="Nouveau dossier">
+							Créer un nouveau dossier
+						</button>
+
+					</div>
+				</div>
+				<!-- / .row -->
+
+				<div class="table-responsive" style="overflow-x:hidden" data-list='{"valueNames": ["tables-row", "tables-first", "tables-last", "tables-handle"]}'>
+					{% include 'fonds_archives/composants/_docs-tab.html.twig' %}
+				</div>
+			</div>
+		</div>
+		<!-- / .row -->
+
+	</div>
+	<script src="{{ asset('assets/js/folders-accordion.js') }}"></script>
+	<script src="{{ asset('assets/js/shortcodes/_slide-form.js') }}"></script>
+	<script src="{{ asset('assets/js/shortcodes/_reset-form.js') }}"></script>
+	<script src="{{ asset('assets/js/shortcodes/_form-check.js') }}"></script>
+	<script src="{{ asset('assets/js/shortcodes/_keywords.js') }}"></script>
+	<script src="{{ asset('assets/js/shortcodes/_searchable-select.js') }}"></script>
+{% endblock %}

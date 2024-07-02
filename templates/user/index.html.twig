@@ -99,7 +99,7 @@
 
 		</div>
 
-		<div class="card mb-2 border border-primary-subtle shadow" style="z-index:1">
+		<div class="card mb-2 border border-primary-subtle" style="z-index:1">
 			<div class="card-body text-center" id="empty-card" style="display:#">
 				<div class="row justify-content-center">
 					<div
@@ -126,9 +126,5 @@
 		</div>
 
 	</div>
-	{% for flashMessage in app.flashes('success') %}
-		{{ include('layouts/partials/_success_login_flash_msg.html.twig')}}
-	{% endfor %}
-	<script src="{{ asset('assets/js/gime-toast.js') }}"></script>
 
 {% endblock %}

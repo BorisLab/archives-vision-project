@@ -7,7 +7,9 @@
 
 {% block stylesheets %}
 	<link rel="stylesheet" href="{{ asset('assets/css/theme.bundle.css') }}"/>
-	<link rel="stylesheet" href="{{ asset('assets/css/styles.css') }}"/>
+	<link rel="stylesheet" href="{{ asset('assets/css/toasts.css') }}"/>
+	<link href="{{ asset('build/app.css') }}" rel="stylesheet">
+	<script src="{{ asset('build/app.js') }}"></script>
 
 	<style>
 		* {
@@ -17,23 +19,38 @@
 {% endblock %}
 
 {% block body %}
-	{{ include('layouts/partials/_login-load.html.twig') }}
+	{{ include('layouts/partials/_login-loading.html.twig') }}
 	<div class="row">
 		<div class="container mx-auto">
-			<img class="rounded mx-auto d-block" src="{{ asset('assets/imgs/logo.png') }}" style="margin-bottom: -50px;" width="250" height="250" alt=""/>
+			<div class="bg-zinc-50 px-6 mt-20 mb-5 text-center dark:bg-neutral-700 dark:text-white">
+				<h3 class="text-4xl font-bold">ARCHIVES VISION</h3>
+			</div>
 		</div>
 		<div class="col-md-5 mx-auto">
 			<h1 class="text-center">
 				Accédez à votre compte
 			</h1>
-			<p class="mt-3 mb-3 text-center text-info">
+			<p class="mt-3 mb-3 text-center text-muted">
 				Vos documents d'archives n'attendent que vous !
 			</p>
 			<form id="auth-form" method="post">
 				{% if error %}
-					<div class="rounded mb-3 alert text-danger-emphasis bg-danger-subtle" style="z-index:-100" role="alert">
-						{{ error.messageKey|trans(error.messageData, 'security') }}
-					</div>
+					{% for message in app.flashes('error') %}
+						<div class="toast-container position-fixed bottom-0 right-0 p-3 mb-5" style="z-index: 1050;">
+							<div class="toast" role="alert" aria-live="assertive" data-bs-animation="false" data-bs-delay='10000' style="box-shadow:none" aria-atomic="true">
+								<div class="toast-header text-danger">
+									<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-circle-fill" viewbox="0 0 16 16">
+										<path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293z"/>
+									</svg>
+									<strong class="me-auto ms-2">Message d'erreur</strong>
+									<button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+								</div>
+								<div class="toast-body w-auto text-truncate" style="max-width:500px">
+									{{ message }}
+								</div>
+							</div>
+						</div>
+					{% endfor %}
 				{% endif %}
 
 				{% if app.user %}
@@ -43,7 +60,6 @@
 						<a href="{{ path('app_logout') }}">Se déconnecter</a>
 					</div>
 				{% endif %}
-
 				<div class="container">
 					<div class="mb-3">
 						<label for="inputEmail">Email</label>
@@ -58,17 +74,12 @@
 					<input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}"/>
 
 					<div class="mb-3 d-flex justify-content-between">
-						<div class="form-check">
-							<input class="form-check-input" name="_remember_me" type="checkbox" value="" id="remember_me"/>
-							<label class="form-check-label" for="remember_me">
-								Garder ma session active
-							</label>
-						</div>
-						<a href="#" draggable="false">Mot de passe oublié ?</a>
+						<div class="form-check"></div>
+						<a class="link-dark" href="passwordForget" data-bs-target="#passwordForget" draggable="false">Mot de passe oublié ?</a>
 					</div>
 
 					<div class="d-grid gap-2 mb-4">
-						<button class="btn btn-lg btn-primary" type="submit">
+						<button class="btn btn-lg btn-dark" type="submit">
 							Se connecter
 						</button>
 					</div>
@@ -84,5 +95,6 @@
 {% endblock %}
 
 {% block javascripts %}
-	<script src="{{ asset('assets/js/shortcodes/_login-load.js') }}"></script>
+	<script src="{{ asset('assets/js/shortcodes/_login-loading.js') }}"></script>
+	<script src="{{ asset('assets/js/shortcodes/_toasts.js') }}"></script>
 {% endblock %}

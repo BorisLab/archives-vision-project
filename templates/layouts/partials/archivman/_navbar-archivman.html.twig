@@ -1,7 +1,6 @@
 <nav class="navbar navbar-expand-md p-3 border-bottom shadow-sm" id="topbar" style="background-color: #fff;">
     <div class="container-fluid">
       <a class="navbar-brand" draggable="false" href="#">
-        <img class="shadow-sm" src="{{ asset('assets/imgs/logo-small.png') }}" alt="" style="margin-right: 7px;" width="46px" height="34px">
         ARCHIVES VISION
       </a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
@@ -9,26 +8,29 @@
       </button>
      
       <div class=" collapse navbar-collapse" id="navbarNavDropdown">
-        <ul class="navbar-nav ms-auto ">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <li class="nav-item">
-            <a class="nav-link mx-2 {{ set_active_route('app_archivist_home') }}" draggable="false" href="{{ path('app_archivist_home') }}">Accueil</a>
+            <a class="nav-link {{ set_active_route('app_archivist_home') }}" draggable="false" href="{{ path('app_archivist_home') }}">Accueil</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link mx-2 {{ set_active_route('app_archives') }}" draggable="false" href="{{ path('app_archives') }}">Fonds d'archives</a>
+            <a class="nav-link {{ set_active_route('app_archives_folders_directory') }}" draggable="false" href="{{ path('app_archives_folders_directory') }}">Fonds d'archives</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link mx-2 {{ set_active_route('app_departements') }}" draggable="false" href="{{ path('app_departements') }}">Numérisation #</a>
+            <a class="nav-link {{ set_active_route('app_departements') }}" draggable="false" href="{{ path('app_departements') }}">Numérisation #</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link mx-2 {{ set_active_route('app_archivist_chat') }}" draggable="false" href="{{ path('app_archivist_chat') }}">Messagerie</a>
+            <a class="nav-link {{ set_active_route('app_archivist_chat') }}" draggable="false" href="{{ path('app_archivist_notifs') }}">Notifications</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link mx-2 {{ set_active_route('app_archivist_profile') }}" draggable="false" href="{{ path('app_archivist_profile') }}">Mon Profil</a>
+            <a class="nav-link {{ set_active_route('app_archivist_chat') }}" draggable="false" href="{{ path('app_archivist_chat') }}">Messagerie</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link mx-2 {{ set_active_route('app_logout') }}" id="logout-button" draggable="false" href="{{ path('app_logout') }}">Déconnexion</a>
+            <a class="nav-link {{ set_active_route('app_archivist_profile') }}" draggable="false" href="{{ path('app_archivist_profile') }}">Mon Profil</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {{ set_active_route('app_logout') }}" id="logout-button" draggable="false" href="{{ path('app_logout') }}">Déconnexion</a>
           </li>
         </ul>
       </div>
     </div>
-    </nav>
+</nav>

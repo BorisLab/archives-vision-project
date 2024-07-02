@@ -82,12 +82,11 @@
 		li.user-unit:hover {
 			background-color: #EEEEEE;
 		}
-
 	</style>
 {% endblock %}
 
 {% block body %}
-	{{ include('layouts/partials/_logout.html.twig') }}
+	{{ include('layouts/partials/_logout-loading.html.twig') }}
 	<div class="load-div" style="display:none">
 		<div id="loading-overlay" class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="display: none; background-color: rgba(255, 255, 255, 0.8);">
 			<div class="text-center">
@@ -274,7 +273,7 @@
 										<!-- Time -->
 										<p class="small mb-0">
 											<span class="text-success">●</span>
-											Connecté(e)
+											En ligne
 										</p>
 
 									</div>
@@ -311,7 +310,7 @@
 										<!-- Time -->
 										<p class="small mb-0">
 											<span class="text-success">●</span>
-											Connecté(e)
+											En ligne
 										</p>
 
 									</div>
@@ -343,7 +342,7 @@
 										<!-- Time -->
 										<p class="small mb-0">
 											<span class="text-warning">●</span>
-											Déconnecté(e)
+											Hors-Ligne
 										</p>
 
 									</div>
@@ -375,7 +374,7 @@
 										<!-- Time -->
 										<p class="small mb-0">
 											<span class="text-warning">●</span>
-											Déconnecté(e)
+											Hors-Ligne
 										</p>
 
 									</div>
@@ -407,7 +406,7 @@
 										<!-- Time -->
 										<p class="small mb-0">
 											<span class="text-warning">●</span>
-											Déconnecté(e)
+											Hors-Ligne
 										</p>
 
 									</div>
@@ -439,7 +438,7 @@
 										<!-- Time -->
 										<p class="small mb-0">
 											<span class="text-warning">●</span>
-											Déconnecté(e)
+											Hors-Ligne
 										</p>
 
 									</div>
@@ -471,7 +470,7 @@
 										<!-- Time -->
 										<p class="small mb-0">
 											<span class="text-warning">●</span>
-											Déconnecté(e)
+											Hors-Ligne
 										</p>
 
 									</div>
@@ -503,7 +502,7 @@
 										<!-- Time -->
 										<p class="small mb-0">
 											<span class="text-warning">●</span>
-											Déconnecté(e)
+											Hors-Ligne
 										</p>
 
 									</div>
@@ -535,7 +534,7 @@
 										<!-- Time -->
 										<p class="small mb-0">
 											<span class="text-warning">●</span>
-											Déconnecté(e)
+											Hors-Ligne
 										</p>
 
 									</div>
@@ -567,7 +566,7 @@
 										<!-- Time -->
 										<p class="small mb-0">
 											<span class="text-warning">●</span>
-											Déconnecté(e)
+											Hors-Ligne
 										</p>
 
 									</div>
@@ -599,7 +598,7 @@
 										<!-- Time -->
 										<p class="small mb-0">
 											<span class="text-warning">●</span>
-											Déconnecté(e)
+											Hors-Ligne
 										</p>
 
 									</div>
@@ -631,7 +630,7 @@
 										<!-- Time -->
 										<p class="small mb-0">
 											<span class="text-warning">●</span>
-											Déconnecté(e)
+											Hors-Ligne
 										</p>
 
 									</div>
@@ -639,7 +638,7 @@
 								<!-- / .row -->
 							</a>
 						</li>
-						
+
 						<li class="list-group-item user-unit p-3">
 							<a class="" style="text-decoration:none;color:black" href="#" draggable="false">
 								<div class="row align-items-center">
@@ -663,7 +662,7 @@
 										<!-- Time -->
 										<p class="small mb-0">
 											<span class="text-warning">●</span>
-											Déconnecté(e)
+											Hors-Ligne
 										</p>
 
 									</div>
@@ -801,4 +800,4 @@
 		<input type="text" style="outline:none" placeholder="Écrire un message...">
 		<button class="btn btn-info" id="send-button">Envoyer</button>
 	</div>
-</div></div></div>{% for flashMessage in app.flashes('success') %}{{ include('layouts/partials/_success_login_flash_msg.html.twig')}}{% endfor %}<script src="{{ asset('assets/js/gime-toast.js') }}"></script><script src="{{ asset('assets/js/chat.js') }}"></script>{% endblock %}
+</div></div></div><script src="{{ asset('assets/js/chat.js') }}"></script>{% endblock %}

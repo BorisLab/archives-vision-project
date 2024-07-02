@@ -25,7 +25,7 @@
 {% endblock %}
 
 {% block body %}
-	{{ include('layouts/partials/_logout.html.twig') }}
+	{{ include('layouts/partials/_logout-loading.html.twig') }}
 	<div class="main-content">
 		{{ include('layouts/partials/archivman/_navbar-archivman.html.twig')}}
 	</div>
@@ -67,21 +67,21 @@
 										</div>
 										<div class="col">
 											<label for="lastName" class="form-label">Prénom(s)</label>
-											<input type="text" class="form-control" id="lastName" placeholder="Entrez votre/vos prénom(s)">
+											<input type="text" class="form-control" id="lastName" placeholder="Entrez votre(vos) prénom(s)">
 										</div>
 									</div>
 									<div class="row mb-3">
 										<div class="col">
 											<label for="emailAddress" class="form-label">Email
-												<small class="form-text text-muted">(contactez l'administrateur si besoin de modification)</small>
+												<span class="badge text-bg-info">Seul l'administratreur peut modifier ce champ</span>
 											</label>
-											<span class="form-control" id="emailAddress">hazard@example.com</span>
+											<span class="form-control" style="background-color:whitesmoke" id="emailAddress">drogba@example.com</span>
 										</div>
 										<div class="col">
 											<label for="departement" class="form-label">Département
-												<small class="form-text text-muted">(contactez l'administrateur si besoin de modification)</small>
+												<span class="badge text-bg-info">Seul l'administratreur peut modifier ce champ</span>
 											</label>
-											<span type="text" class="form-control" id="departement">Comptabilité</span>
+											<span class="form-control" style="background-color:whitesmoke" id="departement">Comptabilité</span>
 										</div>
 									</div>
 									<div class="row mb-5">

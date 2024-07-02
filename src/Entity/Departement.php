@@ -19,12 +19,16 @@ class Departement
     private ?string $libelle_dep = null;
 
     #[ORM\OneToMany(mappedBy: 'departement', targetEntity: Utilisateur::class)]
-    private Collection $Utilisateur;
+    private Collection $utilisateur;
+
+    #[ORM\OneToMany(mappedBy: 'departement', targetEntity: Dossier::class)]
+    private Collection $dossiers;
 
     public function __construct()
     {
         $this->id_dep_util = new ArrayCollection();
         $this->Utilisateur = new ArrayCollection();
+        $this->dossiers = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -49,7 +53,7 @@ class Departement
      */
     public function getUtilisateur(): Collection
     {
-        return $this->Utilisateur;
+        return $this->utilisateur;
     }
 
     public function addUtilisateur(Utilisateur $utilisateur): self
@@ -68,6 +72,36 @@ class Departement
             // set the owning side to null (unless already changed)
             if ($utilisateur->getDepartement() === $this) {
                 $utilisateur->setDepartement(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Dossier>
+     */
+    public function getDossiers(): Collection
+    {
+        return $this->dossiers;
+    }
+
+    public function addDossier(Dossier $dossier): static
+    {
+        if (!$this->dossiers->contains($dossier)) {
+            $this->dossiers->add($dossier);
+            $dossier->setDepartement($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDossier(Dossier $dossier): static
+    {
+        if ($this->dossiers->removeElement($dossier)) {
+            // set the owning side to null (unless already changed)
+            if ($dossier->getDepartement() === $this) {
+                $dossier->setDepartement(null);
             }
         }
 

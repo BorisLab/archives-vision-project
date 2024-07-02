@@ -2,49 +2,47 @@
 
 namespace App\Entity\Traits;
 
-use DateTimeImmutable;
-use DateTimeInterface;
 
 trait Horodateur
 {
 
-    #[ORM\Column(type: 'datetime_immutable', options: ['default' => 'CURRENT_TIMESTAMP'])]
-    private $dateAjout;
+    #[Column(type: 'datetime_immutable', options: ['default' => 'CURRENT_TIMESTAMP'])]
+    private $date_creation;
 
     #[ORM\Column(type: 'datetime_immutable', options: ['default' => 'CURRENT_TIMESTAMP'])]
-    private $dateModif;
+    private $date_modif;
 
-    public function getDateAjout(): ?\DateTimeInterface
+    public function getDateCreation(): ?\DateTimeInterface
     {
-        return $this->dateAjout;
+        return $this->date_creation;
     }
 
-    public function setDateAjout(\DateTimeInterface $dateAjout): self
+    public function setDateCreation(\DateTimeInterface $date_creation): self
     {
-        $this->dateAjout = $dateAjout;
+        $this->date_creation = $date_creation;
 
         return $this;
     }
 
     public function getDateModif(): ?\DateTimeInterface
     {
-        return $this->dateModif;
+        return $this->date_modif;
     }
 
-    public function setDateModif(\DateTimeInterface $dateModif): self
+    public function setDateModif(\DateTimeInterface $date_modif): self
     {
-        $this->dateModif = $dateModif;
+        $this->date_modif = $date_modif;
 
         return $this;
     }
 
     #[ORM\PrePersist]
     #[ORM\PreUpdate]
-    public function modifHorodatage()
+    public function applyHorodatage()
     {
-        if($this->getDateAjout() == null)
+        if($this->getDateCreation() === null)
         {
-           $this->setDateAjout(new \DateTimeImmutable);
+           $this->setDateCreation(new DateTimeImmutable);
         }
         $this->setDateModif(new \DateTimeImmutable);
     }

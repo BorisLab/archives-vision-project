@@ -1,0 +1,279 @@
+<style>
+	.table thead th {
+		position: sticky;
+		top: 0;
+	}
+</style>
+
+<div class="table-wrapper" style="max-height:500px;overflow-x:hidden;overflow-y:auto">
+	<table class="table table-sm">
+		<thead class="bg-secondary-subtle">
+			<tr>
+				<th>
+					<a href="#" class="link-dark list-sort" data-sort="tables-first">Nom</a>
+				</th>
+				<th>
+					<a href="#" class="link-dark list-sort" data-sort="tables-last">Format</a>
+				</th>
+				<th>
+					<a href="#" class="link-dark list-sort" data-sort="tables-handle">Département</a>
+				</th>
+				<th>
+					<a href="#" class="link-dark list-sort" data-sort="tables-handle">Mots-clés</a>
+				</th>
+				<th>
+					<a href="#" class="link-dark list-sort" data-sort="tables-handle">Date de création</a>
+				</th>
+				<th class="text-end pe-5">
+					<span class="text-dark">Actions</span>
+				</th>
+			</tr>
+		</thead>
+		<tbody class="list">
+			{% if parent %}
+				{% if parent.dossierParent %}
+					<tr class="item-row">
+						<td class="tables-first" colspan="6">
+							<a class="link-dark" href="{{ path('app_archives_folder_content', {id: parent.dossierParent.dossierId}) }}">
+								<div>
+									<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-return-left" viewbox="0 0 16 16">
+										<path fill-rule="evenodd" d="M14.5 1.5a.5.5 0 0 1 .5.5v4.8a2.5 2.5 0 0 1-2.5 2.5H2.707l3.347 3.346a.5.5 0 0 1-.708.708l-4.2-4.2a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 8.3H12.5A1.5 1.5 0 0 0 14 6.8V2a.5.5 0 0 1 .5-.5"/>
+									</svg>
+									<span class="">. . Retour</span>
+								</div>
+							</a>
+						</td>
+					</tr>
+				{% else %}
+					<tr class="item-row">
+						<td class="tables-first" colspan="6">
+							<a class="link-dark" href="{{ path('app_archives_folders_directory') }}">
+								<div>
+									<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-return-left" viewbox="0 0 16 16">
+										<path fill-rule="evenodd" d="M14.5 1.5a.5.5 0 0 1 .5.5v4.8a2.5 2.5 0 0 1-2.5 2.5H2.707l3.347 3.346a.5.5 0 0 1-.708.708l-4.2-4.2a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 8.3H12.5A1.5 1.5 0 0 0 14 6.8V2a.5.5 0 0 1 .5-.5"/>
+									</svg>
+									<span class="">. . Retour</span>
+								</div>
+							</a>
+						</td>
+					</tr>
+				{% endif %}
+			{% endif %}
+			{% if dossiers is empty %}
+				<tr class="empty-list">
+
+					<td
+						colspan="6">
+
+						<!-- Title -->
+						<h4 class="mt-2 mb-2 text-center">
+							Aucun dossier trouvé
+						</h4>
+
+						<!-- Content -->
+						<p class="text-muted text-center">
+							Tous les documents ajoutés s'affichent ici.
+						</p>
+					</td>
+				</tr>
+			{% endif %}
+			{%for dossier in dossiers %}
+				<tr class="item-row">
+					<td class="tables-first text-truncate" style="max-width:200px">
+						<svg style="padding-bottom:3px" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-folder-fill" viewbox="0 0 16 16">
+							<path d="M9.828 3h3.982a2 2 0 0 1 1.992 2.181l-.637 7A2 2 0 0 1 13.174 14H2.825a2 2 0 0 1-1.991-1.819l-.637-7a2 2 0 0 1 .342-1.31L.5 3a2 2 0 0 1 2-2h3.672a2 2 0 0 1 1.414.586l.828.828A2 2 0 0 0 9.828 3m-8.322.12q.322-.119.684-.12h5.396l-.707-.707A1 1 0 0 0 6.172 2H2.5a1 1 0 0 0-1 .981z"/>
+						</svg>
+						<a id="item-name" class="link-dark" title="{{ dossier.libelledossier }}" href="{{ path('app_archives_folder_content', {id: dossier.dossierId}) }}">{{ dossier.libelledossier }}</a>
+					</td>
+					<td class="tables-last">{{ dossier.format }}</td>
+					<td class="tables-handle">{{ dossier.departement.libelleDep }}</td>
+					{% if dossier.tags == null %}
+						<td class="tables-tags fst-italic text-secondary">Aucun mot-clé</td>
+					{% else %}
+						<td class="tables-tags text-truncate" style="max-width:200px">{{ dossier.getFormattedTags }}</td>
+					{% endif %}
+					<td class="tables-date">{{ dossier.dateCreation|date('d/m/Y') }}</td>
+					<td class="text-end">
+						<span>
+							<div class="modal fade text-start" id="addElementD1" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" style="font-weight:normal;color:black">
+								<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-card">
+									<div class="modal-content genie-effect" id="form-container" style="width:100%">
+										<div class="modal-header">
+											<h6 class="card-header-title" id="exampleModalLabel2" style="font-size:15px">Ajouter un élément</h6>
+											<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+										</div>
+
+										<form action="" method="post" id="form-addElement" style="display:flex">
+											<div class="page slidepage" id="form-choice" style="display:#">
+												<div class="modal-body" style="margin-bottom:2px;overflow-x:hidden">
+													<div class="mb-4">
+														<span>Que souhaitez-vous ajouter à "Dossier Archives 1" ?</span>
+													</div>
+													<div class="row mb-3 p-3">
+														<input type="radio" class="btn-check" name="options-outlined" id="sd-outlined" autocomplete="off">
+														<label class="btn btn-outline-info" for="sd-outlined">Un ou plusieurs sous-dossier(s)</label>
+													</div>
+													<span class="row mt-3 mb-3" style="display:flex;width:100%;justify-content:center">ou</span>
+													<div class="row p-3">
+														<input type="radio" class="btn-check" name="options-outlined" id="fic-outlined" autocomplete="off">
+														<label class="btn btn-outline-info" for="fic-outlined">Un fichier</label>
+													</div>
+												</div>
+												<div class="row modal-footer">
+													<div class="col" id="nextBtn" style="align-items:center">
+														<button type="button" style="display:flex;width:100%;justify-content:center" id="" class="btn btn-success mb-2">Suivant</button>
+													</div>
+												</div>
+											</div>
+											<div class="page" id="form-sd" style="display:#">
+												<div class="modal-body" style="margin-bottom:125px">
+													<div class="mb-4">
+														<span>Combien de sous-dossiers voulez-vous ajouter à "Dossier Archives 1" ?</span>
+													</div>
+													<div class="mb-3">
+														<input min="0" value="0" type="number" id="typeNumberSD" class="form-control" style="padding-right:7px"/>
+													</div>
+												</div>
+												<div class="row modal-footer">
+													<div class="col" id="prevbtnSD" style="align-items:center">
+														<button type="button" style="display:flex;width:100%;justify-content:center" id="" class="btn btn-light mb-2">Précédent</button>
+													</div>
+													<div class="col" id="submitbtnSD" style="align-items:center">
+														<button type="button" style="display:flex;width:100%;justify-content:center" id="" class="btn btn-success mb-2">Suivant</button>
+													</div>
+												</div>
+											</div>
+											<div class="page" id="form-fic">
+												<div class="modal-body" style="margin-bottom:0px">
+													<div class="mb-3">
+														<label for="exampleFormControlInput1" class="form-label">Nom du fichier</label>
+														<input type="text" readonly class="form-control" id="exampleFormControlInput1" value="Dossier Archives 1">
+													</div>
+													<div class="mb-3">
+														<label class="form-label" for="typeNumber">Format du fichier</label>
+														<select name="" id="exampleFormControlSelect1" class="form-control">
+															<option value="">--Choisir--</option>
+															<option value="">Physique</option>
+															<option value="">Numérique</option>
+														</select>
+													</div>
+													<div class="mb-3" style="display:#">
+														<div style="border-radius: 5px;display: flex;align-items: center;justify-content: center;flex-direction: column;border-radius: 5px;border: 2px dashed #6990f2;">
+															<form class="uploadfile">
+																<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cloud-upload-fill" viewbox="0 0 16 16">
+																	<path fill-rule="evenodd" d="M8 0a5.53 5.53 0 0 0-3.594 1.342c-.766.66-1.321 1.52-1.464 2.383C1.266 4.095 0 5.555 0 7.318 0 9.366 1.708 11 3.781 11H7.5V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V11h4.188C14.502 11 16 9.57 16 7.773c0-1.636-1.242-2.969-2.834-3.194C12.923 1.999 10.69 0 8 0m-.5 14.5V11h1v3.5a.5.5 0 0 1-1 0"/>
+																</svg>
+																<p>Cliquez pour importer un fichier</p>
+															</form>
+														</div>
+														<section class="progress-area">
+															<li class="row">
+																<span>
+																	<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-text-fill" viewbox="0 0 16 16">
+																		<path d="M12 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2M5 4h6a.5.5 0 0 1 0 1H5a.5.5 0 0 1 0-1m-.5 2.5A.5.5 0 0 1 5 6h6a.5.5 0 0 1 0 1H5a.5.5 0 0 1-.5-.5M5 8h6a.5.5 0 0 1 0 1H5a.5.5 0 0 1 0-1m0 2h3a.5.5 0 0 1 0 1H5a.5.5 0 0 1 0-1"/>
+																	</svg>
+
+																	<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-image-fill" viewbox="0 0 16 16">
+																		<path d="M4 0h8a2 2 0 0 1 2 2v8.293l-2.73-2.73a1 1 0 0 0-1.52.127l-1.889 2.644-1.769-1.062a1 1 0 0 0-1.222.15L2 12.292V2a2 2 0 0 1 2-2m4.002 5.5a1.5 1.5 0 1 0-3 0 1.5 1.5 0 0 0 3 0"/>
+																		<path d="M10.564 8.27 14 11.708V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-.293l3.578-3.577 2.56 1.536 2.426-3.395z"/>
+																	</svg>
+
+																	<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-play-fill" viewbox="0 0 16 16">
+																		<path d="M12 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2M6 5.883a.5.5 0 0 1 .757-.429l3.528 2.117a.5.5 0 0 1 0 .858l-3.528 2.117a.5.5 0 0 1-.757-.43V5.884z"/>
+																	</svg>
+
+																	<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-music-fill" viewbox="0 0 16 16">
+																		<path d="M12 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2m-.5 4.11v1.8l-2.5.5v5.09c0 .495-.301.883-.662 1.123C7.974 12.866 7.499 13 7 13s-.974-.134-1.338-.377C5.302 12.383 5 11.995 5 11.5s.301-.883.662-1.123C6.026 10.134 6.501 10 7 10c.356 0 .7.068 1 .196V4.41a1 1 0 0 1 .804-.98l1.5-.3a1 1 0 0 1 1.196.98"/>
+																	</svg>
+																</span>
+																<div class="content">
+																	<div class="details">
+																		<span class="name">image_01.png •
+																			<span>Importation</span>
+																		</span>
+																		<span class="percent">25%</span>
+																		<span class="size">70 KB</span>
+																	</div>
+																	<div class="progress" role="progressbar" aria-label="Example with label" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
+																		<div class="progress-bar" style="width: 25%"></div>
+																	</div>
+																</div>
+															</li>
+														</section>
+													</div>
+												</div>
+												<div class="row modal-footer">
+													<div class="col" id="prevbtnFIC" style="align-items:center">
+														<button type="button" style="display:flex;width:100%;justify-content:center" id="" class="btn btn-light mb-2">Précédent</button>
+													</div>
+													<div class="col" id="submitbtnFIC" style="align-items:center">
+														<button type="button" style="display:flex;width:100%;justify-content:center" id="" class="btn btn-success mb-2">Valider</button>
+													</div>
+												</div>
+											</div>
+										</form>
+									</div>
+								</div>
+							</div>
+						</span>
+						<span>
+							<button type="button" class="btn accordion-edit btn-sm rounded-circle text-end" style="font-size:13px" data-bs-placement="top" data-bs-target="#editD1" data-bs-toggle="modal" data-bs-title="Modifier">
+								<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-pen-fill" viewbox="0 0 16 16">
+									<path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001"/>
+								</svg>
+							</button>
+						</span>
+						<span>
+							<button type="button" class="btn accordion-delete btn-sm rounded-circle text-end" style="font-size:13px" data-bs-placement="top" data-bs-target="#deleteD1" data-bs-toggle="modal" data-bs-title="Supprimer">
+								<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-trash-fill" viewbox="0 0 16 16">
+									<path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0"/>
+								</svg>
+							</button>
+						</span>
+					</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
+{% if 'folder_create_error' %}
+	{% for message in app.flashes('folder_create_error') %}
+		<div class="toast-container position-fixed bottom-0 end-0 p-3 mb-5" style="z-index: 1050;">
+			<div class="toast w-auto" role="alert" aria-live="assertive" data-bs-animation="false" data-bs-delay='10000' style="box-shadow:none" aria-atomic="true">
+				<div class="toast-header text-danger">
+					<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-circle-fill" viewbox="0 0 16 16">
+						<path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293z"/>
+					</svg>
+					<strong class="me-auto ms-2">Message d'erreur</strong>
+					<button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+				</div>
+				<div class="toast-body w-auto text-truncate" style="max-width:500px">
+					{{ message }}
+				</div>
+			</div>
+		</div>
+	{% endfor %}
+
+{% endif %}
+
+
+{% if 'folder_create_success' %}
+
+	{% for message in app.flashes('folder_create_success') %}
+		<div class="toast-container position-fixed bottom-0 end-0 p-3 mb-5" style="z-index: 1050;">
+			<div class="toast w-auto" role="alert" aria-live="assertive" data-bs-animation="false" data-bs-delay='10000' style="box-shadow:none" aria-atomic="true">
+				<div class="toast-header text-success">
+					<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-circle-fill" viewbox="0 0 16 16">
+						<path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293z"/>
+					</svg>
+					<strong class="me-auto ms-2">Message de succès</strong>
+					<button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+				</div>
+				<div class="toast-body w-auto text-truncate" style="max-width:500px">
+					{{ message|raw }}
+				</div>
+			</div>
+		</div>
+	{% endfor %}
+
+{% endif %}

@@ -15,9 +15,15 @@ class ChatController extends AbstractController
         $userChatResponse = $this->render('user/chat-user.html.twig', [
             'user_chat' => 'UserChatPage',
         ]);
-        $userChatResponse->headers->set('Cache-Control', 'no-cache, no-store, must-revalidate');    
-        $userChatResponse->headers->set('Pragma', 'no-cache');    
-        $userChatResponse->headers->set('Expires', '0');  
+        $userChatResponse->setCache([
+            'must_revalidate'  => true,
+            'no_cache'         => true,
+            'no_store'         => true,
+            'no_transform'     => false,
+            'public'           => false,
+            'private'          => true,
+            'max_age'          => 0,
+        ]); 
         return $userChatResponse;
     }
 
@@ -27,9 +33,15 @@ class ChatController extends AbstractController
         $archivistChatResponse = $this->render('archivemanager/chat-archman.html.twig', [
             'archivist_chat' => 'ArchivistChatPage',
         ]);
-        $archivistChatResponse->headers->set('Cache-Control', 'no-cache, no-store, must-revalidate');    
-        $archivistChatResponse->headers->set('Pragma', 'no-cache');    
-        $archivistChatResponse->headers->set('Expires', '0');  
+        $archivistChatResponse->setCache([
+            'must_revalidate'  => true,
+            'no_cache'         => true,
+            'no_store'         => true,
+            'no_transform'     => false,
+            'public'           => false,
+            'private'          => true,
+            'max_age'          => 0,
+        ]);   
         return $archivistChatResponse;
     }
 }

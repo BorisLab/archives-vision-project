@@ -7,6 +7,9 @@ use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Cache;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
+use Symfony\Component\HttpKernel\EventListener\AbstractSessionListener;
+
+
 
 class SecurityController extends AbstractController
 {
@@ -24,13 +27,23 @@ class SecurityController extends AbstractController
 
                 // if the user is successful connected, redirect him to his home page with a flash message.
                 $this->addFlash('success', 'Vous êtes connecté(e) !');
-        
-        $response = $this->render('security/login.html.twig', ['last_username' => $lastUsername, 'error' => $error]);        
-        $response->headers->set('Cache-Control', 'no-cache, no-store, must-revalidate');    
-        $response->headers->set('Pragma', 'no-cache');    
-        $response->headers->set('Expires', '0');    
 
-        return $response;
+                if($error){
+                    $this->addFlash('error', 'Email ou mot de passe incorrect !');
+                }
+        
+        $loginResponse = $this->render('security/login.html.twig', ['last_username' => $lastUsername, 'error' => $error]);        
+        $loginResponse->setCache([
+            'must_revalidate'  => true,
+            'no_cache'         => true,
+            'no_store'         => true,
+            'no_transform'     => false,
+            'public'           => false,
+            'private'          => true,
+            'max_age'          => 0,
+        ]); 
+
+        return $loginResponse;
     }
 
     #[Route(path: '/deconnexion', name: 'app_logout')]

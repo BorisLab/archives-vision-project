@@ -12,26 +12,59 @@ class ProfileController extends AbstractController
     #[IsGranted("ROLE_USER")]
     public function userprofile(): Response
     {
-        return $this->render('user/profile-user.html.twig', [
+        $userProfileResponse = $this->render('user/profile-user.html.twig', [
             'user_profile' => 'UserProfilePage',
         ]);
+        $userProfileResponse->setCache([
+            'must_revalidate'  => true,
+            'no_cache'         => true,
+            'no_store'         => true,
+            'no_transform'     => false,
+            'public'           => false,
+            'private'          => true,
+            'max_age'          => 0,
+        ]); 
+
+        return $userProfileResponse;
     }
 
     #[Route('/archivist/profile', name: 'app_archivist_profile')]
     #[IsGranted("ROLE_ARCHIVIST")]
     public function archivistprofile(): Response
     {
-        return $this->render('archivemanager/profile-archivist.html.twig', [
+        $archivistProfileResponse = $this->render('archivemanager/profile-archivist.html.twig', [
             'archivist_profile' => 'ArchivistProfilePage',
         ]);
+        $archivistProfileResponse->setCache([
+            'must_revalidate'  => true,
+            'no_cache'         => true,
+            'no_store'         => true,
+            'no_transform'     => false,
+            'public'           => false,
+            'private'          => true,
+            'max_age'          => 0,
+        ]); 
+
+        return $archivistProfileResponse;
     }
 
     #[Route('/admin/profile', name: 'app_admin_profile')]
     #[IsGranted("ROLE_ADMIN")]
     public function adminprofile(): Response
     {
-        return $this->render('admin/profile-admin.html.twig', [
+        $adminProfileResponse = $this->render('admin/profile-admin.html.twig', [
             'admin_profile' => 'AdminProfilePage',
         ]);
+        $adminProfileResponse->setCache([
+            'must_revalidate'  => true,
+            'no_cache'         => true,
+            'no_store'         => true,
+            'no_transform'     => false,
+            'public'           => false,
+            'private'          => true,
+            'max_age'          => 0,
+        ]); 
+
+        return $adminProfileResponse;
     }
 }

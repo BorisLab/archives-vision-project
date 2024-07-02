@@ -27,26 +27,55 @@
 			margin-left: 10px;
 		}
 
-		.custom-tooltip-edit {
-			--bs-tooltip-bg: var(--bs-blue);
-			--bs-tooltip-color: var(--bs-white);
+		.genie-effect {
+			transition: transform 0.5s cubic-bezier(0.99, -0.55, 0.27, 1.55);
+			transform-origin: bottom right;
 		}
 
-		.custom-tooltip-delete {
-			--bs-tooltip-bg: var(--bs-red);
-			--bs-tooltip-color: var(--bs-white);
+		.modal.show .genie-effect {
+			transform: scale(1) rotateX(0deg);
 		}
 
-		.custom-tooltip-collapse {
-			--bs-tooltip-bg: var(--bs-cyan);
-			--bs-tooltip-color: var(--bs-white);
+		.modal .genie-effect {
+			transform: scale(0.5) rotateX(45deg);
+		}
+
+		.modal .genie-effect-reverse {
+			transform: scale(0.5) rotateX(-45deg);
+		}
+
+		#form-container form {
+			width: 300%;
+		}
+
+		#form-container form .page {
+			width: 100%;
+			transition: margin-left 0.2s ease-in-out;
+		}
+
+		.hidden {
+			visibility: hidden;
+			opacity: 0;
+			transition: visibility 0s 0.1s, opacity 0.1s linear;
+		}
+
+		#form-container form #form-choice {
+			width: 33%;
+		}
+
+		#form-container form #form-sd {
+			width: 33%;
+		}
+
+		#form-container form #form-fic {
+			width: 33%;
 		}
 	</style>
 
 {% endblock %}
 
 {% block body %}
-	{{ include('layouts/partials/_logout.html.twig') }}
+	{{ include('layouts/partials/_logout-loading.html.twig') }}
 	<div class="load-div" style="display:none">
 		<div id="loading-overlay" class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="display: none; background-color: rgba(255, 255, 255, 0.8);">
 			<div class="text-center">
@@ -87,7 +116,7 @@
 							<!-- Modal -->
 							<div class="modal fade" id="newFolder" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 								<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-card">
-									<div class="modal-content">
+									<div class="modal-content genie-effect">
 										<div class="modal-header">
 											<h6 class="card-header-title" id="exampleModalLabel" style="font-size:15px">Créer un nouveau dossier</h6>
 											<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -99,8 +128,18 @@
 													<input type="text" class="form-control" id="exampleFormControlInput1" value="Dossier Archives X">
 												</div>
 												<div class="mb-3">
-													<label for="exampleFormControlSelect1" class="form-label">Département - Index</label>
+													<label for="exampleFormControlSelect1" class="form-label">Format</label>
 													<select name="" id="exampleFormControlSelect1" class="form-control">
+														<option value="">--Choisir--</option>
+														<option value="">Physique</option>
+														<option value="">Numérique</option>
+														<option value="">Mixte</option>
+													</select>
+												</div>
+												<div class="mb-3">
+													<label for="exampleFormControlSelect1" class="form-label">Département</label>
+													<select name="" id="exampleFormControlSelect1" class="form-control">
+														<option value="">--Choisir--</option>
 														<option value="">Comptabilité</option>
 														<option value="">Informatique</option>
 														<option value="">Ressources Humaines</option>
@@ -111,8 +150,8 @@
 													<input min="0" value="0" type="number" id="typeNumber" class="form-control" style="padding-right:7px"/>
 												</div>
 												<div class="mb-3">
-													<label class="form-label" for="typeNumber">Date de création</label>
-													<input value="date()" type="date" id="dateCreation" class="form-control" style="padding-right:7px"/>
+													<label class="form-label" for="typeNumber">Date de production</label>
+													<input value="" type="date" id="dateCreation" class="form-control" style="padding-right:7px"/>
 												</div>
 											</form>
 										</div>
@@ -142,13 +181,7 @@
 			<div class="col-md-4">
 				<div class="mb-3">
 					<label for="formGroupExampleInput" class="form-label">Rechercher</label>
-					<input type="text" class="form-control" id="formGroupExampleInput" autofocus placeholder="Quel document recherchez-vous?">
-				</div>
-			</div>
-			<div class="col-md-2">
-				<div class="mb-3">
-					<label for="formGroupExampleInput" class="form-label">Département</label>
-					<input type="text" class="form-control" id="formGroupExampleInput" autofocus placeholder="Nom du département">
+					<input type="text" class="form-control" id="formGroupExampleInput" autofocus placeholder="Quel dossier ou fichier recherchez-vous?">
 				</div>
 			</div>
 			<div class="col-md-2">
@@ -157,7 +190,14 @@
 					<option selected>--Choisir--</option>
 					<option>Physique</option>
 					<option>Numérique</option>
+					<option>Mixte</option>
 				</select>
+			</div>
+			<div class="col-md-2">
+				<div class="mb-3">
+					<label for="formGroupExampleInput" class="form-label">Département</label>
+					<input type="text" class="form-control" id="formGroupExampleInput" autofocus placeholder="Nom du département">
+				</div>
 			</div>
 			<div class="col-md-2">
 				<label for="dateMin" class="form-label">Du</label>
@@ -196,7 +236,7 @@
 			</div>
 		</div>
 
-		<div class="card border shadow mb-2" style="display:#">
+		<div class="card border shadow mb-2" style="display:#;max-height:370px;overflow-y:scroll">
 			<div class="card-body text-center">
 				<div class="row justify-content-center">
 					<div class="col-12">
@@ -220,7 +260,7 @@
 									<!-- Modal -->
 									<div class="modal fade" id="renameD1" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 										<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-card">
-											<div class="modal-content">
+											<div class="modal-content genie-effect">
 												<div class="modal-header">
 													<h6 class="card-header-title" id="exampleModalLabel" style="font-size:15px">Modifier un dossier</h6>
 													<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -230,6 +270,28 @@
 														<div class="mb-3">
 															<label for="exampleFormControlInput1" class="form-label">Nom du dossier</label>
 															<input type="text" readonly class="form-control" id="exampleFormControlInput1" value="Dossier Archives 1">
+														</div>
+														<div class="mb-3">
+															<label for="exampleFormControlSelect1" class="form-label">Format</label>
+															<select name="" id="exampleFormControlSelect1" class="form-control">
+																<option value="">--Choisir--</option>
+																<option value="">Physique</option>
+																<option value="">Numérique</option>
+																<option value="">Mixte</option>
+															</select>
+														</div>
+														<div class="mb-3">
+															<label for="exampleFormControlSelect1" class="form-label">Département</label>
+															<select name="" id="exampleFormControlSelect1" class="form-control">
+																<option value="">--Choisir--</option>
+																<option value="">Comptabilité</option>
+																<option value="">Informatique</option>
+																<option value="">Ressources Humaines</option>
+															</select>
+														</div>
+														<div class="mb-3">
+															<label class="form-label" for="typeNumber">Date de production</label>
+															<input value="date()" type="date" id="dateCreation" class="form-control" style="padding-right:7px"/>
 														</div>
 													</form>
 												</div>
@@ -254,7 +316,7 @@
 									<!-- Modal -->
 									<div class="modal fade" id="deleteD1" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 										<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-card">
-											<div class="modal-content">
+											<div class="modal-content genie-effect">
 												<div class="modal-header">
 													<h6 class="card-header-title" id="exampleModalLabel" style="font-size:15px">Supprimer un dossier</h6>
 													<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -290,31 +352,37 @@
 									<!-- Modal -->
 									<div class="modal fade" id="addElement" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" style="font-weight:normal;color:black">
 										<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-card">
-											<div class="modal-content">
+											<div class="modal-content genie-effect" id="form-container" style="width:100%">
 												<div class="modal-header">
 													<h6 class="card-header-title" id="exampleModalLabel2" style="font-size:15px">Ajouter un élément</h6>
 													<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 												</div>
 
-												<form action="" method="post">
-													<div id="form1">
-														<div class="modal-body">
-															<div class="mb-3">
+												<form action="" method="post" id="form-addElement" style="display:flex">
+													<div class="page slidepage" id="form-choice" style="display:#">
+														<div class="modal-body" style="margin-bottom:2px">
+															<div class="mb-4">
 																<span>Que souhaitez-vous ajouter à "Dossier Archives 1" ?</span>
+															</div>
+															<div class="row mb-3 p-3">
+																<input type="radio" class="btn-check" name="options-outlined" id="sd-outlined" autocomplete="off">
+																<label class="btn btn-outline-info" for="sd-outlined">Un ou plusieurs sous-dossier(s)</label>
+															</div>
+															<span class="row mt-3 mb-3" style="display:flex;width:100%;justify-content:center">ou</span>
+															<div class="row p-3">
+																<input type="radio" class="btn-check" name="options-outlined" id="fic-outlined" autocomplete="off">
+																<label class="btn btn-outline-info" for="fic-outlined">Un fichier</label>
 															</div>
 														</div>
 														<div class="row modal-footer">
-															<div class="col" style="align-items:center">
-																<button type="button" style="display:flex;width:100%;justify-content:center" id="" class="btn btn-outline-info mb-2">Sous-Dossier(s)</button>
-															</div>
-															<div class="col" style="align-items:center">
-																<button type="button" style="display:flex;width:100%;justify-content:center" id="" class="btn btn-outline-warning mb-2">Fichier(s)</button>
+															<div class="col" id="nextBtn" style="align-items:center">
+																<button type="button" style="display:flex;width:100%;justify-content:center" id="" class="btn btn-success mb-2">Suivant</button>
 															</div>
 														</div>
 													</div>
-													<div id="form-sd">
-														<div class="modal-body">
-															<div class="mb-3">
+													<div class="page" id="form-sd" style="display:#">
+														<div class="modal-body" style="margin-bottom:125px">
+															<div class="mb-4">
 																<span>Combien de sous-dossiers voulez-vous ajouter à "Dossier Archives 1" ?</span>
 															</div>
 															<div class="mb-3">
@@ -322,10 +390,78 @@
 															</div>
 														</div>
 														<div class="row modal-footer">
-															<div class="col" style="align-items:center">
+															<div class="col" id="prevbtnSD" style="align-items:center">
 																<button type="button" style="display:flex;width:100%;justify-content:center" id="" class="btn btn-light mb-2">Précédent</button>
 															</div>
-															<div class="col" style="align-items:center">
+															<div class="col" id="submitbtnSD" style="align-items:center">
+																<button type="button" style="display:flex;width:100%;justify-content:center" id="" class="btn btn-success mb-2">Suivant</button>
+															</div>
+														</div>
+													</div>
+													<div class="page" id="form-fic">
+														<div class="modal-body" style="margin-bottom:0px">
+															<div class="mb-3">
+																<label for="exampleFormControlInput1" class="form-label">Nom du fichier</label>
+																<input type="text" readonly class="form-control" id="exampleFormControlInput1" value="Dossier Archives 1">
+															</div>
+															<div class="mb-3">
+																<label class="form-label" for="typeNumber">Format du fichier</label>
+																<select name="" id="exampleFormControlSelect1" class="form-control">
+																	<option value="">--Choisir--</option>
+																	<option value="">Physique</option>
+																	<option value="">Numérique</option>
+																</select>
+															</div>
+															<div class="mb-3" style="display:#">
+																<div style="border-radius: 5px;display: flex;align-items: center;justify-content: center;flex-direction: column;border-radius: 5px;border: 2px dashed #6990f2;">
+																	<form class="uploadfile">
+																		<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cloud-upload-fill" viewbox="0 0 16 16">
+																			<path fill-rule="evenodd" d="M8 0a5.53 5.53 0 0 0-3.594 1.342c-.766.66-1.321 1.52-1.464 2.383C1.266 4.095 0 5.555 0 7.318 0 9.366 1.708 11 3.781 11H7.5V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V11h4.188C14.502 11 16 9.57 16 7.773c0-1.636-1.242-2.969-2.834-3.194C12.923 1.999 10.69 0 8 0m-.5 14.5V11h1v3.5a.5.5 0 0 1-1 0"/>
+																		</svg>
+																		<p>Cliquez pour importer un fichier</p>
+																	</form>
+																</div>
+																<section class="progress-area">
+																	<li class="row">
+																		<span>
+																			<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-text-fill" viewbox="0 0 16 16">
+																				<path d="M12 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2M5 4h6a.5.5 0 0 1 0 1H5a.5.5 0 0 1 0-1m-.5 2.5A.5.5 0 0 1 5 6h6a.5.5 0 0 1 0 1H5a.5.5 0 0 1-.5-.5M5 8h6a.5.5 0 0 1 0 1H5a.5.5 0 0 1 0-1m0 2h3a.5.5 0 0 1 0 1H5a.5.5 0 0 1 0-1"/>
+																			</svg>
+
+																			<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-image-fill" viewbox="0 0 16 16">
+																				<path d="M4 0h8a2 2 0 0 1 2 2v8.293l-2.73-2.73a1 1 0 0 0-1.52.127l-1.889 2.644-1.769-1.062a1 1 0 0 0-1.222.15L2 12.292V2a2 2 0 0 1 2-2m4.002 5.5a1.5 1.5 0 1 0-3 0 1.5 1.5 0 0 0 3 0"/>
+																				<path d="M10.564 8.27 14 11.708V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-.293l3.578-3.577 2.56 1.536 2.426-3.395z"/>
+																			</svg>
+
+																			<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-play-fill" viewbox="0 0 16 16">
+																				<path d="M12 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2M6 5.883a.5.5 0 0 1 .757-.429l3.528 2.117a.5.5 0 0 1 0 .858l-3.528 2.117a.5.5 0 0 1-.757-.43V5.884z"/>
+																			</svg>
+
+																			<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-music-fill" viewbox="0 0 16 16">
+																				<path d="M12 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2m-.5 4.11v1.8l-2.5.5v5.09c0 .495-.301.883-.662 1.123C7.974 12.866 7.499 13 7 13s-.974-.134-1.338-.377C5.302 12.383 5 11.995 5 11.5s.301-.883.662-1.123C6.026 10.134 6.501 10 7 10c.356 0 .7.068 1 .196V4.41a1 1 0 0 1 .804-.98l1.5-.3a1 1 0 0 1 1.196.98"/>
+																			</svg>
+																		</span>
+																		<div class="content">
+																			<div class="details">
+																				<span class="name">image_01.png •
+																					<span>Importation</span>
+																				</span>
+																				<span class="percent">25%</span>
+																				<span class="size">70 KB</span>
+																			</div>
+																			<div class="progress" role="progressbar" aria-label="Example with label" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
+																				<div class="progress-bar" style="width: 25%"></div>
+																			</div>
+																		</div>
+																	</li>
+																</section>
+															</div>
+														</div>
+														<div class="row modal-footer">
+															<div class="col" id="prevbtnFIC" style="align-items:center">
+																<button type="button" style="display:flex;width:100%;justify-content:center" id="" class="btn btn-light mb-2">Précédent</button>
+															</div>
+															<div class="col" id="submitbtnFIC" style="align-items:center">
 																<button type="button" style="display:flex;width:100%;justify-content:center" id="" class="btn btn-success mb-2">Valider</button>
 															</div>
 														</div>
@@ -368,7 +504,7 @@
 										<!-- Modal -->
 										<div class="modal fade" id="renameSD11" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 											<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-card">
-												<div class="modal-content">
+												<div class="modal-content genie-effect">
 													<div class="modal-header">
 														<h6 class="card-header-title" id="exampleModalLabel" style="font-size:15px">Modifier un dossier</h6>
 														<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -402,7 +538,7 @@
 										<!-- Modal -->
 										<div class="modal fade" id="deleteSD11" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 											<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-card">
-												<div class="modal-content">
+												<div class="modal-content genie-effect">
 													<div class="modal-header">
 														<h6 class="card-header-title" id="exampleModalLabel" style="font-size:15px">Supprimer un dossier</h6>
 														<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -470,7 +606,7 @@
 									<!-- Modal -->
 									<div class="modal fade" id="renameD2" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 										<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-card">
-											<div class="modal-content">
+											<div class="modal-content genie-effect">
 												<div class="modal-header">
 													<h6 class="card-header-title" id="exampleModalLabel" style="font-size:15px">Modifier un dossier</h6>
 													<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -504,7 +640,7 @@
 									<!-- Modal -->
 									<div class="modal fade" id="deleteD2" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 										<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-card">
-											<div class="modal-content">
+											<div class="modal-content genie-effect">
 												<div class="modal-header">
 													<h6 class="card-header-title" id="exampleModalLabel" style="font-size:15px">Supprimer un dossier</h6>
 													<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -571,7 +707,7 @@
 										<!-- Modal -->
 										<div class="modal fade" id="renameSD21" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 											<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-card">
-												<div class="modal-content">
+												<div class="modal-content genie-effect">
 													<div class="modal-header">
 														<h6 class="card-header-title" id="exampleModalLabel" style="font-size:15px">Modifier un dossier</h6>
 														<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -605,7 +741,7 @@
 										<!-- Modal -->
 										<div class="modal fade" id="deleteSD21" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 											<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-card">
-												<div class="modal-content">
+												<div class="modal-content genie-effect">
 													<div class="modal-header">
 														<h6 class="card-header-title" id="exampleModalLabel" style="font-size:15px">Supprimer un dossier</h6>
 														<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -672,7 +808,7 @@
 											<!-- Modal -->
 											<div class="modal fade" id="renameSD211" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 												<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-card">
-													<div class="modal-content">
+													<div class="modal-content genie-effect">
 														<div class="modal-header">
 															<h6 class="card-header-title" id="exampleModalLabel" style="font-size:15px">Modifier un dossier</h6>
 															<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -706,7 +842,7 @@
 											<!-- Modal -->
 											<div class="modal fade" id="deleteSD211" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 												<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-card">
-													<div class="modal-content">
+													<div class="modal-content genie-effect">
 														<div class="modal-header">
 															<h6 class="card-header-title" id="exampleModalLabel" style="font-size:15px">Supprimer un dossier</h6>
 															<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -773,7 +909,7 @@
 												<!-- Modal -->
 												<div class="modal fade" id="renameSD2111" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 													<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-card">
-														<div class="modal-content">
+														<div class="modal-content genie-effect">
 															<div class="modal-header">
 																<h6 class="card-header-title" id="exampleModalLabel" style="font-size:15px">Modifier un dossier</h6>
 																<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -807,7 +943,7 @@
 												<!-- Modal -->
 												<div class="modal fade" id="deleteSD2111" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 													<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-card">
-														<div class="modal-content">
+														<div class="modal-content genie-effect">
 															<div class="modal-header">
 																<h6 class="card-header-title" id="exampleModalLabel" style="font-size:15px">Supprimer un dossier</h6>
 																<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -876,7 +1012,7 @@
 										<!-- Modal -->
 										<div class="modal fade" id="renameSD22" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 											<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-card">
-												<div class="modal-content">
+												<div class="modal-content genie-effect">
 													<div class="modal-header">
 														<h6 class="card-header-title" id="exampleModalLabel" style="font-size:15px">Modifier un dossier</h6>
 														<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -910,7 +1046,7 @@
 										<!-- Modal -->
 										<div class="modal fade" id="deleteSD22" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 											<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-card">
-												<div class="modal-content">
+												<div class="modal-content genie-effect">
 													<div class="modal-header">
 														<h6 class="card-header-title" id="exampleModalLabel" style="font-size:15px">Supprimer un dossier</h6>
 														<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -977,7 +1113,7 @@
 											<!-- Modal -->
 											<div class="modal fade" id="renameSD221" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 												<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-card">
-													<div class="modal-content">
+													<div class="modal-content genie-effect">
 														<div class="modal-header">
 															<h6 class="card-header-title" id="exampleModalLabel" style="font-size:15px">Modifier un dossier</h6>
 															<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -1011,7 +1147,7 @@
 											<!-- Modal -->
 											<div class="modal fade" id="deleteSD221" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 												<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-card">
-													<div class="modal-content">
+													<div class="modal-content genie-effect">
 														<div class="modal-header">
 															<h6 class="card-header-title" id="exampleModalLabel" style="font-size:15px">Supprimer un dossier</h6>
 															<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -1089,7 +1225,7 @@
 												<!-- Modal -->
 												<div class="modal fade" id="renameF221A" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 													<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-card">
-														<div class="modal-content">
+														<div class="modal-content genie-effect">
 															<div class="modal-header">
 																<h6 class="card-header-title" id="exampleModalLabel" style="font-size:15px">Modifier un dossier</h6>
 																<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -1124,7 +1260,7 @@
 												<!-- Modal -->
 												<div class="modal fade" id="deleteF221A" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 													<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-card">
-														<div class="modal-content">
+														<div class="modal-content genie-effect">
 															<div class="modal-header">
 																<h6 class="card-header-title" id="exampleModalLabel" style="font-size:15px">Supprimer un dossier</h6>
 																<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -1170,8 +1306,9 @@
 		<div class="mt-4">
 			{{ include('layouts/partials/_footer.html.twig')}}
 		</div>
-		<script src="{{ asset('assets/js/docman.js') }}"></script>
-		{% for flashMessage in app.flashes('success') %}
-			{{ include('layouts/partials/_success_login_flash_msg.html.twig')}}
-		{% endfor %}
+		<script src="{{ asset('assets/js/folders-accordion.js') }}"></script>
+		<script src="{{ asset('assets/js/shortcodes/_slide-form.js') }}"></script>
+		<script src="{{ asset('assets/js/shortcodes/_reset-form.js') }}"></script>
+		<script src="{{ asset('assets/js/bootstrap.min.js') }}"></script>
+
 	{% endblock %}
