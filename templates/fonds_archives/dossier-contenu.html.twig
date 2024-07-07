@@ -12,7 +12,7 @@
 	<style>
 		body {
 			background-color: #f9fbfd;
-			overflow-x: hidden;
+			overflow: hidden;
 		}
 
 		.item-row:hover {
@@ -125,7 +125,7 @@
 				<div class="col-sm-4">
 					<div class="mb-3">
 						<label for="inputSelect" class="form-label">Rechercher</label>
-						<input type="text" class="form-control" id="formGroupExampleInput" autofocus placeholder="Quel dossier ou fichier recherchez-vous?">
+						<input type="text" class="form-control" id="formGroupExampleInput" autofocus placeholder="Rechercher un dossier ou fichier (libellé, mots-clés...)">
 					</div>
 				</div>
 				<div class="col-sm-2">
@@ -199,6 +199,7 @@
 	<script src="{{ asset('assets/js/folders-accordion.js') }}"></script>
 	<script src="{{ asset('assets/js/shortcodes/_reset-form.js') }}"></script>
 	<script src="{{ asset('assets/js/shortcodes/_keywords.js') }}"></script>
+	<script src="{{ asset('assets/js/shortcodes/_toasts-files.js') }}"></script>
 	<script src="{{ asset('assets/js/shortcodes/_searchable-select.js') }}"></script>
 	<script src="{{ asset('assets/js/shortcodes/_upload-files.js') }}"></script>
 {% endblock %}

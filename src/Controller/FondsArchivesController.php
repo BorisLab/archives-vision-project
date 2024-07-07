@@ -13,8 +13,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 class FondsArchivesController extends AbstractController
 {
@@ -72,7 +74,7 @@ class FondsArchivesController extends AbstractController
                 return $this->redirectToRoute('app_archives_folders_directory');
             }
             elseif ($form->isSubmitted() && !$form->isValid()) {
-                $this->addFlash('folder_create_error', 'La création du nouveau dossier a échouée');
+                $this->addFlash('folder_create_error', 'La création du dossier a échouée');
                 return $this->redirectToRoute('app_archives_folders_directory');
             }
         }
@@ -84,6 +86,7 @@ class FondsArchivesController extends AbstractController
         $sousFonds = $dossierRepository->findBy(['parent' => false]); 
         $sousFondsList = $this->render('fonds_archives/fonds.html.twig', [
             'dossiers' => $sousFonds,
+            'fichiers' => [],
             'parent' => $parent,
             'createFolder' => $form->createView(),
         ]);
@@ -108,7 +111,7 @@ class FondsArchivesController extends AbstractController
         $parent = $entityManager->getRepository(Dossier::class)->find($id);
         $dossiers = $parent ? $parent->getDossiers() : [];
 
-        if ($request->isMethod('POST')) {
+
             $dossier = new Dossier();
             $dossierForm = $this->createForm(CreateFolderType::class, $dossier);
             $dossierForm->handleRequest($request);
@@ -120,16 +123,16 @@ class FondsArchivesController extends AbstractController
                 $entityManager->persist($dossier);
                 $entityManager->flush();
 
-                $this->addFlash('success', 'Sous-Dossier créé avec succès');
+                $this->addFlash('subfolder_create_success', 'Création du sous-dossier effectuée avec succès');
                 return $this->redirectToRoute('app_archives_folder_content', ['id' => $id]);
             }
             elseif ($dossierForm->isSubmitted() && !$dossierForm->isValid()) {
-                $this->addFlash('folder_create_error', 'La création du nouveau sous-dossier a échouée');
-                return $this->redirectToRoute('app_archives_folders_directory', ['id' => $id]);
+                $this->addFlash('subfolder_create_error', 'Echec de la création du sous-dossier');
+                return $this->redirectToRoute('app_archives_folder_content', ['id' => $id]);
             }
-        } else {
+
             $dossierForm = $this->createForm(CreateFolderType::class, new Dossier());
-        }
+
         $dossierRacine = $parent->getDossierRacine();
 
         //Gestions des fichiers
@@ -137,43 +140,76 @@ class FondsArchivesController extends AbstractController
         $fichierForm->handleRequest($request);
         $fichiers = $parent ? $parent->getFichiers() : [];
 
-        if ($fichierForm->isSubmitted() && $fichierForm->isValid()) {
-            /** @var UploadedFile fichier */
-            $fichier = $fichierForm->get('fichier')->getData();
-            $uploadedFichiers = [];
+        $allowedExtensions = [
+            'image' => ['jpg', 'jpeg', 'png', 'gif', 'apng', "gif", "svg"],
+            'video' => ['mp4', 'avi', 'mov', 'mkv'],
+            'audio' => ['mp3', 'wav'],
+            'document' => ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx']
+        ];
 
-            foreach ($fichiers as $fichier) {
-                if ($fichier) {
+        if ($fichierForm->isSubmitted() && $fichierForm->isValid()) {
+            $loadedFiles = $fichierForm->get('fichiers')->getData();
+            $uploadedFiles = [];
+            $upload_success = false;
+
+                foreach ($loadedFiles as $fichier) {
                     $originalNomFichier = pathinfo($fichier->getClientOriginalName(), PATHINFO_FILENAME);
                     $safeNomFichier = $slugger->slug($originalNomFichier);
                     $newNomFichier = $safeNomFichier.'-'.uniqid().'.'.$fichier->guessExtension();
+                    $ext = strtolower($fichier->guessExtension());
+
+                    $format = null;
+                    foreach ($allowedExtensions as $type => $exts) {
+                        if (in_array($ext, $exts)) {
+                            $format = $type;
+                            break;
+                        }
+                    }
+
+                    if ($format === null) {
+
+                        $nomFichier = htmlspecialchars($originalNomFichier, ENT_QUOTES, 'UTF-8');
+                        $this->addFlash('add_file_error', 'Fichier non autorisé : <strong>' . $nomFichier . '</strong>');
+                        $uploadSuccess = false;
+                        continue; // Skip this file and continue with the next one
+                    }
 
                     // Move the file to the directory where files are stored
                     try {
                         $fichier->move(
-                            $this->getParameter('files_directory'),
+                            $this->getParameter('files_dir'),
                             $newNomFichier
                         );
+
+                        $uploadedFile = new Fichier();
+                        $uploadedFile->setLibelleFichier($originalNomFichier);
+                        $uploadedFile->setType($format);
+                        $parent->addFichier($uploadedFile);
+                        $uploadedFile->setCheminAcces($newNomFichier);
+    
+                        $entityManager->persist($uploadedFile);
+                        $uploadedFiles[] = $uploadedFile;
+                        $upload_success = true;
+
                     } catch (FileException $e) {
-                        $this->addFlash('error', 'Failed to upload file.');
+                        $this->addFlash('add_file_error', 'Echec de l\'importation du/des fichier(s)!');
                         return $this->redirectToRoute('app_archives_folder_content', ['id' => $id]);
                     }
 
-                    // Save the file information in the database
-                    $uploadedFichier = new Fichier();
-                    $uploadedFichier-> setLibelleFichier($newNomFichier);
-                    $parent->addDossier($uploadedFichier);
-                    $uploadedFichier->setCheminAcces($originalNomFichier);
-
-                    $entityManager->persist($uploadedFichier);
-                    $uploadedFichiers[] = $uploadedFichier;
                 }
-            }
-
+            if($upload_success) {
             $entityManager->flush();
-
-            $this->addFlash('success', 'File(s) uploaded successfully!');
+            $this->addFlash('add_file_success', 'Importation effectuée avec succès');
             return $this->redirectToRoute('app_archives_folder_content', ['id' => $id]);
+            }
+        }
+
+        elseif ($fichierForm->isSubmitted() && !$fichierForm->isValid()) {
+            $this->addFlash('add_file_error', 'Aucun fichier importé');
+            return $this->redirectToRoute('app_archives_folder_content', ['id' => $id]);
+        }
+        else {
+            $fichierForm = $this->createForm(AddFichierType::class, new Fichier());
         }
 
         $fichiersAndFolders = $this->render('fonds_archives/dossier-contenu.html.twig', [

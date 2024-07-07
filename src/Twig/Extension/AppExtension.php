@@ -22,9 +22,9 @@ class AppExtension extends AbstractExtension
         ];
     }
 
-    public function setActiveRoute(string $route, ?string $activeClass = 'active') : string {
+    public function setActiveRoute(array $routes, ?string $activeClass = 'active') : string {
         $currentRoute = $this->requestStack->getCurrentRequest()->attributes->get('_route');
         
-        return $currentRoute == $route ? $activeClass : '';
+        return in_array($currentRoute, $routes, true) == $routes ? $activeClass : '';
     }
 }

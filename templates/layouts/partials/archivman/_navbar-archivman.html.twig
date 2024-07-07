@@ -10,25 +10,25 @@
       <div class=" collapse navbar-collapse" id="navbarNavDropdown">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <li class="nav-item">
-            <a class="nav-link {{ set_active_route('app_archivist_home') }}" draggable="false" href="{{ path('app_archivist_home') }}">Accueil</a>
+            <a class="nav-link {{ set_active_route(['app_archivist_home']) }}" draggable="false" href="{{ path('app_archivist_home') }}">Accueil</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link {{ set_active_route('app_archives_folders_directory') }}" draggable="false" href="{{ path('app_archives_folders_directory') }}">Fonds d'archives</a>
+            <a class="nav-link {{ set_active_route(['app_archives_folders_directory', 'app_archives_folder_content']) }}" draggable="false" href="{{ path('app_archives_folders_directory') }}">Fonds d'archives</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link {{ set_active_route('app_departements') }}" draggable="false" href="{{ path('app_departements') }}">Numérisation #</a>
+            <a class="nav-link {{ set_active_route(['app_departements']) }}" draggable="false" href="{{ path('app_departements') }}">Numérisation #</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link {{ set_active_route('app_archivist_chat') }}" draggable="false" href="{{ path('app_archivist_notifs') }}">Notifications</a>
+            <a class="nav-link {{ set_active_route(['app_archivist_chat']) }}" draggable="false" href="{{ path('app_archivist_notifs') }}">Notifications</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link {{ set_active_route('app_archivist_chat') }}" draggable="false" href="{{ path('app_archivist_chat') }}">Messagerie</a>
+            <a class="nav-link {{ set_active_route(['app_archivist_chat']) }}" draggable="false" href="{{ path('app_archivist_chat') }}">Messagerie</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link {{ set_active_route('app_archivist_profile') }}" draggable="false" href="{{ path('app_archivist_profile') }}">Mon Profil</a>
+            <a class="nav-link {{ set_active_route(['app_archivist_profile']) }}" draggable="false" href="{{ path('app_archivist_profile') }}">Mon Profil</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link {{ set_active_route('app_logout') }}" id="logout-button" draggable="false" href="{{ path('app_logout') }}">Déconnexion</a>
+            <a class="nav-link {{ set_active_route(['app_logout']) }}" id="logout-button" draggable="false" href="{{ path('app_logout') }}">Déconnexion</a>
           </li>
         </ul>
       </div>

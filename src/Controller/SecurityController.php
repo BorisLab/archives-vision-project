@@ -26,10 +26,10 @@ class SecurityController extends AbstractController
         $lastUsername = $authenticationUtils->getLastUsername();
 
                 // if the user is successful connected, redirect him to his home page with a flash message.
-                $this->addFlash('success', 'Vous êtes connecté(e) !');
+                $this->addFlash('success', 'Vous êtes connecté(e)');
 
                 if($error){
-                    $this->addFlash('error', 'Email ou mot de passe incorrect !');
+                    $this->addFlash('error', 'Email ou mot de passe incorrect');
                 }
         
         $loginResponse = $this->render('security/login.html.twig', ['last_username' => $lastUsername, 'error' => $error]);        
