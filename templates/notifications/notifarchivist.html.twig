@@ -1,0 +1,44 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}
+	Fonds d'archives &middot;
+	{{ parent() }}
+{% endblock %}
+
+{% block stylesheets %}
+	<link rel="stylesheet" href="{{ asset('assets/css/theme.bundle.css') }}">
+	<link rel="stylesheet" href="{{ asset('assets/css/scrollbar.css') }}">
+	<script src="{{ asset('assets/js/theme.bundle.js') }}"></script>
+
+	<style>
+		body {
+			background-color: #f9fbfd;
+			overflow-x: hidden;
+		}
+	</style>
+
+{% endblock %}
+
+{% block body %}
+	<div style="width:100%">
+		{{ include('layouts/partials/archivman/_navbar-archivman.html.twig') }}
+	</div>
+	<div class="example-wrapper">
+		<h1>Hello
+			{{ controller_name }}! ✅</h1>
+
+		This friendly message is coming from:
+		<ul>
+			<li>Your controller at
+				<code>
+					<a href="{{ 'C:/Users/alibo/Documents/symfonyProjects/archives-vision-project/src/Controller/NotificationsController.php'|file_link(0) }}">src/Controller/NotificationsController.php</a>
+				</code>
+			</li>
+			<li>Your template at
+				<code>
+					<a href="{{ 'C:/Users/alibo/Documents/symfonyProjects/archives-vision-project/templates/notifications/notifarchivist.html.twig'|file_link(0) }}">templates/notifications/notifarchivist.html.twig</a>
+				</code>
+			</li>
+		</ul>
+	</div>
+{% endblock %}

@@ -7,12 +7,13 @@
 
 {% block stylesheets %}
 	<link rel="stylesheet" href="{{ asset('assets/css/theme.bundle.css') }}">
+	<link rel="stylesheet" href="{{ asset('assets/css/scrollbar.css') }}">
 
 	<style>
 
 		body {
 			background-color: #f9fbfd;
-			overflow-x: hidden;
+			overflow: hidden;
 		}
 
 		input.form-control:focus,
@@ -20,6 +21,21 @@
 			border-color: #0d6efd;
 			outline: 0;
 			box-shadow: 0 0 0 0;
+		}
+
+		.item-row:hover {
+			background-color: #F2F3F4;
+		}
+
+		.item-row #item-name:hover {
+			text-decoration: underline;
+		}
+
+		.breadcrumb-item + .breadcrumb-item::before {
+			display: inline-block;
+			padding-right: 0.5rem;
+			padding-top: 0.19rem;
+			content: url("data:image/svg+xml, %3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath d='M9.29 6.71a.996.996 0 0 0 0 1.41L13.17 12l-3.88 3.88a.996.996 0 1 0 1.41 1.41l4.59-4.59a.996.996 0 0 0 0-1.41L10.7 6.7c-.38-.38-1.02-.38-1.41.01'/%3E%3C/svg%3E");
 		}
 	</style>
 {% endblock %}
@@ -47,31 +63,8 @@
 	</div>
 	<div class="main-content">
 		{{ include('layouts/partials/user/_navbar-user.html.twig')}}
-
-		<div class="header">
-			<div
-				class="container">
-				<!-- Body -->
-				<div class="header-body border-bottom mt-4 mb-4" style="border-color:rgba(18, 38, 63, 0.175)">
-					<div class="row align-items-end">
-						<div
-							class="col pb-3">
-
-							<!-- Title -->
-							<h4 class="header-title">
-								Mes documents
-							</h1>
-
-						</div>
-
-					</div>
-					<!-- / .row -->
-				</div>
-				<!-- / .header-body -->
-			</div>
-		</div>
 	</div>
-	<div class="container">
+	<div class="p-4">
 
 		<div class="row mb-3">
 			<div class="col-md-4">
@@ -80,45 +73,51 @@
 					<input type="text" class="form-control" id="formGroupExampleInput" autofocus placeholder="Quel document recherchez-vous?">
 				</div>
 			</div>
+			<div class="col-sm-2">
+				<label for="inputSelect" class="form-label">Type</label>
+				<select id="inputSelect" class="form-select">
+					<option selected>---Choisir---</option>
+					<option>Dossier</option>
+					<option>Fichier</option>
+				</select>
+			</div>
 			<div class="col-md-2">
 				<label for="inputSelect" class="form-label">Format</label>
 				<select id="inputSelect" class="form-select">
 					<option selected>--Choisir--</option>
 					<option>Physique</option>
 					<option>Numérique</option>
+					<option>Mixte</option>
 				</select>
 			</div>
-			<div class="col">
+			<div class="col-md-2">
 				<label for="dateMin" class="form-label">Du</label>
 				<input type="date" id="dateMin" class="form-control" placeholder="Date minimale">
 			</div>
-			<div class="col">
+			<div class="col-md-2">
 				<label for="dateMax" class="form-label">Au</label>
 				<input type="date" id="dateMax" class="form-control" placeholder="Date maximale">
 			</div>
 
 		</div>
+		<div class="row mx-auto mb-3 align-items-center">
+			<div class="col">
 
-		<div class="card mb-2 border border-primary-subtle" style="z-index:1">
-			<div class="card-body text-center" id="empty-card" style="display:#">
-				<div class="row justify-content-center">
-					<div
-						class="col-12 col-xl-10">
+				<nav>
+					<ol class="breadcrumb">
+						<li class="breadcrumb-item">
+							<span class="link-dark" href="#!">Tous les documents</span>
+						</li>
+					</ol>
+				</nav>
 
-						<!-- Image -->
-						<img
-						draggable="false" src="{{ asset('assets/imgs/empty-box.gif') }}" alt="..." class="img-fluid mt-2 mb-2" style="max-width: 272px;">
-
-						<!-- Title -->
-						<h4 class="mb-2">
-							Vous n'avez produit aucun document pour l'instant
-						</h4>
-
-						<!-- Content -->
-						<p class="text-muted">
-							Tous vos documents d'archives produits s'afficheront ici.
-						</p>
-
+			</div>
+		</div>
+		<div class="mb-2 border border-primary-subtle" style="z-index:1">
+			<div class="" id="empty-card" style="display:#">
+				<div class="row">
+					<div>
+						{% include 'user/composants/_docs-tab.html.twig' %}
 					</div>
 				</div>
 				<!-- / .row -->
@@ -126,5 +125,6 @@
 		</div>
 
 	</div>
-
+	<script src="{{ asset('assets/js/shortcodes/_req-folder.js') }}"></script>
+	<script src="{{ asset('assets/js/shortcodes/_req-file.js') }}"></script>
 {% endblock %}

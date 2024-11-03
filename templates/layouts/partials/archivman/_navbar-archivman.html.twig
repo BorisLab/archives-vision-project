@@ -1,8 +1,8 @@
 <nav class="navbar navbar-expand-md p-3 border-bottom shadow-sm" id="topbar" style="background-color: #fff;">
     <div class="container-fluid">
-      <a class="navbar-brand" draggable="false" href="#">
+      <span class="navbar-brand">
         ARCHIVES VISION
-      </a>
+      </span>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -19,7 +19,7 @@
             <a class="nav-link {{ set_active_route(['app_departements']) }}" draggable="false" href="{{ path('app_departements') }}">Numérisation #</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link {{ set_active_route(['app_archivist_chat']) }}" draggable="false" href="{{ path('app_archivist_notifs') }}">Notifications</a>
+            <a class="nav-link {{ set_active_route(['app_archivist_notifs']) }}" draggable="false" href="{{ path('app_archivist_notifs') }}">Notifications</a>
           </li>
           <li class="nav-item">
             <a class="nav-link {{ set_active_route(['app_archivist_chat']) }}" draggable="false" href="{{ path('app_archivist_chat') }}">Messagerie</a>

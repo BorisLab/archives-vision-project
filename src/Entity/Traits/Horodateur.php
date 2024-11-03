@@ -2,11 +2,12 @@
 
 namespace App\Entity\Traits;
 
+use Doctrine\ORM\Mapping as ORM;
 
 trait Horodateur
 {
 
-    #[Column(type: 'datetime_immutable', options: ['default' => 'CURRENT_TIMESTAMP'])]
+    #[ORM\Column(type: 'datetime_immutable', options: ['default' => 'CURRENT_TIMESTAMP'])]
     private $date_creation;
 
     #[ORM\Column(type: 'datetime_immutable', options: ['default' => 'CURRENT_TIMESTAMP'])]
@@ -42,7 +43,7 @@ trait Horodateur
     {
         if($this->getDateCreation() === null)
         {
-           $this->setDateCreation(new DateTimeImmutable);
+           $this->setDateCreation(new \DateTimeImmutable);
         }
         $this->setDateModif(new \DateTimeImmutable);
     }

@@ -1,0 +1,135 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}
+	Accueil &middot;
+	{{ parent() }}
+{% endblock %}
+
+{% block stylesheets %}
+	<link rel="stylesheet" href="{{ asset('assets/css/theme.bundle.css') }}">
+	<link rel="stylesheet" href="{{ asset('assets/css/scrollbar.css') }}">
+
+	<style>
+
+		body {
+			background-color: #f9fbfd;
+			overflow: hidden;
+		}
+
+		input.form-control:focus,
+		.form-select:focus {
+			border-color: #0d6efd;
+			outline: 0;
+			box-shadow: 0 0 0 0;
+		}
+		.item-row:hover {
+			background-color: #F2F3F4;
+		}
+
+		.item-row #item-name:hover {
+			text-decoration: underline;
+		}
+
+		.breadcrumb-item + .breadcrumb-item::before {
+			display: inline-block;
+			padding-right: 0.5rem;
+			padding-top: 0.19rem;
+			content: url("data:image/svg+xml, %3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath d='M9.29 6.71a.996.996 0 0 0 0 1.41L13.17 12l-3.88 3.88a.996.996 0 1 0 1.41 1.41l4.59-4.59a.996.996 0 0 0 0-1.41L10.7 6.7c-.38-.38-1.02-.38-1.41.01'/%3E%3C/svg%3E");
+		}
+	</style>
+{% endblock %}
+
+{% block body %}
+	<div class="logout-div" style="display:none;position:absolute;z-index:2">
+		<div id="loading-overlay" class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="display: none; background-color: rgba(173, 173, 173, 0.7)">
+			<div class="text-center" style="background-color: white;padding: 35px 175px 20px 175px;border-radius: 5px">
+				<div class="spinner-border text-primary" role="status">
+					<span class="visually-hidden">Loading...</span>
+				</div>
+				<p class="mt-2">Déconnexion en cours...</p>
+			</div>
+		</div>
+	</div>
+	<div class="load-div" style="display:none">
+		<div id="loading-overlay" class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="display: none; background-color: rgba(173, 173, 173, 0.7);">
+			<div class="text-center" style="background-color: white;padding: 35px 175px 20px 175px;border-radius: 5px">
+				<div class="spinner-border text-primary" role="status">
+					<span class="visually-hidden">Loading...</span>
+				</div>
+				<p class="mt-2">Veuillez patienter...</p>
+			</div>
+		</div>
+	</div>
+	<div class="main-content">
+		{{ include('layouts/partials/user/_navbar-user.html.twig')}}
+	</div>
+	<div class="p-4">
+
+		<div class="row mb-3">
+			<div class="col-md-4">
+				<div class="mb-3">
+					<label for="formGroupExampleInput" class="form-label">Rechercher</label>
+					<input type="text" class="form-control" id="formGroupExampleInput" autofocus placeholder="Quel document recherchez-vous?">
+				</div>
+			</div>
+			<div class="col-sm-2">
+				<label for="inputSelect" class="form-label">Type</label>
+				<select id="inputSelect" class="form-select">
+					<option selected>---Choisir---</option>
+					<option>Dossier</option>
+					<option>Fichier</option>
+				</select>
+			</div>
+			<div class="col-md-2">
+				<label for="inputSelect" class="form-label">Format</label>
+				<select id="inputSelect" class="form-select">
+					<option selected>--Choisir--</option>
+					<option>Physique</option>
+					<option>Numérique</option>
+					<option>Mixte</option>
+				</select>
+			</div>
+			<div class="col-md-2">
+				<label for="dateMin" class="form-label">Du</label>
+				<input type="date" id="dateMin" class="form-control" placeholder="Date minimale">
+			</div>
+			<div class="col-md-2">
+				<label for="dateMax" class="form-label">Au</label>
+				<input type="date" id="dateMax" class="form-control" placeholder="Date maximale">
+			</div>
+
+		</div>
+		<div class="row mx-auto mb-3 align-items-center">
+			<div class="col">
+
+				<nav>
+					<ol class="breadcrumb">
+						<li class="breadcrumb-item">
+							<a class="link-dark text-truncate" style="max-width:200px" href="{{ path("app_user_home")}}">Tous les documents</a>
+						</li>
+						{% for dossier in arborescence %}
+							<li class="breadcrumb-item">
+								<a class="link-dark text-truncate" style="max-width:200px" href="{{ path("app_user_folder_content", {id: dossier.dossierId})}}">{{ dossier.libelleDossier }}</a>
+							</li>
+						{% endfor %}
+						<li class="breadcrumb-item active" aria-current="page">{{ dossier_courant.libelleDossier }}</li>
+					</ol>
+				</nav>
+
+			</div>
+		</div>
+		<div class="mb-2 border border-primary-subtle" style="z-index:1">
+			<div class="" id="empty-card" style="display:#">
+				<div class="row">
+					<div>
+						{% include 'user/composants/_docs-tab.html.twig' %}
+					</div>
+				</div>
+			</div>
+			<!-- / .row -->
+		</div>
+	</div>
+
+</div>
+<script src="{{ asset('assets/js/shortcodes/_req-folder.js') }}"></script>
+<script src="{{ asset('assets/js/shortcodes/_req-file.js') }}"></script>{% endblock %}

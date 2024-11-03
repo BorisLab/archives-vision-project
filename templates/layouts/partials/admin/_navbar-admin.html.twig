@@ -10,19 +10,19 @@
       <div class=" collapse navbar-collapse" id="navbarNavDropdown">
         <ul class="navbar-nav ms-auto ">
           <li class="nav-item">
-            <a class="nav-link mx-2 {{ set_active_route('app_admin_home') }}" draggable="false" href="{{ path('app_admin_home') }}">Accueil</a>
+            <a class="nav-link mx-2 {{ set_active_route(['app_admin_home']) }}" draggable="false" href="{{ path('app_admin_home') }}">Accueil</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link mx-2 {{ set_active_route('app_departements') }}" draggable="false" href="{{ path('app_departements') }}">Départements</a>
+            <a class="nav-link mx-2 {{ set_active_route(['app_departements']) }}" draggable="false" href="{{ path('app_departements') }}">Départements</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link mx-2 {{ set_active_route('app_users') }}" draggable="false" href="{{ path('app_users') }}">Utilisateurs</a>
+            <a class="nav-link mx-2 {{ set_active_route(['app_users']) }}" draggable="false" href="{{ path('app_users') }}">Utilisateurs</a>
           </li>
           <li class="nav-item">
             <a class="nav-link mx-2 " draggable="false" href="">Audit & Suivi</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link mx-2 {{ set_active_route('app_logout') }}" draggable="false" href="{{ path('app_logout') }}">Déconnexion</a>
+            <a class="nav-link mx-2 {{ set_active_route(['app_logout']) }}" draggable="false" href="{{ path('app_logout') }}">Déconnexion</a>
           </li>
         </ul>
       </div>

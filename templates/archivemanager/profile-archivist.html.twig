@@ -51,11 +51,11 @@
 							<div class="card-body">
 								<form>
 									<div class="row">
-										<div class="col mt-4 mb-4">
+										<div class="col mt-4 mb-5">
 											<span href="../profile-posts.html" class="avatar avatar-xl card-avatar card-avatar-top mb-4" style="width:75px;height:75px">
 												<img src="{{ asset('assets/imgs/default-image-user.jpg') }}" class="avatar-img rounded-circle border border-2 border-card" alt="...">
 											</span>
-											<button class="btn btn-outline-light btn-sm position-absolute start-50 translate-middle">
+											<button class="btn btn-outline-dark btn-sm position-absolute start-50 translate-middle">
 												Mettre à jour votre photo
 											</button>
 										</div>
@@ -63,23 +63,23 @@
 									<div class="row mb-3">
 										<div class="col">
 											<label for="firstName" class="form-label">Nom</label>
-											<input type="text" class="form-control" id="firstName" placeholder="Entrez votre nom">
+											<input type="text" class="form-control" id="firstName" value="{{ app.user.nom }}" placeholder="Entrez votre nom">
 										</div>
 										<div class="col">
 											<label for="lastName" class="form-label">Prénom(s)</label>
-											<input type="text" class="form-control" id="lastName" placeholder="Entrez votre(vos) prénom(s)">
+											<input type="text" class="form-control" id="lastName" value="{{ app.user.prenoms }}" placeholder="Entrez votre(vos) prénom(s)">
 										</div>
 									</div>
 									<div class="row mb-3">
 										<div class="col">
 											<label for="emailAddress" class="form-label">Email
-												<span class="badge text-bg-info">Seul l'administratreur peut modifier ce champ</span>
+												<span class="badge text-bg-dark">Seul l'administratreur peut modifier cette information</span>
 											</label>
-											<span class="form-control" style="background-color:whitesmoke" id="emailAddress">drogba@example.com</span>
+											<span class="form-control" style="background-color:whitesmoke" id="emailAddress">{{ app.user.email }}</span>
 										</div>
 										<div class="col">
 											<label for="departement" class="form-label">Département
-												<span class="badge text-bg-info">Seul l'administratreur peut modifier ce champ</span>
+												<span class="badge text-bg-dark">Seul l'administratreur peut modifier cette information</span>
 											</label>
 											<span class="form-control" style="background-color:whitesmoke" id="departement">Comptabilité</span>
 										</div>
@@ -96,7 +96,7 @@
 									</div>
 
 									<div class="d-grid gap-2">
-										<button type="submit" class="btn btn-lg btn-info mb-0">
+										<button type="submit" class="btn btn-lg btn-dark mb-0">
 											<span style="font-size:17px">Enregistrer les modifications</span>
 										</button>
 									</div>

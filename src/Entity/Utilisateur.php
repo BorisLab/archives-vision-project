@@ -47,9 +47,13 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'utilisateur', targetEntity: Dossier::class)]
     private Collection $dossiers;
 
+    #[ORM\OneToMany(mappedBy: 'Utilisateur', targetEntity: DemandeAcces::class, orphanRemoval: true)]
+    private Collection $demandeAcces;
+
     public function __construct()
     {
         $this->dossiers = new ArrayCollection();
+        $this->demandeAcces = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -181,6 +185,36 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($dossier->getUtilisateur() === $this) {
                 $dossier->setUtilisateur(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, DemandeAcces>
+     */
+    public function getDemandeAcces(): Collection
+    {
+        return $this->demandeAcces;
+    }
+
+    public function addDemandeAcce(DemandeAcces $demandeAcce): static
+    {
+        if (!$this->demandeAcces->contains($demandeAcce)) {
+            $this->demandeAcces->add($demandeAcce);
+            $demandeAcce->setUtilisateur($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDemandeAcce(DemandeAcces $demandeAcce): static
+    {
+        if ($this->demandeAcces->removeElement($demandeAcce)) {
+            // set the owning side to null (unless already changed)
+            if ($demandeAcce->getUtilisateur() === $this) {
+                $demandeAcce->setUtilisateur(null);
             }
         }
 

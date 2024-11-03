@@ -1,0 +1,65 @@
+<div class="modal fade text-start" id="editFolder" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-card">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h6 class="card-header-title" id="exampleModalLabel" style="font-size:15px">Editer un dossier</h6>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<form action="" method="post" id="editFolderForm" style="overflow-x:hidden;overflow-y:scroll">
+				<div class="modal-body">
+					<input type="hidden" name="_action" value="editDossier">
+					<input type="hidden" id="editFolderId" name="folderId">
+					<div class="mb-3">
+						<label for="exampleFormControlInput1" class="form-label">Nom du dossier</label>
+						<input type="text" class="form-control" name="libelle_dossier" placeholder="Entrer le nom du dossier" id="editFolderName">
+					</div>
+					<div class="mb-3">
+						<label class="form-label">Format</label>
+						<select name="format_dossier" id="editFolderFormat" class="form-control">
+							{% for format in formats %}
+								<option value="{{ format.value }}">{{ format.name }}</option>
+							{% endfor %}
+						</select>
+					</div>
+					<div class="mb-3 edit-searchable-select">
+						<label for="edit-searchable-select-input" class="form-label">Département</label>
+						<input type="text" id="edit-searchable-select-input" required="required" name="departement_dossier" class="form-control" placeholder="Rechercher un département">
+						<ul id="edit-searchable-list" class="list-group hidden"></ul>
+						<div class="mb-3">
+							<select id="edit-dossier_departement" required="required" class="d-none edit-searchable-select-list form-select">
+								{% for dep in deps %}
+									<option value="{{ dep.id }}">{{ dep.libelleDep }}</option>
+								{% endfor %}
+							</select>
+						</div>
+					</div>
+					<div class="mb-3">
+						<label class="form-label">Statut</label>
+						<select name="statut_dossier" id="editFolderStatut" class="form-control">
+							{% for statut in statuts %}
+								<option value="{{ statut.value }}">{{ statut.name }}</option>
+							{% endfor %}
+						</select>
+					</div>
+					<div class="mb-3">
+						<input type="hidden" id="folder_tags" name="motsClesDossier" class="folder-tags-input" mapped="mapped">
+						<label for="editFolderKeywordsContainer" class="form-label">Mots-clés
+							<span class="fst-italic">(optionnel)</span>
+						</label>
+						<div id="editFolderKeywordsContainer" class="keywords-input rounded-2">
+							<input type="text" id="editFolderKeywordsInput" placeholder="Ajouter des mots-clés"/>
+						</div>
+					</div>
+				</div>
+				<div class="row modal-footer">
+					<div class="col" style="align-items:center">
+						<button type="button" style="display:flex;width:100%;justify-content:center" id="" class="btn btn-light mb-2" data-bs-dismiss="modal">Annuler</button>
+					</div>
+					<div class="col" style="align-items:center">
+						<button type="submit" style="display:flex;width:100%;justify-content:center" formnovalidate id="" class="btn btn-dark mb-2">Enregistrer les modifications</button>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>

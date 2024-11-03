@@ -9,10 +9,18 @@ use Symfony\Component\Routing\Annotation\Route;
 class NotificationsController extends AbstractController
 {
     #[Route('/archivist/notifications', name: 'app_archivist_notifs')]
-    public function index(): Response
+    public function notifarchivist(): Response
     {
-        return $this->render('notifications/index.html.twig', [
-            'controller_name' => 'NotificationsController',
+        return $this->render('notifications/notifarchivist.html.twig', [
+            'controller_name' => 'ArchivistNotifPage',
+        ]);
+    }
+
+    #[Route('/user/notifications', name: 'app_user_notifs')]
+    public function notifuser(): Response
+    {
+        return $this->render('notifications/notifuser.html.twig', [
+            'controller_name' => 'UserNotifPage',
         ]);
     }
 }

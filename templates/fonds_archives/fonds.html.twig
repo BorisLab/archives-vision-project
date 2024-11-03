@@ -92,7 +92,8 @@
 			width: 100%;
 			box-sizing: border-box;
 		}
-		.searchable-select ul {
+		.searchable-select ul,
+		.edit-searchable-select ul {
 			position: absolute;
 			top: 100%;
 			left: 0;
@@ -112,6 +113,37 @@
 			cursor: pointer;
 		}
 		.searchable-select ul li:hover {
+			background-color: #f1f1f1;
+		}
+
+		.edit-searchable-select {
+			position: relative;
+			width: 100%;
+		}
+		.edit-searchable-select input {
+			width: 100%;
+			box-sizing: border-box;
+		}
+		{
+			position: absolute;
+			top: 100%;
+			left: 0;
+			width: 100%;
+			max-height: 200px;
+			overflow-y: auto;
+			background: white;
+			border: 1px solid #ced4da;
+			border-top: none;
+			z-index: 1050; /* Plus grand que celui de la modal */
+			list-style: none;
+			padding: 0;
+			margin: 0;
+		}
+		.edit-searchable-select ul li {
+			padding: 0.5rem;
+			cursor: pointer;
+		}
+		.edit-searchable-select ul li:hover {
 			background-color: #f1f1f1;
 		}
 		.hidden {
@@ -142,18 +174,29 @@
 		<div>
 			<div>
 				<!-- Modal -->
-				{{ include('fonds_archives/composants/modals/_create_folder_modal.html.twig') }}
+				{{ include('fonds_archives/composants/modals/forms/_create_folder_modal.html.twig') }}
+				{{ include('fonds_archives/composants/modals/forms/_edit_folder_modal.html.twig') }}
+				{{ include('fonds_archives/composants/modals/forms/_delete_folder_modal.html.twig') }}
+
+
 			</div>
 		</div>
 
 		<div class="container-fluid">
 			<div class="row p-3">
-
 				<div class="col-sm-4">
 					<div class="mb-3">
 						<label for="inputSelect" class="form-label">Rechercher</label>
 						<input type="text" class="form-control" id="formGroupExampleInput" autofocus placeholder="Rechercher un sous-fonds (libellé, mots-clés...)">
 					</div>
+				</div>
+				<div class="col-sm-2">
+					<label for="inputSelect" class="form-label">Type</label>
+					<select id="inputSelect" class="form-select">
+						<option selected>---Choisir---</option>
+						<option>Dossier</option>
+						<option>Fichier</option>
+					</select>
 				</div>
 				<div class="col-sm-2">
 					<label for="inputSelect" class="form-label">Format</label>
@@ -170,11 +213,11 @@
 						<input type="text" class="form-control" id="formGroupExampleInput" autofocus placeholder="Nom du département">
 					</div>
 				</div>
-				<div class="col-sm-2">
+				<div class="col-sm-1">
 					<label for="dateMin" class="form-label">Du</label>
 					<input type="date" id="dateMin" class="form-control"/>
 				</div>
-				<div class="col-sm-2">
+				<div class="col-sm-1">
 					<label for="dateMax" class="form-label">Au</label>
 					<input type="date" id="dateMax" class="form-control"/>
 				</div>
@@ -184,14 +227,13 @@
 		<!-- / .row -->
 		<div class="row">
 			<div class="col-12 col-xl-12">
-
 				<div class="row mx-auto align-items-center">
 					<div class="col">
 
 						<nav>
 							<ol class="breadcrumb">
 								<li class="breadcrumb-item">
-									<span class="link-dark" href="#!">Tous les sous-fonds</span>
+									<span class="link-dark">Tous les sous-fonds</span>
 								</li>
 							</ol>
 						</nav>
@@ -201,7 +243,7 @@
 						class="col-auto">
 
 						<!-- Button -->
-						<button type="button" href="#!" id="newFolderBtn" data-bs-target="#newFolder" class="btn btn-sm me-3 mb-2 btn-white" data-bs-toggle="modal" data-bs-title="Nouveau dossier">
+						<button type="button" id="newFolderBtn" data-bs-target="#newFolder" class="btn btn-sm me-3 mb-2 btn-white" data-bs-toggle="modal" data-bs-title="Nouveau dossier">
 							Créer un nouveau dossier
 						</button>
 
@@ -218,10 +260,13 @@
 
 	</div>
 	<script src="{{ asset('assets/js/folders-accordion.js') }}"></script>
-	<script src="{{ asset('assets/js/shortcodes/_slide-form.js') }}"></script>
-	<script src="{{ asset('assets/js/shortcodes/_reset-form.js') }}"></script>
+	<script src="{{ asset('assets/js/shortcodes/_reset-folder-form.js') }}"></script>
 	<script src="{{ asset('assets/js/shortcodes/_form-check.js') }}"></script>
+	<script src="{{ asset('assets/js/shortcodes/_modal-get.js') }}"></script>
 	<script src="{{ asset('assets/js/shortcodes/_toasts.js') }}"></script>
-	<script src="{{ asset('assets/js/shortcodes/_keywords.js') }}"></script>
+	<script src="{{ asset('assets/js/shortcodes/_new-folder-keywords.js') }}"></script>
+	<script src="{{ asset('assets/js/shortcodes/_edit-folder-keywords.js') }}"></script>
 	<script src="{{ asset('assets/js/shortcodes/_searchable-select.js') }}"></script>
+	<script src="{{ asset('assets/js/shortcodes/_edit-searchable-select.js') }}"></script>
+
 {% endblock %}

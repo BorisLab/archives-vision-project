@@ -54,10 +54,17 @@ class Dossier
     #[ORM\OneToMany(mappedBy: 'dossier_parent', targetEntity: self::class)]
     private Collection $dossiers;
 
+    #[ORM\Column]
+    private ?bool $statut = true;
+
+    #[ORM\OneToMany(mappedBy: 'dossier', targetEntity: DemandeAcces::class)]
+    private Collection $demandeAcces;
+
     public function __construct()
     {
         $this->fichiers = new ArrayCollection();
         $this->dossiers = new ArrayCollection();
+        $this->demandeAcces = new ArrayCollection();
     }
 
     public function getDossierId(): ?int
@@ -196,6 +203,19 @@ class Dossier
         return $dossier_racine;
     }
 
+    public function getArborescence(): array
+    {
+        $arbo = [];
+        $dossierCourant = $this;
+
+        while ($dossierCourant) {
+            array_unshift($arbo, $dossierCourant);
+            $dossierCourant = $dossierCourant->getDossierParent();
+        }
+
+        return $arbo;
+    }
+
     /**
      * @return Collection<int, self>
      */
@@ -230,5 +250,47 @@ class Dossier
     public function persistParent()
     {
         $this->parent = $this->dossier_parent !== null;
+    }
+
+    public function isStatut(): ?bool
+    {
+        return $this->statut;
+    }
+
+    public function setStatut(bool $statut): static
+    {
+        $this->statut = $statut;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, DemandeAcces>
+     */
+    public function getDemandeAcces(): Collection
+    {
+        return $this->demandeAcces;
+    }
+
+    public function addDemandeAcces(DemandeAcces $demandeAcces): static
+    {
+        if (!$this->demandeAcces->contains($demandeAcces)) {
+            $this->demandeAcces->add($demandeAcces);
+            $demandeAcces->setDossier($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDemandeAcces(DemandeAcces $demandeAcces): static
+    {
+        if ($this->demandeAcces->removeElement($demandeAcces)) {
+            // set the owning side to null (unless already changed)
+            if ($demandeAcces->getDossier() === $this) {
+                $demandeAcces->setDossier(null);
+            }
+        }
+
+        return $this;
     }
 }

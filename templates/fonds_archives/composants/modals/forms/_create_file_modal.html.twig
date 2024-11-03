@@ -1,0 +1,97 @@
+<style>
+	#drop-zone {
+		border: 2px dashed grey;
+	}
+
+	#drop-zone.active {
+		border: 2px solid black;
+	}
+
+	#drop-zone.active .box-title {
+		pointer-events: none;
+	}
+</style>
+
+<div class="modal fade" id="addFile" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-card">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h6 class="card-header-title" id="exampleModalLabel2" style="font-size:15px">Ajouter une/des pièces</h6>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="container">
+				<div class="d-flex" id="form-container" style="width:400%">
+					<form id="form-choice" class="w-25">
+						<div class="page">
+							<div class="modal-body" style="overflow-x:hidden">
+								<div class="mb-4">
+									<span>Choisissez le format de la pièce à ajouter :</span>
+								</div>
+								<div class="row p-3">
+									<input type="radio" class="btn-check" name="options-outlined" id="formPhys" value="formPhys" autocomplete="off">
+									<label class="btn btn-outline-dark" for="formPhys">Format physique</label>
+								</div>
+								<span class="row" style="display:flex;width:100%;justify-content:center">ou</span>
+								<div class="row p-3">
+									<input type="radio" class="btn-check" name="options-outlined" id="formNum" value="formNum" autocomplete="off">
+									<label class="btn btn-outline-dark" for="formNum">Format numérique</label>
+								</div>
+							</div>
+						</div>
+					</form>
+					{{ form_start(addPhysFile, { 'attr': { 'id': 'add_phys_file', 'class': 'w-25' } }) }}
+					<div class="page" id="form-fic-phys">
+						<div class="modal-body">
+							<div class="mb-3">
+								{{ form_row(addPhysFile.libelle_fichier) }}
+							</div>
+							<div class="mb-3">
+								{{ form_row(addPhysFile.type) }}
+							</div>
+							<div class="mb-3">
+								{{ form_row(addPhysFile.tags) }}
+								<label for="addFileKeywordsContainer" class="form-label">Mots-clés
+									<span class="fst-italic">(optionnel)</span>
+								</label>
+								<div id="addFileKeywordsContainer" class="keywords-input rounded-2">
+									<input type="text" id="addFileKeywordsInput" placeholder="Ajouter des mots-clés"/>
+								</div>
+							</div>
+						</div>
+						<div class="row modal-footer">
+							<div class="col" style="align-items:center">
+								<button type="button" class="btn btn-light" style="display:flex;width:100%;justify-content:center" id="create-cancel-button" data-bs-dismiss="modal">Annuler</button>
+							</div>
+							<div class="col" style="align-items:center">
+								<button type="submit" class="btn btn-dark w-200" style="display:flex;width:100%;justify-content:center" formnovalidate>Enregistrer</button>
+							</div>
+						</div>
+					</div>
+					{{ form_end(addPhysFile) }}
+					{{ form_start(addNumFile, {'attr': {'id': 'upload_fichier', 'class': 'w-25'}}) }}
+					<div class="page" id="form-fic-num">
+						<div class="modal-body">
+							<div class="mb-3">
+								<div id="drop-zone" class="rounded p-5 text-center">
+									<span class="box-title">
+										<span class="instruction">Glissez les fichiers ici ou</span>
+										<span class="text-primary file-browse" style="cursor:pointer">parcourir</span>
+									</span>
+									{{ form_row(addNumFile.fichiers, {'attr': {'style': 'display:none'}}) }}
+								</div>
+							</div>
+							<div class="list-group" id="list-group" style="max-height:300px;overflow-y:auto"></div>
+						</div>
+						<div class="row modal-footer">
+							<div id="upload-status"></div>
+							<div class="col" style="align-items:center">
+								<button type="submit" class="btn btn-dark w-200 mt-3" style="display:flex;width:100%;justify-content:center" formnovalidate>Lancer l'importation</button>
+							</div>
+						</div>
+					</div>
+					{{ form_end(addNumFile) }}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

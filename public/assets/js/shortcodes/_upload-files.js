@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", function() {
   const dropZone = document.getElementById("drop-zone");
   const fileBrowseBtn = document.querySelector(".file-browse");
-  const fileInput = document.getElementById("add_fichier_fichiers");
+  const fileInput = document.getElementById("add_fichier_num_fichiers");
   const fileList = document.querySelector("#list-group");
   const form = document.getElementById("upload_fichier");
 
@@ -41,7 +41,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const { name, size } = file;
     const ext = name.split(".").pop();
 
-    return `<div id="file-item-${id}" class="d-flex w-100 gap-10 justify-content-between">
+    return `<div id="file-item-${id}" class="file-item d-flex w-100 gap-10 justify-content-between">
 							<span class="badge mt-3 mb-3 bg-dark" style="width:50px;height:50px;display:flex;align-items:center;justify-content:center">
 							   ${showIconItem(ext)}	
 							</span>

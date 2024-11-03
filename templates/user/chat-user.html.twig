@@ -197,8 +197,5 @@
 		{{ include('layouts/partials/_footer.html.twig')}}
 	</div>
 </div>
-{% for flashMessage in app.flashes('success') %}
-	{{ include('layouts/partials/_success_login_flash_msg.html.twig')}}
-{% endfor %}
 <script src="{{ asset('assets/js/gime-toast.js') }}"></script>
 <script src="{{ asset('assets/js/chat.js') }}"></script>{% endblock %}
