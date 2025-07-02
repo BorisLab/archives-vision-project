@@ -1,0 +1,41 @@
+<div class="modal fade" id="newDepart" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-card">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h6 class="card-header-title" style="font-size:15px">Créer un nouveau département</h6>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+			</div>
+			{{ form_start(departementForm, { 'attr': { 'id': 'departement_form', 'style': 'overflow-x:hidden;overflow-y:auto' } }) }}
+			<input type="hidden" name="_action" value="createDepartement">
+			<div class="modal-body mb-5">
+				<div class="mb-3">
+					{{ form_row(departementForm.libelle_dep, {
+                        label: "Nom du département",
+                        class: "form-control",
+                        id: "depName",
+                    }) }}
+				</div>
+				<div class="mb-5 searchable-select">
+					<label for="searchable-select-input" class="form-label">Département parent</label>
+					<input type="text" id="searchable-select-input" class="form-control" placeholder="Rechercher un département">
+					<ul id="searchable-list" class="list-group hidden"></ul>
+					{{ form_row(departementForm.departement_parent) }}
+				</div>
+			</div>
+			<div class="row modal-footer">
+				<div class="col" style="align-items:center">
+					<button type="button" style="display:flex;width:100%;justify-content:center" id="cancel-button" class="btn btn-light mb-2" data-bs-dismiss="modal">Annuler</button>
+				</div>
+				<div class="col" style="align-items:center">
+					<button type="submit" style="display:flex;width:100%;justify-content:center" id="submit-button" class="btn btn-dark mb-2">Valider</button>
+				</div>
+				<div class="d-flex justify-content-center">
+					<span class="form-text fst-italic">
+						<strong>Note :
+						</strong>Tous les champs sont obligatoires à remplir, sauf le département parent.</span>
+				</div>
+			</div>
+			{{ form_end(departementForm) }}
+		</div>
+	</div>
+</div>

@@ -3,8 +3,10 @@
 namespace App\Repository;
 
 use App\Entity\Message;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use App\Entity\Utilisateur;
+use App\Entity\StatutMessage;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 /**
  * @extends ServiceEntityRepository<Message>
@@ -37,6 +39,30 @@ class MessageRepository extends ServiceEntityRepository
         if ($flush) {
             $this->getEntityManager()->flush();
         }
+    }
+
+    public function findByConversation(Utilisateur $sender, Utilisateur $receiver): array
+    {
+    return $this->createQueryBuilder('m')
+        ->where('(m.sender = :sender AND m.recipient = :recipient) OR (m.sender = :recipient AND m.recipient = :sender)')
+        ->setParameter('sender', $sender)
+        ->setParameter('recipient', $receiver)
+        ->orderBy('m.date_creation', 'ASC')
+        ->getQuery()
+        ->getResult();
+    }
+
+    public function countUnreadMessages(Utilisateur $user): array
+    {
+        return $this->createQueryBuilder('m')
+            ->select('IDENTITY(m.sender) as sender_id, COUNT(m.id) as unread_count')
+            ->where('m.recipient = :user')
+            ->andWhere('m.statut = :unread')
+            ->groupBy('m.sender')
+            ->setParameter('user', $user)
+            ->setParameter('unread', StatutMessage::NON_LU)
+            ->getQuery()
+            ->getResult();
     }
 
 //    /**

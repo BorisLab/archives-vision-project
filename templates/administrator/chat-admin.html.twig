@@ -1,0 +1,320 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}
+	Messagerie &middot;
+	{{ parent() }}
+{% endblock %}
+
+{% block stylesheets %}
+	<link rel="stylesheet" href="{{ asset('assets/css/theme.bundle.css') }}">
+	<link rel="stylesheet" href="{{ asset('assets/css/scrollbar.css') }}">
+
+	<style>
+
+		body {
+			background-color: #f9fbfd;
+			overflow: hidden;
+		}
+
+		input.form-control:focus,
+		.form-select:focus {
+			border-color: #0d6efd;
+			outline: 0;
+			box-shadow: 0 0 0 0;
+		}
+
+		#users-container {
+			display: flex;
+			height: 100vh;
+			overflow: hidden;
+		}
+
+		#user-list {
+			width: 25%;
+			background-color: #fff;
+			border-right: 1px solid #ddd;
+		}
+
+		#chat-container {
+			flex: 1;
+			display: flex;
+			flex-direction: column;
+			height: 600px;
+		}
+
+		#messages-list {
+			flex: 1;
+			overflow-y: auto;
+			padding: 20px;
+		}
+
+		#message-input {
+			padding: 10px;
+			border-top: 1px solid #ddd;
+			display: flex;
+			align-items: center;
+			background-color: #fff;
+		}
+
+		#message-input input {
+			flex: 1;
+			padding: 8px;
+			border: none;
+			border-radius: 5px;
+			margin-right: 10px;
+		}
+
+		input#inputUserSearch:focus {
+			outline: none;
+		}
+
+		li.user-unit {
+			border: none;
+		}
+
+		li.user-unit:hover {
+			background-color: #EBF5FB;
+			cursor: pointer;
+		}
+	</style>
+{% endblock %}
+
+{% block body %}
+	{{ include('layouts/partials/_logout-loading.html.twig') }}
+	<div class="load-div" style="display:none">
+		<div id="loading-overlay" class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="display: none; background-color: rgba(255, 255, 255, 0.8);">
+			<div class="text-center">
+				<div class="spinner-border text-primary" role="status">
+					<span class="visually-hidden">Loading...</span>
+				</div>
+				<p class="mt-2">Veuillez patienter...</p>
+			</div>
+		</div>
+	</div>
+	<div class="main-content">
+		{{ include('layouts/partials/admin/_navbar-admin.html.twig') }}
+	</div>
+
+	<div
+		id="users-container">
+		<!-- Liste des utilisateurs -->
+		<div id="user-list">
+			<div class="user-item" style="height:80%">
+				<div class="input-group input-group-merge input-group-reverse p-3 mb-3" style="">
+					<input class="form-control" id="user-searchbar" placeholder="Rechercher un destinataire" style="border:1px solid #ddd;border-left:none" type="text" aria-label="Input group reverse" aria-describedby="inputGroupReverse">
+					<div class="input-group-text" style="border:1px solid #ddd;border-right:none" id="inputUserSearch">
+						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewbox="0 0 16 16">
+							<path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+						</svg>
+					</div>
+				</div>
+				<div style="height:100%;overflow-y:auto">
+					<ul class="list-group list-group-flush list ">
+						{% for archiviste in archivistes %}
+								<li class="list-group-item user-unit p-3">
+									<div class="row align-items-center correspondant" data-id="{{ archiviste.id }}">
+										<div
+											class="col-auto">
+
+											<!-- Avatar -->
+											<span class="user-av avatar">
+												<img src="{{ archiviste.photoProfil ? asset('uploads/profiles/' ~ archiviste.photoProfil) : asset('assets/imgs/default-image-user.jpg') }}" alt="..." class="avatar-img rounded-circle">
+											</span>
+
+										</div>
+										<div
+											class="col ms-n2">
+
+											<!-- Title -->
+											<h4 class="mb-1 name" id>
+												<span id="userFullN">{{ archiviste.nomcomplet }}</span>
+											</h4>
+
+											<!-- Departement -->
+											<p class="small mb-0">
+												<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="bi bi-briefcase-fill" viewbox="0 0 16 16">
+													<path d="M6.5 1A1.5 1.5 0 0 0 5 2.5V3H1.5A1.5 1.5 0 0 0 0 4.5v1.384l7.614 2.03a1.5 1.5 0 0 0 .772 0L16 5.884V4.5A1.5 1.5 0 0 0 14.5 3H11v-.5A1.5 1.5 0 0 0 9.5 1zm0 1h3a.5.5 0 0 1 .5.5V3H6v-.5a.5.5 0 0 1 .5-.5"/>
+													<path d="M0 12.5A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5V6.85L8.129 8.947a.5.5 0 0 1-.258 0L0 6.85z"/>
+												</svg>
+												<span class="text-dark fs-6 text-truncate">{{ archiviste.departement.libelledep }}</span>
+												&centerdot;
+												<span class="text-dark fs-6 text-truncate">ARCHIVISTE</span>
+											</p>
+
+
+											<!-- Time -->
+											<p class="small mb-0">
+												{% if archiviste.isConnecte %}
+													<span class="text-success">●</span>
+													<span id="userStatutValue" class="text-secondary">Connecté</span>
+												{% else %}
+													<span class="text-warning">●</span>
+													<span id="userStatutValue" class="text-secondary">Déconnecté</span>
+												{% endif %}
+											</p>
+
+										</div>
+										{% if nonLusCounts[archiviste.id] is defined and nonLusCounts[archiviste.id] > 0 %}
+											<div id="unRBadge" class="col-auto">
+
+												<span class="badge bg-dark rounded-pill">{{ nonLusCounts[archiviste.id] }}</span>
+
+											</div>
+										{% endif %}
+									</div>
+									<!-- / .row -->
+								</li>
+							{% endfor %}
+				</ul>
+			</div>
+		</div>
+		<!-- Ajouter d'autres utilisateurs ici -->
+	</div>
+
+	<div id="no-title" class="position-absolute top-50 start-50 translate-middle" style="padding-left:330px;">
+		<p class="text-lg font-semibold">Veuillez cliquer sur un destinataire pour démarrer une discussion</p>
+	</div>
+	<!-- Conteneur principal des messages -->
+	<div id="chat-container" style="background:url({{ asset('assets/imgs/pattern.png') }})">
+		<div class="row justify-content-center" id="msgList" style="padding-left:11px;">
+			<div style="height:70px;background-color: #fff;border-left: 1px solid #ddd;border-bottom: 1px solid #ddd;">
+				<div class="row align-items-center pt-3 pb-2 ps-4 mb-3">
+					<div
+						class="col-auto">
+						<!-- Avatar -->
+						<span class="rcp-av avatar">
+							<img src="" alt="..." class="avatar-img rounded-circle" style="width:45px;height:45px">
+						</span>
+					</div>
+					<div
+						class="col ms-n2">
+						<!-- Title -->
+						<h4 class="mb-1 name">
+							<span id="recipFullN"></span>
+						</h4>
+
+						<!-- Time -->
+						<p class="small mb-0">
+							<span id="recipStatut" class="text-secondary"></span>
+						</p>
+
+					</div>
+				</div>
+				<!-- / .row -->
+			</div>
+		</div>
+		<!-- Liste des messages -->
+		<div id="messages-list"></div>
+
+		<!-- Zone de saisie des messages -->
+		<div
+			id="message-input">
+			<!--<a class="pe-1" draggable="false" type="upload" href="#">
+																	<svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-plus-circle" viewbox="0 0 16 16">
+																		<path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+																		<path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
+																	</svg>
+																</a>-->
+			<input type="text" id="messageInput" style="width:85%;outline:none" placeholder="Écrire un message...">
+			<button class="btn btn-dark ps-4 pe-4" id="sendBtn">Envoyer</button>
+		</div>
+	</div>
+</div>
+<div
+	id="flash-msgs">
+	<!-- Modals Toats -->
+	{{ include('administrator/composants/modals/toasts/_system.html.twig') }}
+</div></div><script src="{{ asset('assets/js/chat.js') }}"></script><script src="{{ asset('assets/js/shortcodes/_cnx-statut.js') }}"></script><script src="{{ asset('assets/js/shortcodes/_load-msgs.js') }}"></script><script src="{{ asset('assets/js/shortcodes/_search-list-c.js') }}"></script><script src="{{ asset('assets/js/shortcodes/_sendM.js') }}"></script><script>
+const es1 = new EventSource("{{ mercure('http://127.0.0.1:8000/users/' ~ app.user.id)|escape('js') }}", {withCredentials: true});
+
+es1.onmessage = function (event) {
+const data = JSON.parse(event.data);
+const notifContainer = document.querySelector(".toast-container");
+const toast = document.createElement('div');
+let userId = {{ app.user.id }};
+let messagesList = document.getElementById("messages-list");
+
+
+toast.className = 'toast bg-dark text-bg-dark flash-msg';
+toast.setAttribute('role', 'alert');
+toast.setAttribute('aria-live', 'assertive');
+toast.setAttribute('aria-atomic', 'true');
+toast.setAttribute('data-bs-delay', '10000'); // Délai de 5 secondes
+toast.setAttribute('style', 'width:450px;box-shadow:none');
+
+
+if (data.type == "system") {
+
+toast.innerHTML = `<div class="toast-header bg-dark mt-0 pb-0 border border-0">
+				    <span class="text-info me-3">
+				        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle-fill mb-1" viewBox="0 0 16 16">
+                            <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2"/>
+                        </svg>
+				    </span>
+				    <span class="text-light me-auto">Statut de demande</span>
+			           </div>
+			        <div class="toast-body w-auto">
+				        <span class="text-light text-truncate fs-5" style="max-width:700px">${
+data.message
+}</span>
+			        </div>`;
+} else if (data.type == "message") {
+if (data.recipient === userId) {
+let msgBox = `<div id="msg">
+                        <div id="msg-coming" style="display:flex;align-items:flex-end">
+                            <img class="avatar-img rounded-circle" src="/assets/imgs/default-image-user.jpg" alt="" style="height:40px;width:40px"/>
+                            <div id="details" style="max-width:calc(100% - 210px);margin-left:10px;margin-right:auto">
+                                <p class="text-bg-light" style="padding:8px 16px;word-wrap:break-word;border-radius:18px 18px 18px 0;">${
+data.content
+}</p>
+                            </div>
+                        </div>
+                    </div>`
+messagesList.innerHTML += `${msgBox}`;
+}
+}
+
+notifContainer.appendChild(toast);
+
+const messages = $('.toast');
+let index = 0;
+
+function showNextMessage() {
+if (index < messages.length) {
+const currentToast = $(messages[index]);
+currentToast.toast('show');
+
+// Déclenche après la durée définie dans `data-bs-delay` ou ici manuellement
+currentToast.on('hidden.bs.toast', function () {
+currentToast.remove();
+index++;
+showNextMessage();
+});
+}
+}
+
+showNextMessage();
+}
+
+const es2 = new EventSource("{{ mercure('http://127.0.0.1:8000/status')|escape('js') }}");
+let recipStatut = document.querySelector("#recipStatut");
+
+
+es2.onmessage = function (event) {
+const data = JSON.parse(event.data);
+const userId = data.userId;
+
+// Sélectionne l'élément qui représente l'utilisateur dans la liste
+const userElement = document.querySelector(`[data-id="${userId}"]`);
+if (userElement) {
+const statusElement = userElement.querySelector("#userStatut");
+if (statusElement) {
+statusElement.innerHTML = (data.statut === "online") ? `<span class="text-success">●</span><span class="text-secondary"> Connecté</span>` : `<span class="text-warning">●</span><span class="text-secondary"> Déconnecté</span>`;
+}
+}
+};
+
+window.addEventListener("beforeunload", function () {
+es1.close();
+es2.close();
+});</script>{% endblock %}

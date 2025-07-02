@@ -8,22 +8,25 @@ const formEditFolder = document.querySelector("#editFolderForm");
 
 const keywordsContainer = document.getElementById("addFolderKeywordsContainer");
 
-const searchableList = document.getElementById('searchable-list');
+const searchableList = document.getElementById("searchable-list");
 
-const editSearchableList = document.getElementById('edit-searchable-list');
+const editSearchableList = document.getElementById("edit-searchable-list");
 
-
-modalFolder.addEventListener("hidden.bs.modal", function() {
-  formCreateFolder.reset();
-  searchableList.classList.add("hidden");
-  firstKeyword = keywordsContainer.firstElementChild;
-  while(keywordsContainer.children.length > 1){
-    keywordsContainer.removeChild(firstKeyword);
+if (modalFolder) {
+  modalFolder.addEventListener("hidden.bs.modal", function() {
+    formCreateFolder.reset();
+    searchableList.classList.add("hidden");
     firstKeyword = keywordsContainer.firstElementChild;
-  }
-});
+    while (keywordsContainer.children.length > 1) {
+      keywordsContainer.removeChild(firstKeyword);
+      firstKeyword = keywordsContainer.firstElementChild;
+    }
+  });
+}
 
-modalEditFolder.addEventListener("hidden.bs.modal", function() {
-  formEditFolder.reset();
-  editSearchableList.classList.add("hidden");
-})
+if (modalEditFolder) {
+  modalEditFolder.addEventListener("hidden.bs.modal", function() {
+    formEditFolder.reset();
+    editSearchableList.classList.add("hidden");
+  });
+}

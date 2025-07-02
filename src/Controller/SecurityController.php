@@ -29,13 +29,9 @@ class SecurityController extends AbstractController
                 $this->addFlash('success', 'Vous êtes connecté(e)');
 
                 if($error){
-                    $this->addFlash('error', 'Email ou mot de passe incorrect');
+                    $this->addFlash('error', 'Identifiants incorrects');
                 }
 
-        if ($this->getUser()) {
-            $this->addFlash('success', 'Vous êtes déjà connecté(e)');
-            return $this->redirectToRoute('app_archivist_home');
-        }
         
         $loginResponse = $this->render('security/login.html.twig', ['last_username' => $lastUsername, 'error' => $error]);        
         $loginResponse->setCache([

@@ -1,0 +1,29 @@
+<div class="modal fade text-start" id="deleteFolder" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-card">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h6 class="card-header-title" id="exampleModalLabel" style="font-size:15px">Supprimer un dossier</h6>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+			</div>
+			<form action="" method="post" id="delFolderForm">
+				<div class="modal-body">
+					<input type="hidden" name="_action" value="deleteDossier">
+					<input type="hidden" id="delFolderId" name="folderId">
+					<div class="mb-3">
+						<div class="text-break">Voulez-vous vraiment supprimer le dossier
+							<span id="folderToDelName" class="fw-bold"></span>
+							?</div>
+					</div>
+				</div>
+				<div class="row modal-footer">
+					<div class="col" style="align-items:center">
+						<button type="button" style="display:flex;width:100%;justify-content:center" id="" class="btn btn-light mb-2" data-bs-dismiss="modal">Annuler</button>
+					</div>
+					<div class="col" style="align-items:center">
+						<button type="submit" style="display:flex;width:100%;justify-content:center" formnovalidate id="" class="btn btn-danger mb-2">Supprimer</button>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>

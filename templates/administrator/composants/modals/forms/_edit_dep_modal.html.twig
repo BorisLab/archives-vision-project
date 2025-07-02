@@ -1,0 +1,40 @@
+<div class="modal fade text-start" id="editDepart" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-card">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h6 class="card-header-title" style="font-size:15px">Editer un département</h6>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<form action="" method="post" id="editDepForm" style="overflow-x:hidden;overflow-y:auto">
+				<div class="modal-body mb-5">
+					<input type="hidden" name="_action" value="editDepartement" />
+					<input type="hidden" id="editDepId" name="depId" />
+					<div class="mb-3">
+						<label for="libelle_departement" class="form-label">Nom du département</label>
+						<input type="text" class="form-control" name="libelle_departement" placeholder="Entrer le nom du département" id="editDepName">
+					</div>
+					<div class="mb-3 edit-searchable-select">
+						<label for="edit-searchable-select-input" class="form-label">Département parent</label>
+						<input type="text" id="edit-searchable-select-input" name="departement_parent_departement" class="form-control" placeholder="Rechercher un département">
+						<ul id="edit-searchable-list" class="list-group hidden"></ul>
+						<div class="mb-5">
+							<select id="edit-departement_departement_parent" class="d-none edit-searchable-select-list form-select">
+								{% for dep in deps %}
+									<option value="{{ dep.id }}" data-id={{ dep.id }}>{{ dep.libelleDep }}</option>
+								{% endfor %}
+							</select>
+						</div>
+					</div>
+				</div>
+				<div class="row modal-footer">
+					<div class="col" style="align-items:center">
+						<button type="button" style="display:flex;width:100%;justify-content:center" id="" class="btn btn-light mb-2" data-bs-dismiss="modal">Annuler</button>
+					</div>
+					<div class="col" style="align-items:center">
+						<button type="submit" style="display:flex;width:100%;justify-content:center" id="" class="btn btn-dark mb-2">Enregistrer les modifications</button>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>

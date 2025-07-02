@@ -1,0 +1,27 @@
+<div class="modal fade text-start" id="disableAct" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-card">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h6 class="card-header-title" style="font-size:15px">Désactivation de compte</h6>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<form action="" method="post" id="disableAccountForm" style="overflow-x:hidden;overflow-y:auto">
+				<div class="modal-body">
+					<input type="hidden" name="_action" value="disable"/>
+					<input type="hidden" id="daccountId" name="daccountId"/>
+					<div class="mb-3">
+						<div class="text-break">Voulez-vous vraiment désactiver ce compte ?</div>
+					</div>
+				</div>
+				<div class="row modal-footer">
+					<div class="col" style="align-items:center">
+						<button type="button" style="display:flex;width:100%;justify-content:center" id="" class="btn btn-light mb-2" data-bs-dismiss="modal">Annuler</button>
+					</div>
+					<div class="col" style="align-items:center">
+						<button type="submit" style="display:flex;width:100%;justify-content:center" id="" class="btn btn-danger mb-2">Désactiver le compte</button>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>

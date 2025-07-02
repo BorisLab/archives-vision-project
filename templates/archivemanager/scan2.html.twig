@@ -1,0 +1,233 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}
+	Numérisation &middot;
+	{{ parent() }}
+{% endblock %}
+
+{% block stylesheets %}
+	<link rel="stylesheet" href="{{ asset('assets/css/theme.bundle.css') }}">
+	<link rel="stylesheet" href="{{ asset('assets/css/scrollbar.css') }}">
+
+	<style>
+
+		body {
+			background-color: #F9FBFD;
+			overflow-x: hidden;
+		}
+
+		#drop-zone {
+			border: 2px dashed grey;
+		}
+
+		#drop-zone.active {
+			border: 2px solid black;
+		}
+
+		#drop-zone.active .box-title {
+			pointer-events: none;
+		}
+
+		.range-cust::-webkit-slider-thumb {
+			background: black;
+		}
+		.range-cust::-moz-range-thumb {
+			background: black;
+		}
+		.range-cust::-ms-thumb {
+			background: black;
+		}
+	</style>
+{% endblock %}
+
+{% block body %}
+	{{ include('layouts/partials/_logout-loading.html.twig') }}
+	{{ include('layouts/partials/_loading.html.twig') }}
+
+	<div class="main-content">
+		{{ include('layouts/partials/archivman/_navbar-archivman.html.twig') }}
+
+	</div>
+	<div class="container">
+		<div class="card mt-4 border border-secondary-subtle">
+			<div class="card-body">
+				<div class="container">
+					<div class="row">
+						<div class="col-5">
+							<div class="mb-4 pb-4 border-bottom">
+								<select class="form-select form-select-sm" aria-label="Small select example">
+									<option selected>--- Sélectionner le scanner ---</option>
+									<option value="1">Aucun périphérique</option>
+								</select>
+							</div>
+							<div class="mb-4">
+								<label for="formExampleSelect2" class="form-label">Format de couleur :</label>
+								<select class="form-select form-select-sm" id="formExampleSelect2" aria-label="Small select example">
+									<option value="1">Par défaut</option>
+									<option value="2">Blanc sur noir</option>
+								</select>
+							</div>
+							<div class="mb-4">
+								<label for="formExampleSelect3" class="form-label">Type de fichier :</label>
+								<select class="form-select form-select-sm" id="formExampleSelect3" aria-label="Small select example">
+									<option value="1">One</option>
+									<option value="2">Two</option>
+									<option value="3">Three</option>
+								</select>
+							</div>
+							<div class="mb-4 pb-4 border-bottom">
+								<label for="formExampleInput2" class="form-label">Résolution (DPI) :</label>
+								<input class="form-control form-control-sm" type="number" value="200" id="formExampleInput2" aria-label="Small input example"/>
+							</div>
+							<div class="mb-3">
+								<label for="customRange1" class="form-label">Luminosité</label>
+								<input type="range" class="form-range range-cust" min="0" max="5" step="0.5" id="customRange1"/>
+							</div>
+					<div class="mb-3 edit-searchable-select">
+						<label for="edit-searchable-select-input" class="form-label">Enregistrer le fichier sous</label>
+						<input type="text" id="edit-searchable-select-input" required="required" name="departement_dossier" class="form-control" placeholder="Rechercher une destination">
+						<ul id="edit-searchable-list" class="list-group hidden"></ul>
+						<div class="mb-3">
+							<select id="edit-dossier_departement" required="required" class="d-none edit-searchable-select-list form-select">
+								{% for dossier in dossiers %}
+									<option value="{{ dossier.dossierid }}">{{ dossier.libelledossier }}</option>
+								{% endfor %}
+							</select>
+						</div>
+					</div>
+						</div>
+						<div class="col-7 pb-4">
+							<div id="drop-zone" class="rounded h-100 text-center">
+								<span class="box-title position-absolute top-50 start-75 translate-middle" style="margin-top:-50px">
+									<span class="instruction">Espace réservé à la numérisation de vos</span>
+									<span class="text-primary">documents physiques</span>
+								</span>
+							</div>
+						</div>
+                        <p class="text-end">0/0</p>
+						<div class="d-grid gap-2 d-md-flex justify-content-md-end">
+							<button class="btn btn-light me-md-2" type="button">Annuler</button>
+							<button class="btn btn-dark" type="button">Aperçu</button>
+							<button class="btn btn-dark" type="button">Lancer le scan</button>
+						</div>
+					</div>
+				</div>
+				<!-- / .row -->
+			</div>
+		</div>
+		<div
+			id="flash-msgs">
+			<!-- Modals Toats -->
+			{{ include('archivemanager/composants/modals/toasts/_system.html.twig') }}
+		</div>
+	</div>
+{% endblock %}
+
+{% block javascripts %}
+	<script>
+	   document.addEventListener("DOMContentLoaded", function() {
+		const notifContainer = document.querySelector(".toast-container");
+
+		const es1 = new EventSource("{{ mercure('http://127.0.0.1:8000/archivists')|escape('js') }}", {
+            withCredentials: true
+        });
+
+es1.onmessage = function (event) {
+let data = JSON.parse(event.data);
+let toast = document.createElement('div');
+
+toast.className = 'toast bg-dark text-bg-dark flash-msg';
+toast.setAttribute('role', 'alert');
+toast.setAttribute('aria-live', 'assertive');
+toast.setAttribute('aria-atomic', 'true');
+toast.setAttribute('data-bs-delay', '10000'); // Délai de 5 secondes
+toast.setAttribute('style', 'width:450px;box-shadow:none');
+
+toast.innerHTML = `<div class="toast-header bg-dark mt-0 pb-0 border border-0">
+				    <span class="text-info me-3">
+				        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle-fill mb-1" viewBox="0 0 16 16">
+                            <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2"/>
+                        </svg>
+				    </span>
+				    <span class="text-light me-auto">Nouvelle demande d'accès</span>
+			           </div>
+			        <div class="toast-body w-auto">
+				        <span class="text-light text-truncate fs-5" style="max-width:700px">${data.message}</span>
+			        </div>`;
+
+notifContainer.appendChild(toast);
+
+const messages = $('.toast');
+let index = 0;
+
+function showNextMessage() {
+if (index < messages.length) {
+const currentToast = $(messages[index]);
+currentToast.toast('show');
+
+// Déclenche après la durée définie dans `data-bs-delay` ou ici manuellement
+currentToast.on('hidden.bs.toast', function () {
+currentToast.remove();
+index++;
+showNextMessage();
+});
+}
+}
+
+showNextMessage();
+};
+
+		const es2 = new EventSource("{{ mercure('http://127.0.0.1:8000/users/' ~ app.user.id)|escape('js') }}", {
+            withCredentials: true
+        });
+
+       es2.onmessage = function(event){
+		let data = JSON.parse(event.data);
+        let toast = document.createElement('div');
+
+        toast.className = 'toast bg-dark text-bg-dark flash-msg';
+        toast.setAttribute('role', 'alert');
+        toast.setAttribute('aria-live', 'assertive');
+        toast.setAttribute('aria-atomic', 'true');
+        toast.setAttribute('data-bs-delay', '10000'); // Délai de 5 secondes
+        toast.setAttribute('style', 'width:450px;box-shadow:none');
+
+		toast.innerHTML = `<div class="toast-body w-auto">
+					        <span class="text-success me-3">
+						        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle-fill" viewbox="0 0 16 16">
+							        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+						        </svg>
+					        </span>
+					        <span class="text-light text-truncate" style="max-width:350px">${data.notif}</span>
+				          </div>`;
+
+			notifContainer.appendChild(toast);
+
+const messages = $('.toast');
+let index = 0;
+
+function showNextMessage() {
+if (index < messages.length) {
+const currentToast = $(messages[index]);
+currentToast.toast('show');
+
+// Déclenche après la durée définie dans `data-bs-delay` ou ici manuellement
+currentToast.on('hidden.bs.toast', function () {
+currentToast.remove();
+index++;
+showNextMessage();
+});
+}
+}
+
+showNextMessage();
+	   }
+
+	           window.addEventListener("beforeunload", function () {
+            es1.close();
+            es2.close();
+        });
+	   });
+
+	</script>
+{% endblock %}

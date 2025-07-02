@@ -11,8 +11,8 @@ $(document).ready(function() {
                     messages[index].style.display = 'none';
                     index++;
                     showNextMessage();
-                }, 500); // Adjust the delay for hiding message
-            }, 3000); // Adjust the delay for displaying message
+                }, 10000); // Adjust the delay for hiding message
+            }, 10000); // Adjust the delay for displaying message
         }
     }
 

@@ -1,0 +1,64 @@
+<div class="modal fade" id="newFolder" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-card">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h6 class="card-header-title" style="font-size:15px">Rejet de la demande</h6>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+			</div>
+			{{ form_start(dossierForm, { 'attr': { 'id': 'dossier_form', 'style': 'overflow-x:hidden;overflow-y:scroll' } }) }}
+			<input type="hidden" name="_action" value="createDossier">
+			<div class="modal-body">
+				<div class="mb-3">
+					{{ form_row(dossierForm.libelle_dossier, {
+                        label: "Nom du dossier",
+                        class: "form-control",
+                        id: "folderName",
+                    }) }}
+				</div>
+				<div class="mb-3">
+					{{ form_row(dossierForm.format, {
+                        label: "Format",
+                        class: "form-control",
+                        id: "folderFormat",
+                    }) }}
+				</div>
+				<div class="mb-3 searchable-select">
+					<label for="searchable-select-input" class="form-label">Département</label>
+					<input type="text" id="searchable-select-input" required="required" class="form-control" placeholder="Rechercher un département">
+					<ul id="searchable-list" class="list-group hidden"></ul>
+					{{ form_row(dossierForm.departement) }}
+				</div>
+				<div class="mb-3">
+					{{ form_row(dossierForm.statut, {
+                        label: "Statut",
+                        class: "form-control",
+                        id: "folderStatut",
+                    }) }}
+				</div>
+				<div class="mb-3">
+					{{ form_row(dossierForm.tags) }}
+					<label for="addFolderKeywordsContainer" class="form-label">Mots-clés
+						<span class="fst-italic">(optionnel)</span>
+					</label>
+					<div id="addFolderKeywordsContainer" class="keywords-input rounded-2">
+						<input type="text" id="addFolderKeywordsInput" placeholder="Ajouter des mots-clés"/>
+					</div>
+				</div>
+			</div>
+			<div class="row modal-footer">
+				<div class="col" style="align-items:center">
+					<button type="button" style="display:flex;width:100%;justify-content:center" id="cancel-button" class="btn btn-light mb-2" data-bs-dismiss="modal">Annuler</button>
+				</div>
+				<div class="col" style="align-items:center">
+					<button type="submit" style="display:flex;width:100%;justify-content:center" formnovalidate id="submit-button" class="btn btn-dark mb-2">Valider</button>
+				</div>
+				<div class="d-flex justify-content-center">
+					<span class="form-text fst-italic">
+						<strong>Note :
+						</strong>Tous les champs sont obligatoires à remplir, sauf les mot-clés.</span>
+				</div>
+			</div>
+			{{ form_end(dossierForm) }}
+		</div>
+	</div>
+</div>

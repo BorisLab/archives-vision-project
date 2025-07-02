@@ -27,7 +27,7 @@ class Fichier
     #[ORM\Column(length: 255)]
     private ?string $libelle_fichier = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $chemin_acces = null;
 
     #[ORM\Column(length: 255)]
@@ -178,7 +178,7 @@ class Fichier
         return $this;
     }
 
-    public function removeDemandeAcces(DemandeAcces $demandeAcce): static
+    public function removeDemandeAcces(DemandeAcces $demandeAcces): static
     {
         if ($this->demandeAcces->removeElement($demandeAcces)) {
             // set the owning side to null (unless already changed)

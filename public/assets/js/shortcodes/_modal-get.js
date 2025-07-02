@@ -31,63 +31,65 @@ document.addEventListener("DOMContentLoaded", function() {
     });
   }
 
-  //Get pre-existing data for editing a folder
-  editFolder.addEventListener("show.bs.modal", function(event) {
-    let folderButton = event.relatedTarget;
-    let folderId = folderButton.getAttribute("data-id");
-    let folderName = folderButton.getAttribute("data-name");
-    let folderFormat = folderButton.getAttribute("data-format");
-    let folderStatut = folderButton.getAttribute("data-statut");
-    let folderDep = folderButton.getAttribute("data-dep");
-    let folderKeywords = folderButton.getAttribute("data-keywords");
-    let modalBodyFolderInput = document.getElementById("editFolderName");
-    let modalBodyFolderId = document.getElementById("editFolderId");
-    let modalBodyFolderFormat = document.getElementById("editFolderFormat");
-    let modalBodyFolderStatut = document.getElementById("editFolderStatut");
-    let modalBodyFolderDep = document.getElementById(
-      "edit-searchable-select-input"
-    );
-    let folderKYW = document.getElementById("folder_tags");
-    modalBodyFolderInput.value = folderName;
-    modalBodyFolderId.value = folderId;
-    modalBodyFolderFormat.value = folderFormat;
-    modalBodyFolderStatut.value = folderStatut;
-    modalBodyFolderDep.value = folderDep;
-    folderKYW.value = folderKeywords;
+  if (editFolder) {
+    editFolder.addEventListener("show.bs.modal", function(event) {
+      let folderButton = event.relatedTarget;
+      let folderId = folderButton.getAttribute("data-id");
+      let folderName = folderButton.getAttribute("data-name");
+      let folderFormat = folderButton.getAttribute("data-format");
+      let folderStatut = folderButton.getAttribute("data-statut");
+      let folderDep = folderButton.getAttribute("data-dep");
+      let folderKeywords = folderButton.getAttribute("data-keywords");
+      let modalBodyFolderInput = document.getElementById("editFolderName");
+      let modalBodyFolderId = document.getElementById("editFolderId");
+      let modalBodyFolderFormat = document.getElementById("editFolderFormat");
+      let modalBodyFolderStatut = document.getElementById("editFolderStatut");
+      let modalBodyFolderDep = document.getElementById(
+        "edit-searchable-select-input"
+      );
+      let folderKYW = document.getElementById("folder_tags");
+      modalBodyFolderInput.value = folderName;
+      modalBodyFolderId.value = folderId;
+      modalBodyFolderFormat.value = folderFormat;
+      modalBodyFolderStatut.value = folderStatut;
+      modalBodyFolderDep.value = folderDep;
+      folderKYW.value = folderKeywords;
 
-    setFolderKeywordsFromString(folderKeywords);
+      setFolderKeywordsFromString(folderKeywords);
 
-    var editFolderForm = document.getElementById("editFolderForm");
-    editFolderForm.action = editFolderForm.action.replace(
-      /\/\d+$/,
-      "/" + folderId
-    );
-  });
+      var editFolderForm = document.getElementById("editFolderForm");
+      editFolderForm.action = editFolderForm.action.replace(
+        /\/\d+$/,
+        "/" + folderId
+      );
+    });
 
-  editFolder.addEventListener("hide.bs.modal", function(e) {
-    kywds = editFolderKeywordsContainer.querySelectorAll(".keyword");
-    for (let i = 0; i < kywds.length; i++) {
-      editFolderKeywordsContainer.removeChild(kywds[i]);
-    }
-    editFolderKeywordsInput.value = "";
-  });
+    editFolder.addEventListener("hide.bs.modal", function(e) {
+      kywds = editFolderKeywordsContainer.querySelectorAll(".keyword");
+      for (let i = 0; i < kywds.length; i++) {
+        editFolderKeywordsContainer.removeChild(kywds[i]);
+      }
+      editFolderKeywordsInput.value = "";
+    });
+  }
 
-  //Get data for deleting a folder
-  delFolder.addEventListener("show.bs.modal", function(event) {
-    let folderButton = event.relatedTarget;
-    let folderId = folderButton.getAttribute("data-id");
-    let folderName = folderButton.getAttribute("data-name");
-    let modalBodyDelFolder = document.getElementById("folderToDelName");
-    let modalBodyFolderId = document.getElementById("delFolderId");
-    modalBodyDelFolder.innerHTML = folderName;
-    modalBodyFolderId.value = folderId;
+  if (delFolder) {
+    delFolder.addEventListener("show.bs.modal", function(event) {
+      let folderButton = event.relatedTarget;
+      let folderId = folderButton.getAttribute("data-id");
+      let folderName = folderButton.getAttribute("data-name");
+      let modalBodyDelFolder = document.getElementById("folderToDelName");
+      let modalBodyFolderId = document.getElementById("delFolderId");
+      modalBodyDelFolder.innerHTML = folderName;
+      modalBodyFolderId.value = folderId;
 
-    let delFolderForm = document.getElementById("delFolderForm");
-    delFolderForm.action = delFolderForm.action.replace(
-      /\/\d+$/,
-      "/" + folderId
-    );
-  });
+      let delFolderForm = document.getElementById("delFolderForm");
+      delFolderForm.action = delFolderForm.action.replace(
+        /\/\d+$/,
+        "/" + folderId
+      );
+    });
+  }
 
   //Fichiers
   const editFile = document.getElementById("editFile");
@@ -121,44 +123,46 @@ document.addEventListener("DOMContentLoaded", function() {
     });
   }
 
-  //Get pre-existing data for editing a file
-  editFile.addEventListener("show.bs.modal", function(event) {
-    let fileButton = event.relatedTarget;
-    let fileId = fileButton.getAttribute("data-id");
-    let fileName = fileButton.getAttribute("data-name");
-    let fileStatut = fileButton.getAttribute("data-statut");
-    let fileKeywords = fileButton.getAttribute("data-keywords");
-    let modalBodyFileInput = document.getElementById("editFileName");
-    let modalBodyFileId = document.getElementById("editFileId");
-    let modalBodyFileStatut = document.getElementById("editFileStatut");
-    let fileKYW = document.getElementById("edit-file_tags");
-    modalBodyFileInput.value = fileName;
-    modalBodyFileId.value = fileId;
-    modalBodyFileStatut.value = fileStatut;
-    fileKYW.value = fileKeywords;
+  if (editFile) {
+    editFile.addEventListener("show.bs.modal", function(event) {
+      let fileButton = event.relatedTarget;
+      let fileId = fileButton.getAttribute("data-id");
+      let fileName = fileButton.getAttribute("data-name");
+      let fileStatut = fileButton.getAttribute("data-statut");
+      let fileKeywords = fileButton.getAttribute("data-keywords");
+      let modalBodyFileInput = document.getElementById("editFileName");
+      let modalBodyFileId = document.getElementById("editFileId");
+      let modalBodyFileStatut = document.getElementById("editFileStatut");
+      let fileKYW = document.getElementById("edit-file_tags");
+      modalBodyFileInput.value = fileName;
+      modalBodyFileId.value = fileId;
+      modalBodyFileStatut.value = fileStatut;
+      fileKYW.value = fileKeywords;
 
-    setFileKeywordsFromString(fileKeywords);
+      setFileKeywordsFromString(fileKeywords);
 
-    var editFileForm = document.getElementById("editFileForm");
-    editFileForm.action = editFileForm.action.replace(/\/\d+$/, "/" + fileId);
-  });
+      let editFileForm = document.getElementById("editFileForm");
+      editFileForm.action = editFileForm.action.replace(/\/\d+$/, "/" + fileId);
+    });
 
-  editFile.addEventListener("hide.bs.modal", function(e) {
-    kywds = editFileKeywordsContainer.querySelectorAll(".keyword");
-    for (let i = 0; i < kywds.length; i++) {
-      editFileKeywordsContainer.removeChild(kywds[i]);
-    }
-    editFileKeywordsInput.value = "";
-  });
+    editFile.addEventListener("hide.bs.modal", function(e) {
+      kywds = editFileKeywordsContainer.querySelectorAll(".keyword");
+      for (let i = 0; i < kywds.length; i++) {
+        editFileKeywordsContainer.removeChild(kywds[i]);
+      }
+      editFileKeywordsInput.value = "";
+    });
+  }
 
-  //Get data for deleting a file
-  delFile.addEventListener("show.bs.modal", function(event) {
-    let fileButton = event.relatedTarget;
-    let fileId = fileButton.getAttribute("data-id");
-    let modalBodyFileId = document.getElementById("delFileId");
-    modalBodyFileId.value = fileId;
+  if (delFile) {
+    delFile.addEventListener("show.bs.modal", function(event) {
+      let fileButton = event.relatedTarget;
+      let fileId = fileButton.getAttribute("data-id");
+      let modalBodyFileId = document.getElementById("delFileId");
+      modalBodyFileId.value = fileId;
 
-    let delFileForm = document.getElementById("delFileForm");
-    delFileForm.action = delFileForm.action.replace(/\/\d+$/, "/" + fileId);
-  });
+      let delFileForm = document.getElementById("delFileForm");
+      delFileForm.action = delFileForm.action.replace(/\/\d+$/, "/" + fileId);
+    });
+  }
 });

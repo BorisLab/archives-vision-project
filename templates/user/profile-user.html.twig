@@ -58,25 +58,26 @@
 								<h3 class="card-title text-center text-body-secondary mb-3">Modifier mon profil</h3>
 							</div>
 							<div class="card-body">
-								<form>
+								<form method="POST">
 									<div class="row">
 										<div class="col mt-4 mb-5">
-											<span href="../profile-posts.html" class="avatar avatar-xl card-avatar card-avatar-top mb-4" style="width:75px;height:75px">
-												<img src="{{ asset('assets/imgs/default-image-user.jpg') }}" class="avatar-img rounded-circle" alt="...">
+											<span class="avatar avatar-xl card-avatar card-avatar-top mb-4" style="width:75px;height:75px">
+												<img src="{{ app.user.photoProfil ? asset('uploads/profiles/' ~ app.user.photoProfil) : asset('assets/imgs/default-image-user.jpg') }}" class="avatar-img rounded-circle border border-0 border-card">
 											</span>
-											<button class="btn btn-outline-dark btn-sm position-absolute start-50 translate-middle">
-												Changer votre photo
+											<input type="file" id="photoProfilInput" name="photoProfil" accept="image/*" style="display: none;">
+											<button type="button" id="uploadButton" class="btn btn-outline-dark btn-sm position-absolute start-50 translate-middle">
+												Mettre à jour votre photo
 											</button>
 										</div>
 									</div>
 									<div class="row mb-3">
 										<div class="col">
 											<label for="firstName" class="form-label">Nom</label>
-											<input type="text" class="form-control" id="firstName" value="{{ app.user.nom }}" placeholder="Entrez votre nom">
+											<input type="text" class="form-control" id="firstName" name="nom" value="{{ app.user.nom }}" placeholder="Entrez votre nom">
 										</div>
 										<div class="col">
 											<label for="lastName" class="form-label">Prénom(s)</label>
-											<input type="text" class="form-control" id="lastName" value="{{ app.user.prenoms }}" placeholder="Entrez votre/vos prénom(s)">
+											<input type="text" class="form-control" id="lastName" name="prenoms" value="{{ app.user.prenoms }}" placeholder="Entrez votre/vos prénom(s)">
 										</div>
 									</div>
 									<div class="row mb-3">
@@ -95,12 +96,12 @@
 									</div>
 									<div class="row mb-5">
 										<div class="col">
-											<label for="password" class="form-label">Ancien mot de passe</label>
-											<input type="password" class="form-control" id="password" placeholder="Entrez votre ancien mot de passe">
+											<label for="password" class="form-label">Mot de passe</label>
+											<input type="password" class="form-control" id="password" name="password" placeholder="Entrez votre ancien mot de passe">
 										</div>
 										<div class="col">
-											<label for="password" class="form-label">Nouveau mot de passe</label>
-											<input type="password" class="form-control" id="password" placeholder="Entrez votre nouveau mot de passe">
+											<label for="password" class="form-label">Confirmez le mot de passe</label>
+											<input type="password" class="form-control" id="confirm-password" name="confirm_password" placeholder="Entrez votre nouveau mot de passe">
 										</div>
 									</div>
 
@@ -117,7 +118,79 @@
 				</div>
 			</div>
 		</div>
+		<div
+			id="flash-msgs">
+			<!-- Modals Toats -->
+			{{ include('user/composants/modals/toasts/_system.html.twig') }}
+		    {{ include('user/composants/modals/toasts/_account_pp_update.html.twig') }}
+		    {{ include('user/composants/modals/toasts/_account_infos_update.html.twig') }}
+		</div>
 	</div>
 	<script src="{{ asset('assets/js/gime-toast.js') }}"></script>
-	<script src="{{ asset('assets/js/chat.js') }}"></script>
+	<script src="{{ asset('assets/js/shortcodes/_upload-pp.js')}}"></script>
+	<script src="{{ asset('assets/js/shortcodes/_cnx-statut.js') }}"></script>
+	<script>
+		const eventSource = new EventSource("{{ mercure('http://127.0.0.1:8000/users/' ~ app.user.id)|escape('js') }}", {
+            withCredentials: true
+        });
+
+eventSource.onmessage = function (event) {
+const data = JSON.parse(event.data);
+const notifContainer = document.querySelector(".toast-container");
+const toast = document.createElement('div');
+let userId = "{{ app.user.id }}";
+
+
+toast.className = 'toast bg-dark text-bg-dark flash-msg';
+toast.setAttribute('role', 'alert');
+toast.setAttribute('aria-live', 'assertive');
+toast.setAttribute('aria-atomic', 'true');
+toast.setAttribute('data-bs-delay', '10000'); // Délai de 5 secondes
+toast.setAttribute('style', 'width:450px;box-shadow:none');
+
+if(data.type == "system"){
+toast.innerHTML = `<div class="toast-header bg-dark mt-0 pb-0 border border-0">
+				    <span class="text-info me-3">
+				        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle-fill mb-1" viewBox="0 0 16 16">
+                            <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2"/>
+                        </svg>
+				    </span>
+				    <span class="text-light me-auto">Statut de demande</span>
+			           </div>
+			        <div class="toast-body w-auto">
+				        <span class="text-light text-truncate fs-5" style="max-width:700px">${data.message}</span>
+			        </div>`;
+} else if(data.type == "message"){
+			toast.innerHTML = `<div class="toast-body w-auto">
+					        <span class="text-success me-3">
+						        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle-fill" viewbox="0 0 16 16">
+							        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+						        </svg>
+					        </span>
+					        <span class="text-light text-truncate" style="max-width:350px">${data.notif}</span>
+				          </div>`;
+}
+
+notifContainer.appendChild(toast);
+
+const messages = $('.toast');
+let index = 0;
+
+function showNextMessage() {
+if (index < messages.length) {
+const currentToast = $(messages[index]);
+currentToast.toast('show');
+
+// Déclenche après la durée définie dans `data-bs-delay` ou ici manuellement
+currentToast.on('hidden.bs.toast', function () {
+currentToast.remove();
+index++;
+showNextMessage();
+});
+}
+}
+
+showNextMessage();
+}
+	</script>
 {% endblock %}

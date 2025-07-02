@@ -5,7 +5,7 @@
 				<h6 class="card-header-title" style="font-size:15px">Créer un nouveau dossier</h6>
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
 			</div>
-			{{ form_start(dossierForm, { 'attr': { 'id': 'dossier_form', 'style': 'overflow-x:hidden;overflow-y:scroll' } }) }}
+			{{ form_start(dossierForm, { 'attr': { 'id': 'dossier_form', 'style': 'overflow-x:hidden;overflow-y:auto' } }) }}
 			<input type="hidden" name="_action" value="createDossier">
 			<div class="modal-body">
 				<div class="mb-3">
@@ -50,7 +50,7 @@
 					<button type="button" style="display:flex;width:100%;justify-content:center" id="cancel-button" class="btn btn-light mb-2" data-bs-dismiss="modal">Annuler</button>
 				</div>
 				<div class="col" style="align-items:center">
-					<button type="submit" style="display:flex;width:100%;justify-content:center" formnovalidate id="submit-button" class="btn btn-dark mb-2">Valider</button>
+					<button type="submit" style="display:flex;width:100%;justify-content:center" id="submit-button" class="btn btn-dark mb-2">Valider</button>
 				</div>
 				<div class="d-flex justify-content-center">
 					<span class="form-text fst-italic">

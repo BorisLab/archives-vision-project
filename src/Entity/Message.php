@@ -2,51 +2,63 @@
 
 namespace App\Entity;
 
-use App\Repository\MessageRepository;
+use App\Entity\Utilisateur;
+use App\Entity\StatutMessage;
+use ORM\HasLifecycleCallbacks;
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\Traits\Horodateur;
+use App\Repository\MessageRepository;
 
 #[ORM\Entity(repositoryClass: MessageRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class Message
 {
+    use Horodateur;
+        
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column]
-    private ?int $sender_id = null;
+    #[ORM\ManyToOne(targetEntity: Utilisateur::class, inversedBy: 'sentMessages')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Utilisateur $sender = null;
 
-    #[ORM\Column]
-    private ?int $receiver_id = null;
+    #[ORM\ManyToOne(targetEntity: Utilisateur::class, inversedBy: 'receivedMessages')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Utilisateur $recipient = null;
 
     #[ORM\Column(length: 255)]
     private ?string $content = null;
+
+    #[ORM\Column(type: "string", enumType: StatutMessage::class, options: ['default' => 'unread'], length: 255)]
+    private StatutMessage $statut;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getSenderId(): ?int
+    public function getSender(): ?Utilisateur
     {
-        return $this->sender_id;
+        return $this->sender;
     }
 
-    public function setSenderId(int $sender_id): self
+    public function setSender(?Utilisateur $sender): self
     {
-        $this->sender_id = $sender_id;
+        $this->sender = $sender;
 
         return $this;
     }
 
-    public function getReceiverId(): ?int
+    public function getRecipient(): ?Utilisateur
     {
-        return $this->receiver_id;
+        return $this->recipient;
     }
 
-    public function setReceiverId(int $receiver_id): self
+    public function setRecipient(?Utilisateur $recipient): self
     {
-        $this->receiver_id = $receiver_id;
+        $this->recipient = $recipient;
 
         return $this;
     }
@@ -59,6 +71,18 @@ class Message
     public function setContent(string $content): self
     {
         $this->content = $content;
+
+        return $this;
+    }
+
+    public function getStatut(): StatutMessage
+    {
+        return $this->statut;
+    }
+
+    public function setStatut(StatutMessage $statut): static
+    {
+        $this->statut = $statut;
 
         return $this;
     }

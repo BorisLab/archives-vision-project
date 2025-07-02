@@ -1,0 +1,436 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}
+	Audit & Suivi &middot;
+	{{ parent() }}
+{% endblock %}
+
+{% block stylesheets %}
+	<link rel="stylesheet" href="{{ asset('assets/css/theme.bundle.css') }}">
+	<link rel="stylesheet" href="{{ asset('assets/css/scrollbar.css') }}">
+
+	<style>
+		body {
+			background-color: #f9fbfd;
+			overflow: hidden;
+		}
+
+		#inputSelect option:nth-child(1) {
+			color: gray;
+			font-style: italic;
+		}
+
+		#inputSelect option:nth-child(2) {
+			color: black;
+			font-style: normal;
+
+		}
+
+		#inputSelect option:nth-child(3) {
+			color: black;
+			font-style: normal;
+
+		}
+
+		#inputSelect option:nth-child(4) {
+			color: black;
+			font-style: normal;
+
+		}
+
+		.item-row:hover {
+			background-color: #EBF5FB;
+		}
+
+		/* Champ des mots-clés */
+		.keywords-input {
+			display: flex;
+			flex-wrap: wrap;
+			padding: 0.5rem;
+			border: 1px solid #ced4da;
+			border-radius: 0.25rem;
+		}
+		.keywords-input input {
+			border: none;
+			outline: none;
+			flex-grow: 1;
+		}
+		.keyword {
+			background-color: #e9ecef;
+			padding: 0.5rem;
+			margin: 0.2rem;
+			border-radius: 0.2rem;
+			display: flex;
+			align-items: center;
+		}
+		.keyword .remove-keyword {
+			margin-left: 0.5rem;
+			cursor: pointer;
+		}
+
+		.searchable-select {
+			position: relative;
+			width: 100%;
+		}
+		.searchable-select input {
+			width: 100%;
+			box-sizing: border-box;
+		}
+		.searchable-select ul,
+		.edit-searchable-select ul {
+			position: absolute;
+			top: 100%;
+			left: 0;
+			width: 100%;
+			max-height: 200px;
+			overflow-y: auto;
+			background: white;
+			border: 1px solid #ced4da;
+			border-top: none;
+			z-index: 1050; /* Plus grand que celui de la modal */
+			list-style: none;
+			padding: 0;
+			margin: 0;
+		}
+		.searchable-select ul li {
+			padding: 0.5rem;
+			cursor: pointer;
+		}
+		.searchable-select ul li:hover {
+			background-color: #EBF5FB;
+		}
+
+		.edit-searchable-select {
+			position: relative;
+			width: 100%;
+		}
+		.edit-searchable-select input {
+			width: 100%;
+			box-sizing: border-box;
+		}
+		{
+			position: absolute;
+			top: 100%;
+			left: 0;
+			width: 100%;
+			max-height: 200px;
+			overflow-y: auto;
+			background: white;
+			border: 1px solid #ced4da;
+			border-top: none;
+			z-index: 1050; /* Plus grand que celui de la modal */
+			list-style: none;
+			padding: 0;
+			margin: 0;
+		}
+		.edit-searchable-select ul li {
+			padding: 0.5rem;
+			cursor: pointer;
+		}
+		.edit-searchable-select ul li:hover {
+			background-color: #EBF5FB;
+		}
+		.hidden {
+			display: none;
+		}
+	</style>
+{% endblock %}
+
+{% block body %}
+	{{ include('layouts/partials/_logout-loading.html.twig') }}
+	<div class="load-div" style="display:none">
+		<div id="loading-overlay" class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="display: none; background-color: rgba(255, 255, 255, 0.8);">
+			<div class="text-center">
+				<div class="spinner-border text-primary" role="status">
+					<span class="visually-hidden">Loading...</span>
+				</div>
+				<p class="mt-2">Veuillez patienter...</p>
+			</div>
+		</div>
+	</div>
+	<div style="width:100%">
+		{{ include('layouts/partials/admin/_navbar-admin.html.twig') }}
+	</div>
+
+	<!-- Conteneur principal des documents -->
+	<div class="main-content" id="folder-files-container" style="max-height:100%">
+
+		{{ include('administrator/composants/modals/forms/_active_user.html.twig') }}
+		{{ include('administrator/composants/modals/forms/_disable_user.html.twig') }}
+
+
+		<div class="container-fluid">
+			<div class="row p-3">
+				<div class="col-sm-6">
+					<div class="mb-3">
+						<label for="searchInput" class="form-label">Rechercher</label>
+						<input type="text" class="form-control" id="searchInput" autofocus placeholder="Rechercher">
+					</div>
+				</div>
+				<div class="col-sm-2">
+					<label for="statut-select" class="form-label">Type d'opération</label>
+					<select id="statut-select" class="form-select">
+						<option selected>Choisir</option>
+						<option>Demande d'accès</option>
+						<option>Autorisation d'accès</option>
+						<option>Refus d'accès</option>
+						<option>Révocation d'accès</option>
+					</select>
+				</div>
+				<div class="col-sm-2">
+					<label for="dateMin" class="form-label">Du</label>
+					<input type="date" id="dateMin" class="form-control"/>
+				</div>
+				<div class="col-sm-2">
+					<label for="dateMax" class="form-label">Au</label>
+					<input type="date" id="dateMax" class="form-control"/>
+				</div>
+
+			</div>
+		</div>
+		<!-- / .row -->
+		<div class="row">
+			<div class="col-12 col-xl-12">
+				<div class="row mx-auto align-items-center">
+					<div class="col">
+
+						<nav>
+							<ol class="breadcrumb">
+								<li class="breadcrumb-item">
+									<span class="link-dark">Toutes les opérations</span>
+								</li>
+							</ol>
+						</nav>
+
+					</div>
+				</div>
+				<!-- / .row -->
+
+				<div class="table-responsive" style="overflow-x:hidden" data-list='{"valueNames": ["tables-row", "tables-first", "tables-last", "tables-handle"]}'>
+					<div class="table-wrapper" style="max-height:75vh;overflow-x:hidden;overflow-y:auto">
+						<table class="table table-sm">
+							<thead class="bg-secondary-subtle">
+								<tr>
+									<th>
+										<span class="link-dark">Type d'opération</span>
+									</th>
+									<th>
+										<span class="link-dark">Demandeur</span>
+									</th>
+									<th>
+										<span class="link-dark">Archiviste</span>
+									</th>
+									<th>
+										<span class="link-dark">Dossier/Fichier concerné</span>
+									</th>
+									<th>
+										<span class="link-dark">Date d'exécution</span>
+									</th>
+								</tr>
+							</thead>
+							<tbody class="list">
+								{% if notifs is empty %}
+									<tr class="empty-list">
+										<td
+											colspan="7">
+											<!-- Title -->
+											<h4 class="mt-2 mb-2 text-center">
+												Aucune opération trouvée
+											</h4>
+
+											<!-- Content -->
+											<p class="text-muted text-center">
+												Toutes les opérations effectuées s'affichent ici.
+											</p>
+										</td>
+									</tr>
+								{% endif %}
+								{% for notif in notifs %}
+									{% if notif.type.value == "info-response" %}
+										<tr class="item-row">
+											<td class="tables-first text-truncate" style="max-width:200px">
+												<span id="item-name" class="" title="Demande d'accès">Demande d'accès</span>
+											</td>
+											<td class="tables-last">{{ notif.utilisateur.nomcomplet }}</td>
+											<td class="tables-last">{{ notif.archiviste.nomcomplet }}</td>
+											{% if notif.demandeacces.dossier %}
+												<td class="tables-last">{{ notif.demandeacces.dossier.libelledossier }}</td>
+											{% elseif notif.demandeacces.fichier %}
+												<td class="tables-last">{{ notif.demandeacces.fichier.libellefichier }}</td>
+											{% endif %}
+											<td class="tables-date">{{ notif.dateCreation|date('d/m/Y', 'Africa/Abidjan') }}</td>
+										</tr>
+									{% elseif notif.type.value == "approval-response" %}
+										<tr class="item-row">
+											<td class="tables-first text-truncate" style="max-width:200px">
+												<span id="item-name" class="" title="Autorisation d'accès">Autorisation d'accès</span>
+											</td>
+											<td class="tables-last">{{ notif.utilisateur.nomcomplet }}</td>
+											<td class="tables-last">{{ notif.archiviste.nomcomplet }}</td>
+											{% if notif.demandeacces.dossier %}
+												<td class="tables-last">{{ notif.demandeacces.dossier.libelledossier }}</td>
+											{% elseif notif.demandeacces.fichier %}
+												<td class="tables-last">{{ notif.demandeacces.fichier.libellefichier }}</td>
+											{% endif %}
+											<td class="tables-date">{{ notif.dateCreation|date('d/m/Y', 'Africa/Abidjan') }}</td>
+										</tr>
+									{% elseif notif.type.value == "rejection-response" %}
+										<tr class="item-row">
+											<td class="tables-first text-truncate" style="max-width:200px">
+												<span id="item-name" class="" title="Refus d'accès">Refus d'accès</span>
+											</td>
+											<td class="tables-last">{{ notif.utilisateur.nomcomplet }}</td>
+											<td class="tables-last">{{ notif.archiviste.nomcomplet }}</td>
+											{% if notif.demandeacces.dossier %}
+												<td class="tables-last">{{ notif.demandeacces.dossier.libelledossier }}</td>
+											{% elseif notif.demandeacces.fichier %}
+												<td class="tables-last">{{ notif.demandeacces.fichier.libellefichier }}</td>
+											{% endif %}
+											<td class="tables-date">{{ notif.dateCreation|date('d/m/Y', 'Africa/Abidjan') }}</td>
+										</tr>
+									{% elseif notif.type == "revocation-response" %}
+										<tr class="item-row">
+											<td class="tables-first text-truncate" style="max-width:200px">
+												<span id="item-name" class="" title="Révocation d'accès">Révocation d'accès</span>
+											</td>
+											<td class="tables-last">{{ notif.utilisateur.nomcomplet }}</td>
+											<td class="tables-last">{{ notif.archiviste.nomcomplet }}</td>
+											{% if notif.demandeacces.dossier %}
+												<td class="tables-last">{{ notif.demandeacces.dossier.libelledossier }}</td>
+											{% elseif notif.demandeacces.fichier %}
+												<td class="tables-last">{{ notif.demandeacces.fichier.libellefichier }}</td>
+											{% endif %}
+											<td class="tables-date">{{ notif.dateCreation|date('d/m/Y', 'Africa/Abidjan') }}</td>
+										</tr>
+									{% endif %}
+								{% endfor %}
+							</tbody>
+						</table>
+					</div>
+					<div
+						id="flash-msgs">
+						<!-- Modals Toats -->
+						{{ include('administrator/composants/modals/toasts/_user_account.html.twig') }}
+						{{ include('administrator/composants/modals/toasts/_system.html.twig') }}
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- / .row -->
+	</div>
+{% endblock %}
+{% block javascripts %}
+	<script src="{{ asset('assets/js/shortcodes/_cnx-statut.js')}}"></script>
+	<script src="{{ asset('assets/js/shortcodes/_search-a.js')}}"></script>
+	<script>
+		document.addEventListener("DOMContentLoaded", function () {
+const notifContainer = document.querySelector(".toast-container");
+
+const es1 = new EventSource("{{ mercure('http://127.0.0.1:8000/archivists')|escape('js') }}", {withCredentials: true});
+
+es1.onmessage = function (event) {
+let data = JSON.parse(event.data);
+let toast = document.createElement('div');
+
+toast.className = 'toast bg-dark text-bg-dark flash-msg';
+toast.setAttribute('role', 'alert');
+toast.setAttribute('aria-live', 'assertive');
+toast.setAttribute('aria-atomic', 'true');
+toast.setAttribute('data-bs-delay', '10000'); // Délai de 5 secondes
+toast.setAttribute('style', 'width:450px;box-shadow:none');
+
+toast.innerHTML = `<div class="toast-header bg-dark mt-0 pb-0 border border-0">
+				    <span class="text-info me-3">
+				        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle-fill mb-1" viewBox="0 0 16 16">
+                            <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2"/>
+                        </svg>
+				    </span>
+				    <span class="text-light me-auto">Nouvelle demande d'accès</span>
+			           </div>
+			        <div class="toast-body w-auto">
+				        <span class="text-light text-truncate fs-5" style="max-width:700px">${
+data.message
+}</span>
+			        </div>`;
+
+notifContainer.appendChild(toast);
+
+const messages = $('.toast');
+let index = 0;
+
+function showNextMessage() {
+if (index < messages.length) {
+const currentToast = $(messages[index]);
+currentToast.toast('show');
+
+// Déclenche après la durée définie dans `data-bs-delay` ou ici manuellement
+currentToast.on('hidden.bs.toast', function () {
+currentToast.remove();
+index++;
+showNextMessage();
+});
+}
+}
+
+showNextMessage();
+};
+
+const es2 = new EventSource("{{ mercure('http://127.0.0.1:8000/users/' ~ app.user.id)|escape('js') }}", {withCredentials: true});
+
+es2.onmessage = function (event) {
+let data = JSON.parse(event.data);
+let toast = document.createElement('div');
+
+toast.className = 'toast bg-dark text-bg-dark flash-msg';
+toast.setAttribute('role', 'alert');
+toast.setAttribute('aria-live', 'assertive');
+toast.setAttribute('aria-atomic', 'true');
+toast.setAttribute('data-bs-delay', '10000'); // Délai de 5 secondes
+toast.setAttribute('style', 'width:450px;box-shadow:none');
+
+toast.innerHTML = `<div class="toast-body w-auto">
+					        <span class="text-success me-3">
+						        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle-fill" viewbox="0 0 16 16">
+							        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+						        </svg>
+					        </span>
+					        <span class="text-light text-truncate" style="max-width:350px">${
+data.notif
+}</span>
+				          </div>`;
+
+notifContainer.appendChild(toast);
+
+const messages = $('.toast');
+let index = 0;
+
+function showNextMessage() {
+if (index < messages.length) {
+const currentToast = $(messages[index]);
+currentToast.toast('show');
+
+// Déclenche après la durée définie dans `data-bs-delay` ou ici manuellement
+currentToast.on('hidden.bs.toast', function () {
+currentToast.remove();
+index++;
+showNextMessage();
+});
+}
+}
+
+showNextMessage();
+}
+
+window.addEventListener("beforeunload", function () {
+es1.close();
+es2.close();
+});
+
+});
+	</script>
+	<script src="{{ asset('assets/js/folders-accordion.js') }}"></script>
+	<script src="{{ asset('assets/js/shortcodes/_reset-folder-form.js') }}"></script>
+	<script src="{{ asset('assets/js/shortcodes/_form-check.js') }}"></script>
+	<script src="{{ asset('assets/js/shortcodes/_modal-get-2.js') }}"></script>
+	<script src="{{ asset('assets/js/shortcodes/_toasts.js') }}"></script>
+{% endblock %}

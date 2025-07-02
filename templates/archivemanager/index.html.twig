@@ -7,7 +7,6 @@
 
 {% block stylesheets %}
 	<link rel="stylesheet" href="{{ asset('assets/css/theme.bundle.css') }}">
-	<link rel="stylesheet" href="{{ asset('assets/css/toasts.css') }}"/>
 	<link rel="stylesheet" href="{{ asset('assets/css/scrollbar.css') }}">
 
 
@@ -18,9 +17,88 @@
 			overflow-x: hidden;
 		}
 
+		.dropdown-ellipses svg:hover {
+			stroke: gray;
+		}
+
+
+		#statutSelect {
+			color: gray;
+			font-style: italic;
+		}
+
+		#statutSelect option:nth-child(2) {
+			color: black;
+			font-style: normal;
+
+		}
+
+		#statutSelect option:nth-child(3) {
+			color: black;
+			font-style: normal;
+
+		}
+
+		#statutSelect option:nth-child(4) {
+			color: black;
+			font-style: normal;
+
+		}
+
+		#statutSelect option:nth-child(5) {
+			color: black;
+			font-style: normal;
+		}
+
+		.modal-backdrop.show:nth-of-type(3) {
+			z-index: 1059 !important; /* Ajuste automatiquement l'arrière-plan de la seconde modale */
+		}
+
+		#revokeAccess {
+			z-index: 1060 !important; /* Assurer que la seconde modale est bien au-dessus de la première */
+		}
+
+		#agreeRequest {
+			z-index: 1060 !important; /* Assurer que la seconde modale est bien au-dessus de la première */
+		}
+
+		#agreeRequest2 {
+			z-index: 1060 !important; /* Assurer que la seconde modale est bien au-dessus de la première */
+		}
+
+		#rejectRequest {
+			z-index: 1060 !important; /* Assurer que la seconde modale est bien au-dessus de la première */
+		}
+
+		#rejectRequest2 {
+			z-index: 1060 !important; /* Assurer que la seconde modale est bien au-dessus de la première */
+		}
+
 		#notifcart:hover {
-			background-color: #F1F1F1;
-			box-shadow: 0 0 20px 2px #ECF2F3;
+			background-color: #EBF5FB;
+			box-shadow: 0 0 20px 2px #E9F2FF;
+		}
+
+		.table thead th {
+			position: sticky;
+			top: 0;
+		}
+
+		.rejectComment-input {
+			flex-wrap: wrap;
+			padding: 0.5rem;
+			border: 1px solid #ced4da;
+			border-radius: 0.25rem;
+			height: 150px;
+		}
+		.rejectComment-input textarea {
+			border: none;
+			outline: none;
+			width: 100%;
+			height: 100%;
+			min-height: 100%;
+			max-height: 100%;
+			flex-grow: 1;
 		}
 	</style>
 
@@ -30,12 +108,18 @@
 	{{ include('layouts/partials/_logout-loading.html.twig') }}
 	{{ include('layouts/partials/_loading.html.twig') }}
 
+
 	<div class="main-content">
 		{{ include('layouts/partials/archivman/_navbar-archivman.html.twig') }}
 
 		<div class="header">
-			<div
-				class="container">
+			<div class="container">
+				{{ include('archivemanager/composants/modals/forms/_reject_request_modal-2.html.twig') }}
+
+				{{ include('archivemanager/composants/modals/forms/_agree_request_modal-2.html.twig') }}
+
+				{{ include('archivemanager/composants/modals/forms/_revoke_access_modal.html.twig') }}
+
 
 				<!-- Body -->
 				<div class="header-body border-bottom mt-4" style="border-color:rgba(18, 38, 63, 0.175)">
@@ -45,7 +129,7 @@
 
 							<!-- Title -->
 							<h4 class="header-title">
-								Tableau de notifications
+								Tableau de bord
 							</h4>
 
 						</div>
@@ -60,7 +144,7 @@
 		<div class="row row-cols-1 row-cols-md-3 g-4">
 			<div class="col-12 col-lg-6 col-xl">
 
-				<a href="#" draggable="false" style="text-decoration:none">
+				<a href="{{ path('app_archivist_notifs') }}" draggable="false" style="text-decoration:none">
 					<div class="card border border-secondary-subtle" id="notifcart">
 						<div class="card-body">
 							<div class="row align-items-center gx-0">
@@ -73,8 +157,8 @@
 									</h6>
 
 									<!-- Heading -->
-									<span class="h2 text-dark mb-0">
-										0
+									<span id="nbr1_unread" class="h2 text-dark mb-0">
+									{{ nbr_notifs_unread }}
 									</span>
 
 								</div>
@@ -82,8 +166,8 @@
 									class="col-auto">
 
 									<!-- Icon -->
-									<span class="h2">
-										<box-icon color="#00000" type='solid' animation='tada-hover' name='flag'></box-icon>
+									<span class="h2" id="notif-icon">
+										<box-icon color="#000000" type='solid' animation='tada-hover' name='flag'></box-icon>
 									</span>
 
 								</div>
@@ -96,7 +180,7 @@
 			</div>
 			<div class="col-12 col-lg-6 col-xl">
 
-				<a href="#" draggable="false" style="text-decoration:none">
+				<a href="{{ path('app_archivist_chat') }}" draggable="false" style="text-decoration:none">
 					<div class="card border border-secondary-subtle" id="notifcart">
 						<div class="card-body">
 							<div class="row align-items-center gx-0">
@@ -109,8 +193,8 @@
 									</h6>
 
 									<!-- Heading -->
-									<span class="h2 text-dark mb-0">
-										0
+									<span id="nbr2_unread" class="h2 text-dark mb-0">
+									{{ nbr_msgs_unread }}
 									</span>
 
 								</div>
@@ -119,7 +203,7 @@
 
 									<!-- Icon -->
 									<span class="h2">
-										<box-icon color="#00000" type='solid' animation='tada-hover' name='envelope'></box-icon>
+										<box-icon color="#000000" type='solid' animation='tada-hover' name='envelope'></box-icon>
 									</span>
 
 								</div>
@@ -130,7 +214,6 @@
 				</a>
 
 			</div>
-
 		</div>
 		<div
 			class="container">
@@ -142,9 +225,12 @@
 
 						<!-- Title -->
 						<h4 class="header-title">
-							Actions récentes
+							Activités récentes
 						</h4>
 
+					</div>
+					<div class="col-auto">
+						<button class="btn btn-sm btn-white mb-3" type="button" data-bs-toggle="modal" data-bs-target="#historyRegisterData">Voir plus</button>
 					</div>
 				</div>
 				<!-- / .row -->
@@ -152,63 +238,449 @@
 			<!-- / .header-body -->
 		</div>
 		<div class="card border border-secondary-subtle mb-2">
-			<div class="card-body text-center">
-				<div class="row justify-content-center">
-					<div class="tab-content" id="myTabContent">
-						<div class="tab-pane fade show active" id="docphys-tab-pane" role="tabpanel" aria-labelledby="docphys-tab" tabindex="0">
-							<div
-								class="col-12">
+			{% if demandes %}
+				<table class="card-table table-nowrap table table-sm table-hover">
+					<thead style="">
+						<tr>
+							<th colspan="1" title="{{ 'ID' }}" class="text-dark">ID</th>
+							<th colspan="1" title="{{ 'Dép./Div/Sect' }}"  class="text-dark">Dép./Div./Sect.</th>
+							<th colspan="1" title="{{ 'Demnadeur' }}" class="text-dark">Demandeur</th>
+							<th colspan="1" title="{{ 'Catégorie' }}" class="text-dark">Catégorie</th>
+							<th colspan="1" title="{{ 'Format' }}" class="text-dark">Format</th>
+							<th colspan="1" title="{{ 'Libellé de document' }}" class="text-dark">Libellé du dossier/fichier</th>
+							<th colspan="1" title="{{ 'Statut' }}" class="text-center text-dark">Statut</th>
+							<th colspan="1" title="{{ 'Date de demande' }}" class="text-dark">Demande</th>
+							<th colspan="1" title="{{ 'Date de fin d\'accès' }}" class="text-dark">Fin d'accès</th>
+						</tr>
+					</thead>
+					<tbody> 
+						{% for demande in demandes|slice(0, 3) %}
+							<tr>
+								<td>
+									#{{ loop.index }}
+								</td>
+								<td>{{ demande.utilisateur.departement.libelleDep }}</td>
+								<td>{{ demande.utilisateur.nomcomplet }}</td>
+								{% if demande.dossier %}
+									<td>
+										Dossier
+									</td>
+									<td>
+										{{ demande.dossier.format }}
+									</td>
+									<td title="{{ demande.dossier.libelledossier }}" class="text-truncate">{{ demande.dossier.libelledossier }}</td>
+								{% else %}
+									<td>
+										Fichier
+									</td>
+									<td>
+										{{ demande.fichier.format }}
+									</td>
+									<td title="{{ demande.fichier.libellefichier }}" class="text-truncate">{{ demande.fichier.libellefichier }}</td>
+								{% endif %}
+								<td class="text-center">
+									{% if demande.statut.value == 'approved' %}
+										<span class="badge text-bg-success">Approuvée</span>
+									{% elseif demande.statut.value == 'rejected' %}
+										<span class="badge text-bg-danger">Rejetée</span>
+									{% elseif demande.statut.value == 'revoked' %}
+										<span class="badge text-bg-danger">Révoquée</span>
+									{% else %}
+										<span class="badge text-bg-info">En Attente</span>
+									{% endif %}
+								</td>
+								<td>
+									<time datetime="2018-07-30">{{ demande.dateCreation|format_date_fr }}, {{ demande.dateCreation|format_heure_fr }}</time>
+								</td>
+								<td>
+									{% if demande.expiration == NULL %}
+										<span class="fst-italic text-secondary">Néant</span>
+									{% else %}
+										<time datetime="2018-07-30">{{ demande.expiration|format_date_fr }}, {{ demande.expiration|format_heure_fr }}</time>
+									{% endif %}
+								</td>
+							</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			{% else %}
+				<div class="card-body text-center">
+					<div class="row d-flex align-items-center" style="height:175px">
+						<div class="tab-content" id="myTabContent">
+							<div class="tab-pane fade show active" id="activity1-tab-pane" role="tabpanel" aria-labelledby="activity1-tab" tabindex="0">
+								<div
+									class="col-12">
 
-								<!-- Title -->
-								<h4 class="mt-3 mb-2">
-									Votre historique est vide
-								</h4>
+									<!-- Title -->
+									<h4 class="mb-2">
+										Rien pour l'instant...
+									</h4>
 
-								<!-- Content -->
-								<p class="text-muted">
-									Toutes vos actions récentes s'affichent ici.
-								</p>
+									<!-- Content -->
+									<p class="text-muted">
+										Toutes les activités relatives aux documents demandés s'affichent ici.
+									</p>
 
+								</div>
+							</div>
+							<div class="tab-pane fade" id="activity2-tab-pane" role="tabpanel" aria-labelledby="activity2-tab" tabindex="0">
+								<div
+									class="col-12">
+
+									<!-- Title -->
+									<h4 class="mb-2">
+										Historique vide pour le moment
+									</h4>
+
+									<!-- Content -->
+									<p class="text-muted">
+										Évènements récents relatifs aux documents numériques.
+									</p>
+
+								</div>
 							</div>
 						</div>
-						<div class="tab-pane fade" id="docnum-tab-pane" role="tabpanel" aria-labelledby="docnum-tab" tabindex="0">
-							<div
-								class="col-12">
+					</div>
+					<!-- / .row -->
+				</div>
+			{% endif %}
 
-								<!-- Image -->
-								<img
-								draggable="false" src="{{ asset('assets/imgs/empty-box.gif') }}" alt="..." class="img-fluid mb-4" style="max-width: 272px;">
+			<div class="modal fade" id="historyRegisterData" tabindex="-1" aria-labelledby="#" aria-hidden="true">
+				<div class="modal-dialog modal-fullscreen">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h1 class="modal-title fs-5" id="exampleModalLabel">Registre des demandes</h1>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+						<div class="modal-body" style="overflow:hidden">
+							<div class="container-fluid">
+								<div class="row mb-3">
+									<div class="col-sm-7">
+										<div>
+											<label for="searchInput" class="form-label">Rechercher</label>
+											<input type="text" class="form-control" id="searchInput" autofocus placeholder="Saisir pour rechercher">
+										</div>
+									</div>
+									<div class="col-sm-1">
+										<label for="statutSelect" class="form-label">Statut</label>
+										<select id="statutSelect" class="form-select">
+											<option selected>Choisir</option>
+											<option>Approuvée</option>
+											<option>Rejetée</option>
+											<option>Révoquée</option>
+											<option>En Attente</option>
+										</select>
+									</div>
+									<div class="col-sm-2">
+										<label for="dateMin" class="form-label">Du</label>
+										<input type="date" id="dateMin" class="form-control"/>
+									</div>
+									<div class="col-sm-2">
+										<label for="dateMax" class="form-label">Au</label>
+										<input type="date" id="dateMax" class="form-control"/>
+									</div>
 
-								<!-- Title -->
-								<h4 class="mb-2">
-									Votre historique est vide
-								</h4>
+								</div>
+							</div>
+							<div class="card">
+								<div class="table-responsive border border-secondary-subtle" style="max-height:80vh;overflow-x:hidden;overflow-y:auto">
+									{% if demandes %}
+										<table class="card-table table-nowrap table table-sm table-hover">
+											<thead style="">
+												<tr>
+													<th colspan="1" class="text-dark">ID</th>
+													<th colspan="1" class="text-dark">Dép./Div/Sect.</th>
+													<th colspan="1" class="text-dark">Demandeur</th>
+													<th colspan="1" class="text-dark">Catégorie</th>
+													<th colspan="1" class="text-dark">Format</th>
+													<th colspan="1" class="text-dark">Libellé du dossier/fichier</th>
+													<th colspan="1" class="text-center text-dark">Statut</th>
+													<th colspan="1" class="text-dark">Demande</th>
+													<th colspan="1" class="text-dark">Fin d'accès</th>
+													<th colspan="1" class="text-end">&nbsp;</th>
+												</tr>
+											</thead>
+											<tbody id="body-md">
+												{% for demande in demandes %}
+													<tr>
+														<td>
+															#{{ loop.index }}
+														</td>
+														<td>{{ demande.utilisateur.departement.libelleDep }}</td>
+														<td>{{ demande.utilisateur.nomcomplet }}</td>
+														{% if demande.dossier %}
+															<td>
+																Dossier
+															</td>
+															<td>
+																{{ demande.dossier.format }}
+															</td>
+															<td title="{{ demande.dossier.libelledossier }}" class="text-truncate">{{ demande.dossier.libelledossier }}</td>
+														{% else %}
+															<td>
+																Fichier
+															</td>
+															<td>
+																{{ demande.fichier.format }}
+															</td>
+															<td title="{{ demande.fichier.libellefichier }}" class="text-truncate">{{ demande.fichier.libellefichier }}</td>
+														{% endif %}
+														<td class="text-center">
+															{% if demande.statut.value == 'approved' %}
+																<span class="badge text-bg-success">Approuvée</span>
+															{% elseif demande.statut.value == 'rejected' %}
+																<span class="badge text-bg-danger">Rejetée</span>
+															{% elseif demande.statut.value == 'revoked' %}
+																<span class="badge text-bg-danger">Révoquée</span>
+															{% else %}
+																<span class="badge text-bg-info">En Attente</span>
+															{% endif %}
+														</td>
+														<td>
+															<time datetime="#">{{ demande.dateCreation|format_date_fr }}, {{ demande.dateCreation|format_heure_fr }}</time>
+														</td>
+														<td>
+															{% if demande.expiration == NULL %}
+																<span class="fst-italic text-secondary">Néant</span>
+															{% else %}
+																<time datetime="#">{{ demande.expiration|format_date_fr }}, {{ demande.expiration|format_heure_fr }}</time>
+															{% endif %}
+														</td>
+														<td class="text-end">
+															<div class="dropdown dropend">
+																{% if demande.statut.value == 'approved' or demande.statut.value == 'pending' %}
+																	<button class="dropdown-ellipses border border-0 bg-light rounded" type="button" data-bs-toggle="dropdown">
+																		<svg width="17" height="17" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-more-vertical ">
+																			<g>
+																				<circle cx="12" cy="12" r="1"></circle>
+																				<circle cx="12" cy="5" r="1"></circle>
+																				<circle cx="12" cy="19" r="1"></circle>
+																			</g>
+																		</svg>
+																	</button>
+																{% endif %}
+																<ul class="dropdown-menu">
+																	{% if demande.statut.value == 'approved' %}
+																		{% if demande.expiration|date('d/m/Y, h:m', 'Africa/Abidjan') > "now"|date('d/m/Y, h:m', 'Africa/Abidjan') %}
+																			<li>
+																				<button type="button" onclick="RV(this)" class="dropdown-item" data-da="{{ demande.id }}">Révoquer l'accès</a>
+																			</li>
+																		{% else %}
+																			<li>
+																				<button type="button" class="dropdown-item" disabled>Révoquer l'accès</a>
+																			</li>
+																		{% endif %}
+																	{% elseif demande.statut.value == 'pending' %}
+																		<li>
+																			<button type="button" onclick="AG(this)" class="dropdown-item" data-da="{{ demande.id }}">Accorder</a>
+																		</li>
+																		<li>
+																			<button type="button" onclick="RJ(this)" class="dropdown-item" data-da="{{ demande.id }}">Ne pas accorder</a>
+																		</li>
+																	{% endif %}
+																</ul>
+															</div>
+														</td>
+													</tr>
+												{% endfor %}
+											</tbody>
+										</table>
+									{% else %}
+										<div class="card-body text-center">
+											<div class="row d-flex align-items-center" style="height:175px">
+												<div class="tab-content" id="myTabContent">
+													<div class="tab-pane fade show active" id="activity1-tab-pane" role="tabpanel" aria-labelledby="activity1-tab" tabindex="0">
+														<div
+															class="col-12">
 
-								<!-- Content -->
-								<p class="text-muted">
-									Évènements récents relatifs aux documents numériques.
-								</p>
+															<!-- Title -->
+															<h4 class="mb-2">
+																Rien pour l'instant...
+															</h4>
 
+															<!-- Content -->
+															<p class="text-muted">
+																Toutes les activités relatives aux documents demandés s'affichent ici.
+															</p>
+
+														</div>
+													</div>
+													<div class="tab-pane fade" id="activity2-tab-pane" role="tabpanel" aria-labelledby="activity2-tab" tabindex="0">
+														<div
+															class="col-12">
+
+															<!-- Title -->
+															<h4 class="mb-2">
+																Historique vide pour le moment
+															</h4>
+
+															<!-- Content -->
+															<p class="text-muted">
+																Évènements récents relatifs aux documents numériques.
+															</p>
+
+														</div>
+													</div>
+												</div>
+											</div>
+											<!-- / .row -->
+										</div>
+									{% endif %}
+								</div>
 							</div>
 						</div>
 					</div>
 				</div>
-				<!-- / .row -->
 			</div>
+		</div>
+		<div
+			id="flash-msgs">
+			<!-- Modals Toats -->
+			{{ include('archivemanager/composants/modals/toasts/_system.html.twig') }}
+			{{ include('archivemanager/composants/modals/toasts/_access_requests.html.twig') }}
 		</div>
 		<div class="mt-4">
 			{{ include('layouts/partials/_footer.html.twig')}}
 		</div>
 	</div>
-	<div
-		id="flash-msgs">
-		<!-- Modals Toats -->
-		{{ include('fonds_archives/composants/modals/toasts/_system.html.twig') }}
-	</div>
-
-
 {% endblock %}
-
 {% block javascripts %}
-	<script src="{{ asset('assets/js/shortcodes/_toasts.js') }}"></script>
+    <script src="{{ asset('assets/js/shortcodes/_modal-get-req-2.js')}}"></script>
+	<script src="{{ asset('assets/js/shortcodes/_cnx-statut.js')}}"></script>
+	<script src="{{ asset('assets/js/shortcodes/_search-req.js')}}"></script>
+	<script>
+	   document.addEventListener("DOMContentLoaded", function() {
+		let nbrUnreadNotifs = document.querySelector("#nbr1_unread");
+		let nbrUnreadMsgs = document.querySelector("#nbr2_unread");
+		const notifContainer = document.querySelector(".toast-container");
+
+		const es1 = new EventSource("{{ mercure('http://127.0.0.1:8000/archivists')|escape('js') }}", {
+            withCredentials: true
+        });
+
+es1.onmessage = function (event) {
+let data = JSON.parse(event.data);
+let toast = document.createElement('div');
+
+toast.className = 'toast bg-dark text-bg-dark flash-msg';
+toast.setAttribute('role', 'alert');
+toast.setAttribute('aria-live', 'assertive');
+toast.setAttribute('aria-atomic', 'true');
+toast.setAttribute('data-bs-delay', '10000'); // Délai de 5 secondes
+toast.setAttribute('style', 'width:450px;box-shadow:none');
+
+toast.innerHTML = `<div class="toast-header bg-dark mt-0 pb-0 border border-0">
+				    <span class="text-info me-3">
+				        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle-fill mb-1" viewBox="0 0 16 16">
+                            <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2"/>
+                        </svg>
+				    </span>
+				    <span class="text-light me-auto">Nouvelle demande d'accès</span>
+			           </div>
+			        <div class="toast-body w-auto">
+				        <span class="text-light text-truncate fs-5" style="max-width:700px">${data.message}</span>
+			        </div>`;
+
+notifContainer.appendChild(toast);
+
+                nbrUnreadNotifs.innerHTML = data.unread_notifs_count + 1;
+
+const messages = $('.toast');
+let index = 0;
+
+function showNextMessage() {
+if (index < messages.length) {
+const currentToast = $(messages[index]);
+currentToast.toast('show');
+
+// Déclenche après la durée définie dans `data-bs-delay` ou ici manuellement
+currentToast.on('hidden.bs.toast', function () {
+currentToast.remove();
+index++;
+showNextMessage();
+});
+}
+}
+
+showNextMessage();
+};
+
+		const es2 = new EventSource("{{ mercure('http://127.0.0.1:8000/users/' ~ app.user.id)|escape('js') }}", {
+            withCredentials: true
+        });
+
+       es2.onmessage = function(event){
+		let data = JSON.parse(event.data);
+        let toast = document.createElement('div');
+
+        toast.className = 'toast bg-dark text-bg-dark flash-msg';
+        toast.setAttribute('role', 'alert');
+        toast.setAttribute('aria-live', 'assertive');
+        toast.setAttribute('aria-atomic', 'true');
+        toast.setAttribute('data-bs-delay', '10000'); // Délai de 5 secondes
+        toast.setAttribute('style', 'width:450px;box-shadow:none');
+
+		toast.innerHTML = `<div class="toast-body w-auto">
+					        <span class="text-success me-3">
+						        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle-fill" viewbox="0 0 16 16">
+							        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+						        </svg>
+					        </span>
+					        <span class="text-light text-truncate" style="max-width:350px">${data.notif}</span>
+				          </div>`;
+
+			notifContainer.appendChild(toast);
+
+			nbrUnreadMsgs.innerHTML = data.unread_msgs_count;
+
+const messages = $('.toast');
+let index = 0;
+
+function showNextMessage() {
+if (index < messages.length) {
+const currentToast = $(messages[index]);
+currentToast.toast('show');
+
+// Déclenche après la durée définie dans `data-bs-delay` ou ici manuellement
+currentToast.on('hidden.bs.toast', function () {
+currentToast.remove();
+index++;
+showNextMessage();
+});
+}
+}
+
+showNextMessage();
+	   }
+
+	           window.addEventListener("beforeunload", function () {
+            es1.close();
+            es2.close();
+        });
+	   });
+
+function RV(button) {
+let myModal = new bootstrap.Modal(document.getElementById('revokeAccess'));
+let revokeDAId = button.getAttribute("data-da");
+let modalBodyDAId = document.getElementById("revokeAccessReqId");
+myModal.show();
+modalBodyDAId.value = revokeDAId;
+}
+
+function AG(button) {
+let myModal = new bootstrap.Modal(document.getElementById('agreeRequest2'));
+let agreeDAId = button.getAttribute("data-da");
+let modalBodyDAId = document.getElementById("agreeReq2Id");
+myModal.show();
+modalBodyDAId.value = agreeDAId;
+}
+
+function RJ(button) {
+let myModal = new bootstrap.Modal(document.getElementById('rejectRequest2'));
+let rejectDAId = button.getAttribute("data-da");
+let modalBodyDAId = document.getElementById("rejectReq2Id");
+myModal.show();
+modalBodyDAId.value = rejectDAId;
+};
+	</script>
 {% endblock %}

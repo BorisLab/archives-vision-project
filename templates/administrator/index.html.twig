@@ -14,6 +14,75 @@
 			background-color: #f9fbfd;
 			overflow-x: hidden;
 		}
+
+		.chart-card {
+			background-color: white;
+			border-radius: 0.5rem;
+			box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+			padding: 2rem;
+			margin-bottom: 2rem;
+			height: 370px;
+		}
+
+		.chart-card canvas {
+			height: 270px !important;
+		}
+
+		.chart-toggle {
+			display: flex;
+			align-items: center;
+			gap: 1rem;
+		}
+
+		.toggle-switch {
+			position: relative;
+			display: inline-block;
+			width: 50px;
+			height: 24px;
+		}
+
+		.toggle-switch input {
+			opacity: 0;
+			width: 0;
+			height: 0;
+		}
+
+		.slider {
+			position: absolute;
+			cursor: pointer;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			background-color: #DBF6F6;
+			transition: 0.4s;
+			border-radius: 34px;
+		}
+
+		.slider:before {
+			position: absolute;
+			content: "";
+			height: 16px;
+			width: 16px;
+			left: 4px;
+			bottom: 4px;
+			background-color: white;
+			transition: 0.4s;
+			border-radius: 50%;
+		}
+
+		input:checked + .slider {
+			background-color: #70DBF6;
+		}
+
+		input:checked + .slider:before {
+			transform: translateX(26px);
+		}
+
+		#notifcart:hover {
+			background-color: #EBF5FB;
+			box-shadow: 0 0 20px 2px #E9F2FF;
+		}
 	</style>
 {% endblock %}
 
@@ -58,93 +127,21 @@
 		<div class="row row-cols-1 row-cols-md-3 g-4">
 			<div class="col-12 col-lg-6 col-xl">
 
-				<a href="#" draggable="false" style="text-decoration:none">
-					<div class="card">
+				<a href="{{ path('app_admin_departements')}}" draggable="false" style="text-decoration:none">
+					<div class="card border border-secondary-subtle" id="notifcart">
 						<div class="card-body">
 							<div class="row align-items-center gx-0">
 								<div
 									class="col">
 
 									<!-- Title -->
-									<h6 class="text-uppercase text-muted mb-2">
-										Fonds d'archives
-									</h6>
-
-									<!-- Heading -->
-									<span class="h2 mb-0">
-										0
-									</span>
-
-								</div>
-								<div
-									class="col-auto">
-
-									<!-- Icon -->
-									<span class="h2">
-										<box-icon color="blue" type='solid' animation='tada-hover' name='box'></box-icon>
-									</span>
-
-								</div>
-							</div>
-							<!-- / .row -->
-						</div>
-					</div>
-				</a>
-
-			</div>
-			<div class="col-12 col-lg-6 col-xl">
-
-				<a href="#" draggable="false" style="text-decoration:none">
-					<div class="card">
-						<div class="card-body">
-							<div class="row align-items-center gx-0">
-								<div
-									class="col">
-
-									<!-- Title -->
-									<h6 class="text-uppercase text-muted mb-2">
-										Demandes
-									</h6>
-
-									<!-- Heading -->
-									<span class="h2 mb-0">
-										0
-									</span>
-
-								</div>
-								<div
-									class="col-auto">
-
-									<!-- Icon -->
-									<span class="h2">
-										<box-icon color="blue" type='solid' animation='tada-hover' name='envelope'></box-icon>
-									</span>
-
-								</div>
-							</div>
-							<!-- / .row -->
-						</div>
-					</div>
-				</a>
-
-			</div>
-			<div class="col-12 col-lg-6 col-xl">
-
-				<a href="#" draggable="false" style="text-decoration:none">
-					<div class="card">
-						<div class="card-body">
-							<div class="row align-items-center gx-0">
-								<div
-									class="col">
-
-									<!-- Title -->
-									<h6 class="text-uppercase text-muted mb-2">
+									<h6 class="text-uppercase text-dark mb-2">
 										Départements
 									</h6>
 
 									<!-- Heading -->
-									<span class="h2 mb-0">
-										0
+									<span class="h2 text-dark mb-0">
+										{{ nbr_deps }}
 									</span>
 
 								</div>
@@ -153,7 +150,79 @@
 
 									<!-- Icon -->
 									<span class="h2">
-										<box-icon color="blue" name='group' animation='tada-hover' type='solid'></box-icon>
+										<box-icon color="#000000" name='home' animation='tada-hover' type='solid'></box-icon>
+									</span>
+
+								</div>
+							</div>
+							<!-- / .row -->
+						</div>
+					</div>
+				</a>
+
+			</div>
+			<div class="col-12 col-lg-6 col-xl">
+
+				<a href="{{ path('app_admin_users')}}" draggable="false" style="text-decoration:none">
+					<div class="card border border-secondary-subtle" id="notifcart">
+						<div class="card-body">
+							<div class="row align-items-center gx-0">
+								<div
+									class="col">
+
+									<!-- Title -->
+									<h6 class="text-uppercase text-dark mb-2">
+										Utilisateurs
+									</h6>
+
+									<!-- Heading -->
+									<span class="h2 text-dark mb-0">
+										{{ nbr_users }}
+									</span>
+
+								</div>
+								<div
+									class="col-auto">
+
+									<!-- Icon -->
+									<span class="h2">
+										<box-icon color="#000000" name='group' animation='tada-hover' type='solid'></box-icon>
+									</span>
+
+								</div>
+							</div>
+							<!-- / .row -->
+						</div>
+					</div>
+				</a>
+
+			</div>
+			<div class="col-12 col-lg-6 col-xl">
+
+				<a href="{{ path('app_admin_chat') }}" draggable="false" style="text-decoration:none">
+					<div class="card border border-secondary-subtle" id="notifcart">
+						<div class="card-body">
+							<div class="row align-items-center gx-0">
+								<div
+									class="col">
+
+									<!-- Title -->
+									<h6 class="text-uppercase text-dark mb-2">
+										Messages non lus
+									</h6>
+
+									<!-- Heading -->
+									<span class="h2 text-dark mb-0">
+										{{ nbr_msgs_unread }}
+									</span>
+
+								</div>
+								<div
+									class="col-auto">
+
+									<!-- Icon -->
+									<span class="h2">
+										<box-icon color="#000000" type='solid' animation='tada-hover' name='envelope'></box-icon>
 									</span>
 
 								</div>
@@ -166,10 +235,240 @@
 			</div>
 		</div>
 		<div class="row row-cols-1 row-cols-md-3 g-4">
-			<div class="col-12 col-lg-6 col-xl"></div>
-			<div class="col-12 col-lg-6 col-xl"></div>
+			<div class="col-12 col-lg-6 col-xl">
+				<div class="chart-card">
+					<div class="d-flex justify-content-between align-items-center mb-4">
+						<h4 class="mb-0">Demandes d'accès par mois</h4>
+						<div class="chart-toggle">
+							<label class="form-label mb-0">2025</label>
+							<label class="toggle-switch">
+								<input type="checkbox" id="yearToggle">
+								<span class="slider"></span>
+							</label>
+							<label class="form-label mb-0">2024</label>
+						</div>
+					</div>
+					<canvas id="monthlyChart" height="120"></canvas>
+				</div>
+			</div>
+			<div class="col-12 col-lg-6 col-xl">
+				<div class="chart-card">
+					<div class="d-flex justify-content-between align-items-center mb-4">
+						<h4 class="mb-0">Département le plus actif</h4>
+						<select class="form-select w-auto" id="yearFilter">
+							<option value="2025" selected>2025</option>
+							<option value="2024">2024</option>
+						</select>
+					</div>
+					<canvas id="departmentChart" height="120"></canvas>
+				</div>
+			</div>
 		</div>
 	</div>
 	<script src="{{ asset('assets/js/gime-toast.js') }}"></script>
+	<script>
+		const ctx1 = document.getElementById('monthlyChart');
+const ctx2 = document.getElementById('departmentChart');
+
+// Exemple de données (tu les remplaces par les tiennes dynamiquement depuis le contrôleur)
+const months = [
+'Jan',
+'Fev',
+'Mar',
+'Avr',
+'Mai',
+'Juin',
+'Juil',
+'Aout',
+'Sep',
+'Oct',
+'Nov',
+'Dec'
+];
+const monthlyData = {
+2024: [
+15,
+20,
+30,
+25,
+10,
+35,
+40,
+30,
+20,
+50,
+60,
+45
+],
+2025: [
+20,
+25,
+35,
+40,
+30,
+45,
+55,
+60,
+50,
+65,
+70,
+80
+]
+};
+
+const departmentData = {
+2024: {
+labels: [
+'Direction Générale', 'Informatique', 'Comptabilité'
+],
+data: [120, 300, 180]
+},
+2025: {
+labels: [
+'Direction Générale', 'Informatique', 'Comptabilité'
+],
+data: [250, 200, 190]
+}
+};
+
+// Créer un conteneur d’infobulle personnalisé
+function createCustomTooltip() {
+let tooltipEl = document.getElementById('chartjs-tooltip');
+if (! tooltipEl) {
+tooltipEl = document.createElement('div');
+tooltipEl.id = 'chartjs-tooltip';
+tooltipEl.style.opacity = 0;
+tooltipEl.style.position = 'absolute';
+tooltipEl.style.background = '#fff';
+tooltipEl.style.border = '1px solid #e3e3e3';
+tooltipEl.style.borderRadius = '10px';
+tooltipEl.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
+tooltipEl.style.padding = '8px 12px';
+tooltipEl.style.pointerEvents = 'none';
+tooltipEl.style.transition = 'all .2s ease';
+tooltipEl.style.transform = 'translate(-50%, -100%)';
+tooltipEl.style.zIndex = 1000;
+document.body.appendChild(tooltipEl);
+}
+return tooltipEl;
+}
+
+// Fonction d’infobulle externe
+function externalTooltipHandler(context) {
+const {chart, tooltip} = context;
+const tooltipEl = createCustomTooltip();
+
+if (tooltip.opacity === 0) {
+tooltipEl.style.opacity = 0;
+return;
+}
+
+const dataPoint = tooltip.dataPoints[0];
+const date = dataPoint.label;
+const value = dataPoint.formattedValue;
+
+tooltipEl.innerHTML = `
+        <div style="font-weight: bold; margin-bottom: 4px;">${date}</div>
+        <div style="display: flex; align-items: center; gap: 6px;">
+            <span style="display:inline-block;width:10px;height:10px;background:${
+dataPoint.element.options.backgroundColor
+};border-radius:50%;"></span>
+            <span style="color: #6c757d;">${value}</span>
+        </div>
+    `;
+
+const position = chart.canvas.getBoundingClientRect();
+tooltipEl.style.left = position.left + window.pageXOffset + tooltip.caretX + 'px';
+tooltipEl.style.top = position.top + window.pageYOffset + tooltip.caretY + 'px';
+tooltipEl.style.opacity = 1;
+}
+
+// Options partagées
+const sharedOptions = {
+responsive: true,
+maintainAspectRatio: false,
+plugins: {
+tooltip: {
+enabled: false,
+external: externalTooltipHandler
+},
+legend: {
+display: false
+}
+},
+scales: {
+x: {
+grid: {
+display: false
+},
+ticks: {
+color: '#6c757d'
+}
+},
+y: {
+grid: {
+color: '#f1f1f1'
+},
+ticks: {
+color: '#6c757d'
+}
+}
+}
+};
+
+// Chart 1 : Mensuel
+let chart1 = new Chart(ctx1, {
+type: 'bar',
+data: {
+labels: months,
+datasets: [
+{
+label: 'Demandes',
+data: monthlyData[2025],
+backgroundColor: '#007bff',
+borderRadius: 10,
+barPercentage: 0.6,
+categoryPercentage: 0.5
+}
+]
+},
+options: sharedOptions
+});
+
+// Chart 2 : Département
+let chart2 = new Chart(ctx2, {
+type: 'bar',
+data: {
+labels: departmentData[2025].labels,
+datasets: [
+{
+label: 'Demandes',
+data: departmentData[2025].data,
+backgroundColor: '#20c997',
+borderRadius: 10,
+barPercentage: 0.6,
+categoryPercentage: 0.5
+}
+]
+},
+options: sharedOptions
+});
+
+// Toggle pour l’année (chart 1)
+document.getElementById('yearToggle').addEventListener('change', (e) => {
+const year = e.target.checked ? 2024 : 2025;
+chart1.data.datasets[0].data = monthlyData[year];
+chart1.update();
+});
+
+// Sélecteur d’année (chart 2)
+document.getElementById('yearFilter').addEventListener('change', (e) => {
+const year = e.target.value;
+chart2.data.labels = departmentData[year].labels;
+chart2.data.datasets[0].data = departmentData[year].data;
+chart2.update();
+});
+	</script>
+
 
 {% endblock %}

@@ -56,6 +56,39 @@ class UtilisateurRepository extends ServiceEntityRepository implements PasswordU
         $this->save($user, true);
     }
 
+    public function findAllExcept(Utilisateur $user): array
+    {
+    return $this->createQueryBuilder('u')
+        ->where('u != :user')
+        ->setParameter('user', $user)
+        ->getQuery()
+        ->getResult();
+    }
+
+    public function findByRoles(string $value): array
+    {
+    return $this->createQueryBuilder('o')
+        ->where('o.roles LIKE :value')
+        ->setParameter('value', '%"'.$value.'"%')
+        ->getQuery()
+        ->getResult();
+    }
+
+    public function isUserConnecte(int $userId): bool
+    {
+        $twoMinutesAgo = new \DateTime('-2 minutes');
+    
+        return (bool) $this->createQueryBuilder('u')
+            ->select('COUNT(u.id)')
+            ->where('u.id = :userId')
+            ->andWhere('u.derniereActiv > :twoMinutesAgo')
+            ->setParameter('userId', $userId)
+            ->setParameter('twoMinutesAgo', $twoMinutesAgo)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+    
+
 //    /**
 //     * @return Utilisateur[] Returns an array of Utilisateur objects
 //     */

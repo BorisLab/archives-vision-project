@@ -1,5 +1,4 @@
 <style>
-
 	body {
 		background-color: #f9fbfd;
 		overflow-x: hidden;
@@ -11,19 +10,35 @@
 		outline: 0;
 		box-shadow: 0 0 0 0;
 	}
+
+	.table thead th {
+		position: sticky;
+		top: 0;
+	}
+
+	.flash-msg {
+		display: none;
+		opacity: 0;
+		transition: opacity 0.5s ease;
+	}
+
+	.flash-msg.show {
+		display: block;
+		opacity: .9;
+	}
 </style>
-<div class="table-wrapper" style="max-height:500px;overflow-x:hidden;overflow-y:auto">
+<div class="table-wrapper" style="max-height:75vh;overflow-x:hidden;overflow-y:auto">
 	<table class="table table-sm">
 		<thead class="bg-secondary-subtle">
 			<tr>
 				<th>
-					<span href="#" class="link-dark">Nom</span>
+					<span href="#" class="link-dark">Libellé du dossier/fichier</span>
 				</th>
 				<th>
 					<span href="#" class="link-dark">Format</span>
 				</th>
 				<th>
-					<span href="#" class="link-dark">Département</span>
+					<span href="#" class="link-dark">Dép./Div./Sect.</span>
 				</th>
 				<th>
 					<span href="#" class="link-dark">Mots-clés</span>
@@ -86,7 +101,8 @@
 					</td>
 				</tr>
 			{% endif %}
-			{%for dossier in dossiers %}
+			{% if app.user.isDG is not same as true %}
+			{% for dossier in dossiers %}
 				<tr class="item-row">
 					<td class="tables-first text-truncate" style="max-width:200px">
 						<svg style="padding-bottom:3px" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-folder-fill" viewbox="0 0 16 16">
@@ -103,7 +119,7 @@
 					{% endif %}
 					<td class="tables-date">{{ dossier.dateCreation|date('d/m/Y') }}</td>
 					{% if dossier.statut == 1 %}
-						<td class="tables-handle text-success">Disponible</td>
+						<td class="tables-handle text-info">Disponible</td>
 					{% else %}
 						<td class="tables-handle text-danger">Indisponible</td>
 					{% endif %}
@@ -112,26 +128,47 @@
 							<form method="POST">
 								<input type="hidden" name="_action" value="reqDossier">
 								<input type="hidden" id="reqDossierId" name="reqDossierId">
-								{% for da in demandesacces %}
-									{% if da.dossier.dossierid == dossier.dossierid and da.statut == 'pending' %}
-										<button type="button" id="btn-req-folder" class="btn btn-outline-dark accordion-edit btn-sm rounded-sm text-center" disabled style="font-size:13px;width:75%">
-											<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" fill="currentColor" class="bi bi-question-circle-fill mb-1 me-1" viewbox="0 0 16 16">
-												<path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M5.496 6.033h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286a.237.237 0 0 0 .241.247m2.325 6.443c.61 0 1.029-.394 1.029-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94 0 .533.425.927 1.01.927z"/>
-											</svg>
-											En attente...
-										</button>
-									{% else %}
-										<button type="submit" id="btn-req-folder" class="btn btn-outline-dark accordion-edit btn-sm rounded-sm text-center" {{ dossier.statut ? '' : 'disabled' }} style="font-size:13px;width:75%" data-id="{{ dossier.dossierId }}">
-											<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" fill="currentColor" class="bi bi-lock-fill mb-1" viewbox="0 0 16 16">
-												<path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2m3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2"/>
-											</svg>
-											Demander accès
-										</button>
-									{% endif %}
-								{% endfor %}
-								{% if demandesacces == NULL %}
-									<button type="submit" id="btn-req-folder" class="btn btn-outline-dark accordion-edit btn-sm rounded-sm text-center" {{ dossier.statut ? '' : 'disabled' }} style="font-size:13px;width:75%" data-id="{{ dossier.dossierId }}">
-										<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" fill="currentColor" class="bi bi-lock-fill mb-1" viewbox="0 0 16 16">
+								{% if dossier.hasPendingRequest %}
+									<span class="text-dark text-center" style="font-size:13px;width:75%">
+										<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-question-circle-fill mb-1 me-1" viewbox="0 0 16 16">
+											<path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M5.496 6.033h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286a.237.237 0 0 0 .241.247m2.325 6.443c.61 0 1.029-.394 1.029-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94 0 .533.425.927 1.01.927z"/>
+										</svg>
+										En attente...
+									</span>
+								{% elseif dossier.hasApprovedRequest %}
+									    {% if dossier.remainingAccessTimeInSeconds %}
+									        <span class="text-bg-dark text-center p-2 countdown rounded" style="font-size:13px;width:75%" id="countdown-{{ dossier.dossierid }}">
+										        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle-fill" viewbox="0 0 16 16">
+											        <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2"/>
+										        </svg>
+										        Un instant...
+									        </span>
+									            <script>
+                document.addEventListener('DOMContentLoaded', () => {
+                    const countdownDosElement = document.getElementById('countdown-{{ dossier.dossierid }}');
+                    let remainingTimeDos = {{ dossier.remainingAccessTimeInSeconds }};
+
+                    function updateCountdownDos() {
+                        if (remainingTimeDos > 0) {
+                            const hoursDos = Math.floor(remainingTimeDos / 3600);
+                            const minutesDos = Math.floor((remainingTimeDos % 3600) / 60);
+                            countdownDosElement.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-info-circle-fill mb-1" viewbox="0 0 16 16">
+											                <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2"/>
+										                  </svg>
+										Accessible pour ${hoursDos} h : ${minutesDos} min`;
+                            remainingTimeDos -= 60; // Réduire 1 minute
+                        }
+                    }
+
+                    // Initialisation et mise à jour chaque minute
+                    updateCountdownDos();
+                    setInterval(updateCountdownDos, 60000);
+                });
+            </script>
+						                    {% endif %}
+								{% else %}
+									<button type="button" id="btn-req-folder" class="btn btn-outline-dark accordion-edit btn-sm rounded-sm text-center" {{ dossier.statut ? '' : 'disabled' }} style="font-size:13px;width:75%" data-id="{{ dossier.dossierId }}">
+										<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-lock-fill mb-1" viewbox="0 0 16 16">
 											<path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2m3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2"/>
 										</svg>
 										Demander accès
@@ -141,67 +178,358 @@
 						</span>
 					</td>
 				</tr>
-			{% endfor %}
-			{% if fichiers %}
-				{% for fichier in fichiers %}
-					<tr class="item-row">
-						<td class="tables-first text-truncate" style="max-width:200px">
-							{% if fichier.type == 'Document' %}
-								<svg class="padding-bottom:4px" xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="currentColor" class="bi bi-file-earmark-text" viewbox="0 0 16 16">
-									<path d="M5.5 7a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1zM5 9.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5"/>
-									<path d="M9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.5zm0 1v2A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1z"/>
+			</td>
+		</tbody>
+	</tr>
+{% endfor %}
+{% if fichiers %}
+	{% for fichier in fichiers %}
+		<tr class="item-row">
+			<td class="tables-first text-truncate" style="max-width:200px">
+				{% if fichier.type == 'Document' %}
+					<svg class="padding-bottom:4px" xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="currentColor" class="bi bi-file-earmark-text" viewbox="0 0 16 16">
+						<path d="M5.5 7a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1zM5 9.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5"/>
+						<path d="M9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.5zm0 1v2A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1z"/>
+					</svg>
+				{% elseif fichier.type == 'Image' %}
+					<svg class="padding-bottom:4px" xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="currentColor" class="bi bi-file-earmark-image" viewbox="0 0 16 16">
+						<path d="M6.502 7a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3"/>
+						<path d="M14 14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h5.5L14 4.5zM4 1a1 1 0 0 0-1 1v10l2.224-2.224a.5.5 0 0 1 .61-.075L8 11l2.157-3.02a.5.5 0 0 1 .76-.063L13 10V4.5h-2A1.5 1.5 0 0 1 9.5 3V1z"/>
+					</svg>
+				{% elseif fichier.type == 'Vidéo' %}
+					<svg class="padding-bottom:4px" xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="currentColor" class="bi bi-file-earmark-play" viewbox="0 0 16 16">
+						<path d="M6 6.883v4.234a.5.5 0 0 0 .757.429l3.528-2.117a.5.5 0 0 0 0-.858L6.757 6.454a.5.5 0 0 0-.757.43z"/>
+						<path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z"/>
+					</svg>
+				{% elseif fichier.type == 'Audio' %}
+					<svg class="padding-bottom:4px" xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="currentColor" class="bi bi-file-earmark-music" viewbox="0 0 16 16">
+						<path d="M11 6.64a1 1 0 0 0-1.243-.97l-1 .25A1 1 0 0 0 8 6.89v4.306A2.6 2.6 0 0 0 7 11c-.5 0-.974.134-1.338.377-.36.24-.662.628-.662 1.123s.301.883.662 1.123c.364.243.839.377 1.338.377s.974-.134 1.338-.377c.36-.24.662-.628.662-1.123V8.89l2-.5z"/>
+						<path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z"/>
+					</svg>
+				{% endif %}
+				{% if fichier.format == 'Numérique' %}
+					<span id="item-name" class="text-dark" title="{{ fichier.libellefichier }}">{{ fichier.libellefichier }}</span>
+				{% elseif fichier.format == 'Physique' %}
+					<span id="item-name" class="text-dark" title="{{ fichier.libellefichier }}">{{ fichier.libellefichier }}</span>
+				{% endif %}
+			</td>
+			<td id="item-type" class="tables-last">{{ fichier.format }}
+				|
+				<span class="badge text-bg-dark">{{ fichier.type }}</span>
+			</td>
+			<td id="item-dep" class="tables-handle">{{ fichier.dossier.departement.libelleDep }}</td>
+			{% if fichier.tags == null %}
+				<td class="tables-tags fst-italic text-secondary">Aucun mot-clé</td>
+			{% else %}
+				<td id="item-kywd" class="tables-tags text-truncate" style="max-width:200px">{{ fichier.getFormattedTags }}</td>
+			{% endif %}
+			<td class="tables-date">{{ fichier.dateCreation|date('d/m/Y') }}</td>
+			{% if fichier.statut %}
+				<td class="tables-handle text-info">Disponible</td>
+			{% else %}
+				<td class="tables-handle text-danger">Indisponible</td>
+			{% endif %}
+			<td class="text-center">
+				<span>
+					<form method="POST">
+						<input type="hidden" name="_action" value="reqFichier">
+						<input type="hidden" id="reqFichierId" name="reqFichierId">
+						{% if fichier.hasPendingRequest %}
+							<span class="text-dark text-center" style="font-size:13px;width:75%">
+								<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-question-circle-fill mb-1 me-1" viewbox="0 0 16 16">
+									<path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M5.496 6.033h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286a.237.237 0 0 0 .241.247m2.325 6.443c.61 0 1.029-.394 1.029-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94 0 .533.425.927 1.01.927z"/>
 								</svg>
-							{% elseif fichier.type == 'Image' %}
-								<svg class="padding-bottom:4px" xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="currentColor" class="bi bi-file-earmark-image" viewbox="0 0 16 16">
-									<path d="M6.502 7a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3"/>
-									<path d="M14 14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h5.5L14 4.5zM4 1a1 1 0 0 0-1 1v10l2.224-2.224a.5.5 0 0 1 .61-.075L8 11l2.157-3.02a.5.5 0 0 1 .76-.063L13 10V4.5h-2A1.5 1.5 0 0 1 9.5 3V1z"/>
-								</svg>
-							{% elseif fichier.type == 'Vidéo' %}
-								<svg class="padding-bottom:4px" xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="currentColor" class="bi bi-file-earmark-play" viewbox="0 0 16 16">
-									<path d="M6 6.883v4.234a.5.5 0 0 0 .757.429l3.528-2.117a.5.5 0 0 0 0-.858L6.757 6.454a.5.5 0 0 0-.757.43z"/>
-									<path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z"/>
-								</svg>
-							{% elseif fichier.type == 'Audio' %}
-								<svg class="padding-bottom:4px" xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="currentColor" class="bi bi-file-earmark-music" viewbox="0 0 16 16">
-									<path d="M11 6.64a1 1 0 0 0-1.243-.97l-1 .25A1 1 0 0 0 8 6.89v4.306A2.6 2.6 0 0 0 7 11c-.5 0-.974.134-1.338.377-.36.24-.662.628-.662 1.123s.301.883.662 1.123c.364.243.839.377 1.338.377s.974-.134 1.338-.377c.36-.24.662-.628.662-1.123V8.89l2-.5z"/>
-									<path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z"/>
-								</svg>
-							{% endif %}
-							{% if fichier.format == 'Numérique' %}
-								<span id="item-name" class="text-dark" title="{{ fichier.libellefichier }}">{{ fichier.libellefichier }}</span>
-							{% elseif fichier.format == 'Physique' %}
-								<span id="item-name" class="text-dark" title="{{ fichier.libellefichier }}">{{ fichier.libellefichier }}</span>
-							{% endif %}
-						</td>
-						<td id="item-type" class="tables-last">{{ fichier.format }}
-							|
-							<span class="badge text-bg-dark">{{ fichier.type }}</span>
-						</td>
-						<td id="item-dep" class="tables-handle">{{ fichier.dossier.departement.libelleDep }}</td>
-						{% if fichier.tags == null %}
-							<td class="tables-tags fst-italic text-secondary">Aucun mot-clé</td>
-						{% else %}
-							<td id="item-kywd" class="tables-tags text-truncate" style="max-width:200px">{{ fichier.getFormattedTags }}</td>
-						{% endif %}
-						<td class="tables-date">{{ fichier.dateCreation|date('d/m/Y') }}</td>
-						{% if fichier.statut %}
-							<td class="tables-handle text-success">Disponible</td>
-						{% else %}
-							<td class="tables-handle text-danger">Indisponible</td>
-						{% endif %}
-						<td class="text-center">
-							<span>
-								<button type="button" id="btn-req-file" class="btn btn-outline-dark btn-sm rounded-sm text-center" {{ fichier.statut ? '' : 'disabled' }} style="font-size:13px;width:75%" data-bs-placement="top" data-bs-target="">
-									<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" fill="currentColor" class="bi bi-lock-fill mb-1" viewbox="0 0 16 16">
-										<path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2m3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2"/>
-									</svg>
-									Demander accès
-								</button>
+								En attente...
 							</span>
-						</td>
-					</tr>
-				</td>
-			</tr>
-		{% endfor %}
-	{% endif %}
-</tbody></tbody></table></div>
+						{% elseif fichier.hasApprovedRequest %}
+								<button type="button" class="btn btn-outline-dark accordion-view btn-sm rounded-circle text-end" style="font-size:13px" data-bs-placement="top" data-bs-target="#previewFile" data-bs-toggle="modal" data-bs-title="Voir" data-id="{{ fichier.fichierId }}" data-name="{{ fichier.libellefichier }}">
+									<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-eye-fill" viewbox="0 0 16 16">
+										<path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0"/>
+										<path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8m8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7"/>
+									</svg>
+								</button>
+								<button type="button" class="btn btn-outline-dark accordion-view btn-sm rounded-circle text-end" style="font-size:13px" data-bs-placement="top" data-bs-target="#previewFile" data-bs-toggle="modal" data-bs-title="Voir" data-id="{{ fichier.fichierId }}" data-name="{{ fichier.libellefichier }}">
+									<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-download" viewbox="0 0 16 16">
+										<path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"/>
+										<path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708z"/>
+									</svg>
+								</button>
+								{% if fichier.remainingAccessTimeInSeconds %}
+									<span class="text-bg-dark text-center countdown p-2 rounded ms-2" style="font-size:13px;width:75%" id="countdown-{{ fichier.fichierid }}">
+										<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle-fill" viewbox="0 0 16 16">
+											<path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2"/>
+										</svg>
+										Un instant...
+									</span>
+				                    <script>
+                                        document.addEventListener('DOMContentLoaded', () => {
+                                             const countdownFicElement = document.getElementById('countdown-{{ fichier.fichierid }}');
+                                             let remainingTimeFic = {{ fichier.remainingAccessTimeInSeconds }};
+
+                                             function updateCountdownFic() {
+                                                if (remainingTimeFic > 0) {
+                                                    const hoursFic = Math.floor(remainingTimeFic / 3600);
+                                                    const minutesFic = Math.floor((remainingTimeFic % 3600) / 60);
+                                                    countdownFicElement.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-info-circle-fill mb-1" viewbox="0 0 16 16">
+											                     <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2"/>
+										                         </svg> Accessible pour ${hoursFic} h : ${minutesFic} min`;
+                                                                 remainingTimeFic -= 60; // Réduire 1 minute
+                                                }
+                                             }
+
+                                             // Initialisation et mise à jour chaque minute
+                                             updateCountdownFic();
+                                             setInterval(updateCountdownFic, 60000);
+                                        });
+                                     </script>
+			                    {% endif %}
+						{% else %}
+							<button type="button" id="btn-req-file" class="btn btn-outline-dark accordion-edit btn-sm rounded-sm text-center" {{ fichier.statut ? '' : 'disabled' }} style="font-size:13px;width:75%" data-id="{{ fichier.fichierId }}">
+								<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" fill="currentColor" class="bi bi-lock-fill mb-1" viewbox="0 0 16 16">
+									<path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2m3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2"/>
+								</svg>
+								Demander accès
+							</button>
+						{% endif %}
+					</form>
+				</span>
+			</td>
+		</tr>
+	</td>
+</tr>
+{% endfor %}
+{% endif %}
+{% else %}
+<!-- POUR DG -->
+			{% for dossier in dossiers %}
+				<tr class="item-row">
+					<td class="tables-first text-truncate" style="max-width:200px">
+						<svg style="padding-bottom:3px" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-folder-fill" viewbox="0 0 16 16">
+							<path d="M9.828 3h3.982a2 2 0 0 1 1.992 2.181l-.637 7A2 2 0 0 1 13.174 14H2.825a2 2 0 0 1-1.991-1.819l-.637-7a2 2 0 0 1 .342-1.31L.5 3a2 2 0 0 1 2-2h3.672a2 2 0 0 1 1.414.586l.828.828A2 2 0 0 0 9.828 3m-8.322.12q.322-.119.684-.12h5.396l-.707-.707A1 1 0 0 0 6.172 2H2.5a1 1 0 0 0-1 .981z"/>
+						</svg>
+						<a id="item-name" class="link-dark" title="{{ dossier.libelledossier }}" href="{{ path('app_user_folder_content', {id: dossier.dossierId})}}">{{ dossier.libelledossier }}</a>
+					</td>
+					<td class="tables-last text-truncate" style="max-width:200px">{{ dossier.format }}</td>
+					<td class="tables-handle text-truncate" style="max-width:200px">{{ dossier.departement.libelleDep }}</td>
+					{% if dossier.tags == null %}
+						<td class="tables-tags fst-italic text-secondary text-truncate" style="max-width:200px">Aucun mot-clé</td>
+					{% else %}
+						<td class="tables-tags text-truncate" style="max-width:200px">{{ dossier.getFormattedTags }}</td>
+					{% endif %}
+					<td class="tables-date">{{ dossier.dateCreation|date('d/m/Y') }}</td>
+					{% if dossier.statut == 1 %}
+						<td class="tables-handle text-info">Disponible</td>
+					{% else %}
+						<td class="tables-handle text-danger">Indisponible</td>
+					{% endif %}
+					<td class="text-center">
+					{% if dossier.format is not same as "Physique" %}
+					{% if app.user.isDG %}
+						
+					 {% endif %}
+					{% else %}
+						<span>
+							<form method="POST">
+								<input type="hidden" name="_action" value="reqDossier">
+								<input type="hidden" id="reqDossierId" name="reqDossierId">
+								{% if dossier.hasPendingRequest %}
+									<span class="text-dark text-center" style="font-size:13px;width:75%">
+										<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-question-circle-fill mb-1 me-1" viewbox="0 0 16 16">
+											<path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M5.496 6.033h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286a.237.237 0 0 0 .241.247m2.325 6.443c.61 0 1.029-.394 1.029-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94 0 .533.425.927 1.01.927z"/>
+										</svg>
+										En attente...
+									</span>
+								{% elseif dossier.hasApprovedRequest %}
+									    {% if dossier.remainingAccessTimeInSeconds %}
+									        <span class="text-bg-dark text-center p-2 countdown rounded" style="font-size:13px;width:75%" id="countdown-{{ dossier.dossierid }}">
+										        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle-fill" viewbox="0 0 16 16">
+											        <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2"/>
+										        </svg>
+										        Un instant...
+									        </span>
+									            <script>
+                document.addEventListener('DOMContentLoaded', () => {
+                    const countdownDosElement = document.getElementById('countdown-{{ dossier.dossierid }}');
+                    let remainingTimeDos = {{ dossier.remainingAccessTimeInSeconds }};
+
+                    function updateCountdownDos() {
+                        if (remainingTimeDos > 0) {
+                            const hoursDos = Math.floor(remainingTimeDos / 3600);
+                            const minutesDos = Math.floor((remainingTimeDos % 3600) / 60);
+                            countdownDosElement.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-info-circle-fill mb-1" viewbox="0 0 16 16">
+											                <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2"/>
+										                  </svg>
+										Accessible pour ${hoursDos} h : ${minutesDos} min`;
+                            remainingTimeDos -= 60; // Réduire 1 minute
+                        }
+                    }
+
+                    // Initialisation et mise à jour chaque minute
+                    updateCountdownDos();
+                    setInterval(updateCountdownDos, 60000);
+                });
+            </script>
+						                    {% endif %}
+								{% else %}
+									<button type="button" id="btn-req-folder" class="btn btn-outline-dark accordion-edit btn-sm rounded-sm text-center" {{ dossier.statut ? '' : 'disabled' }} style="font-size:13px;width:75%" data-id="{{ dossier.dossierId }}">
+										<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-lock-fill mb-1" viewbox="0 0 16 16">
+											<path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2m3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2"/>
+										</svg>
+										Demander accès
+									</button>
+								{% endif %}
+							</form>
+						</span>
+						{% endif %}
+					</td>
+				</tr>
+			</td>
+		</tbody>
+	</tr>
+{% endfor %}
+{% if fichiers %}
+	{% for fichier in fichiers %}
+		<tr class="item-row">
+			<td class="tables-first text-truncate" style="max-width:200px">
+				{% if fichier.type == 'Document' %}
+					<svg class="padding-bottom:4px" xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="currentColor" class="bi bi-file-earmark-text" viewbox="0 0 16 16">
+						<path d="M5.5 7a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1zM5 9.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5"/>
+						<path d="M9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.5zm0 1v2A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1z"/>
+					</svg>
+				{% elseif fichier.type == 'Image' %}
+					<svg class="padding-bottom:4px" xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="currentColor" class="bi bi-file-earmark-image" viewbox="0 0 16 16">
+						<path d="M6.502 7a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3"/>
+						<path d="M14 14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h5.5L14 4.5zM4 1a1 1 0 0 0-1 1v10l2.224-2.224a.5.5 0 0 1 .61-.075L8 11l2.157-3.02a.5.5 0 0 1 .76-.063L13 10V4.5h-2A1.5 1.5 0 0 1 9.5 3V1z"/>
+					</svg>
+				{% elseif fichier.type == 'Vidéo' %}
+					<svg class="padding-bottom:4px" xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="currentColor" class="bi bi-file-earmark-play" viewbox="0 0 16 16">
+						<path d="M6 6.883v4.234a.5.5 0 0 0 .757.429l3.528-2.117a.5.5 0 0 0 0-.858L6.757 6.454a.5.5 0 0 0-.757.43z"/>
+						<path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z"/>
+					</svg>
+				{% elseif fichier.type == 'Audio' %}
+					<svg class="padding-bottom:4px" xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="currentColor" class="bi bi-file-earmark-music" viewbox="0 0 16 16">
+						<path d="M11 6.64a1 1 0 0 0-1.243-.97l-1 .25A1 1 0 0 0 8 6.89v4.306A2.6 2.6 0 0 0 7 11c-.5 0-.974.134-1.338.377-.36.24-.662.628-.662 1.123s.301.883.662 1.123c.364.243.839.377 1.338.377s.974-.134 1.338-.377c.36-.24.662-.628.662-1.123V8.89l2-.5z"/>
+						<path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z"/>
+					</svg>
+				{% endif %}
+				{% if fichier.format == 'Numérique' %}
+					<span id="item-name" class="text-dark" title="{{ fichier.libellefichier }}">{{ fichier.libellefichier }}</span>
+				{% elseif fichier.format == 'Physique' %}
+					<span id="item-name" class="text-dark" title="{{ fichier.libellefichier }}">{{ fichier.libellefichier }}</span>
+				{% endif %}
+			</td>
+			<td id="item-type" class="tables-last">{{ fichier.format }}
+				|
+				<span class="badge text-bg-dark">{{ fichier.type }}</span>
+			</td>
+			<td id="item-dep" class="tables-handle">{{ fichier.dossier.departement.libelleDep }}</td>
+			{% if fichier.tags == null %}
+				<td class="tables-tags fst-italic text-secondary">Aucun mot-clé</td>
+			{% else %}
+				<td id="item-kywd" class="tables-tags text-truncate" style="max-width:200px">{{ fichier.getFormattedTags }}</td>
+			{% endif %}
+			<td class="tables-date">{{ fichier.dateCreation|date('d/m/Y') }}</td>
+			{% if fichier.statut %}
+				<td class="tables-handle text-info">Disponible</td>
+			{% else %}
+				<td class="tables-handle text-danger">Indisponible</td>
+			{% endif %}
+			<td class="text-center">
+			{% if app.user.isDG %}
+			{% if fichier.format is same as "Numérique" %}
+			<span>
+								<button type="button" class="btn btn-outline-dark accordion-view btn-sm rounded-circle text-end" style="font-size:13px" data-bs-placement="top" data-bs-target="#previewFile" data-bs-toggle="modal" data-bs-title="Voir" data-id="{{ fichier.fichierId }}" data-name="{{ fichier.libellefichier }}">
+									<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-eye-fill" viewbox="0 0 16 16">
+										<path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0"/>
+										<path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8m8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7"/>
+									</svg>
+								</button>
+								<button type="button" class="btn btn-outline-dark accordion-view btn-sm rounded-circle text-end" style="font-size:13px" data-bs-placement="top" data-bs-target="#previewFile" data-bs-toggle="modal" data-bs-title="Voir" data-id="{{ fichier.fichierId }}" data-name="{{ fichier.libellefichier }}">
+									<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-download" viewbox="0 0 16 16">
+										<path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"/>
+										<path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708z"/>
+									</svg>
+								</button>
+			</span>
+			{% endif %}
+			{% else %}
+				<span>
+					<form method="POST">
+						<input type="hidden" name="_action" value="reqFichier">
+						<input type="hidden" id="reqFichierId" name="reqFichierId">
+						{% if fichier.hasPendingRequest %}
+							<span class="text-dark text-center" style="font-size:13px;width:75%">
+								<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-question-circle-fill mb-1 me-1" viewbox="0 0 16 16">
+									<path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M5.496 6.033h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286a.237.237 0 0 0 .241.247m2.325 6.443c.61 0 1.029-.394 1.029-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94 0 .533.425.927 1.01.927z"/>
+								</svg>
+								En attente...
+							</span>
+						{% elseif fichier.hasApprovedRequest %}
+						    {% if fichier.format is same as "Numérique" %}
+								<button type="button" class="btn btn-outline-dark accordion-view btn-sm rounded-circle text-end" style="font-size:13px" data-bs-placement="top" data-bs-target="#previewFile" data-bs-toggle="modal" data-bs-title="Voir" data-id="{{ fichier.fichierId }}" data-name="{{ fichier.libellefichier }}">
+									<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-eye-fill" viewbox="0 0 16 16">
+										<path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0"/>
+										<path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8m8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7"/>
+									</svg>
+								</button>
+								<button type="button" class="btn btn-outline-dark accordion-view btn-sm rounded-circle text-end" style="font-size:13px" data-bs-placement="top" data-bs-target="#previewFile" data-bs-toggle="modal" data-bs-title="Voir" data-id="{{ fichier.fichierId }}" data-name="{{ fichier.libellefichier }}">
+									<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-download" viewbox="0 0 16 16">
+										<path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"/>
+										<path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708z"/>
+									</svg>
+								</button>
+							{% else %} 
+							<!-- Nothing -->
+							{% endif %}
+								{% if fichier.remainingAccessTimeInSeconds %}
+									<span class="text-bg-dark text-center countdown p-2 rounded ms-2" style="font-size:13px;width:75%" id="countdown-{{ fichier.fichierid }}">
+										<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle-fill" viewbox="0 0 16 16">
+											<path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2"/>
+										</svg>
+										Un instant...
+									</span>
+				                    <script>
+                                        document.addEventListener('DOMContentLoaded', () => {
+                                             const countdownFicElement = document.getElementById('countdown-{{ fichier.fichierid }}');
+                                             let remainingTimeFic = {{ fichier.remainingAccessTimeInSeconds }};
+
+                                             function updateCountdownFic() {
+                                                if (remainingTimeFic > 0) {
+                                                    const hoursFic = Math.floor(remainingTimeFic / 3600);
+                                                    const minutesFic = Math.floor((remainingTimeFic % 3600) / 60);
+                                                    countdownFicElement.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-info-circle-fill mb-1" viewbox="0 0 16 16">
+											                     <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2"/>
+										                         </svg> Accessible pour ${hoursFic} h : ${minutesFic} min`;
+                                                                 remainingTimeFic -= 60; // Réduire 1 minute
+                                                }
+                                             }
+
+                                             // Initialisation et mise à jour chaque minute
+                                             updateCountdownFic();
+                                             setInterval(updateCountdownFic, 60000);
+                                        });
+                                     </script>
+			                    {% endif %}
+						{% else %}
+							<button type="button" id="btn-req-file" class="btn btn-outline-dark accordion-edit btn-sm rounded-sm text-center" {{ fichier.statut ? '' : 'disabled' }} style="font-size:13px;width:75%" data-id="{{ fichier.fichierId }}">
+								<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" fill="currentColor" class="bi bi-lock-fill mb-1" viewbox="0 0 16 16">
+									<path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2m3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2"/>
+								</svg>
+								Demander accès
+							</button>
+						{% endif %}
+					</form>
+				</span>
+				{% endif %}
+			</td>
+		</tr>
+	</td>
+</tr>
+{% endfor %}
+{% endif %}
+{% endif %}
+</tbody>
+</table>
+</div>
+<div id="flash-msgs">
+<!-- Modals Toats -->{{ include('user/composants/modals/toasts/_requests.html.twig') }}</div>

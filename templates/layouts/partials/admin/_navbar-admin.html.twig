@@ -10,17 +10,26 @@
       <div class=" collapse navbar-collapse" id="navbarNavDropdown">
         <ul class="navbar-nav ms-auto ">
           <li class="nav-item">
-            <a class="nav-link mx-2 {{ set_active_route(['app_admin_home']) }}" draggable="false" href="{{ path('app_admin_home') }}">Accueil</a>
+            <a class="nav-link {{ set_active_route(['app_admin_home']) }}" draggable="false" href="{{ path('app_admin_home') }}">Accueil</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link mx-2 {{ set_active_route(['app_departements']) }}" draggable="false" href="{{ path('app_departements') }}">Départements</a>
+            <a class="nav-link {{ set_active_route(['app_admin_departements']) }}" draggable="false" href="{{ path('app_admin_departements') }}">Départements</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link mx-2 {{ set_active_route(['app_users']) }}" draggable="false" href="{{ path('app_users') }}">Utilisateurs</a>
+            <a class="nav-link {{ set_active_route(['app_admin_users','app_admin_register']) }}" draggable="false" href="{{ path('app_admin_users') }}">Utilisateurs</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link mx-2 " draggable="false" href="">Audit & Suivi</a>
+					{% if nbr_msgs_unread is not same as 0 %}
+						<a class="nav-link text-danger {{ set_active_route(['app_admin_chat']) }}" draggable="false" href="{{ path('app_admin_chat') }}">Messagerie <span class="badge text-bg-danger">{{ nbr_msgs_unread }}</span></a>
+                    {% else %}
+					    <a class="nav-link {{ set_active_route(['app_admin_chat']) }}" draggable="false" href="{{ path('app_admin_chat') }}">Messagerie</a>
+					{% endif %}          </li>
+          <li class="nav-item">
+            <a class="nav-link {{ set_active_route(['app_admin_audit']) }} " draggable="false" href="{{ path('app_admin_audit') }}">Audit & Suivi</a>
           </li>
+				<li class="nav-item">
+					<a class="nav-link {{ set_active_route(['app_admin_profile']) }}" draggable="false" href="{{ path('app_admin_profile') }}">Mon Profil</a>
+				</li>
           <li class="nav-item">
             <a class="nav-link mx-2 {{ set_active_route(['app_logout']) }}" draggable="false" href="{{ path('app_logout') }}">Déconnexion</a>
           </li>

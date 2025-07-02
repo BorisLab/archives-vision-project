@@ -7,44 +7,137 @@
 
 {% block stylesheets %}
 	<link rel="stylesheet" href="{{ asset('assets/css/theme.bundle.css') }}">
+	<link rel="stylesheet" href="{{ asset('assets/css/scrollbar.css') }}">
 
 	<style>
-
 		body {
 			background-color: #f9fbfd;
-			overflow-x: hidden;
+			overflow: hidden;
 		}
 
-		input.form-control:focus,
-		.form-select:focus {
-			border-color: #0d6efd;
-			outline: 0;
-			box-shadow: 0 0 0 0;
+		#inputSelect option:nth-child(1) {
+			color: gray;
+			font-style: italic;
 		}
 
-		#save {
-			background-color: #fff;
-			color: #2c7be5;
-			font-size: smaller;
+		#inputSelect option:nth-child(2) {
+			color: black;
+			font-style: normal;
+
 		}
 
-		#save:hover {
-			background-color: #2c7be5;
-			color: #fff;
+		#inputSelect option:nth-child(3) {
+			color: black;
+			font-style: normal;
+
 		}
 
-		#cancel {
-			font-size: smaller;
+		#inputSelect option:nth-child(4) {
+			color: black;
+			font-style: normal;
+
 		}
 
-		#cancel:hover {
-			background-color: #6e84a3;
+		.item-row:hover {
+			background-color: #EBF5FB;
+		}
+
+		/* Champ des mots-clés */
+		.keywords-input {
+			display: flex;
+			flex-wrap: wrap;
+			padding: 0.5rem;
+			border: 1px solid #ced4da;
+			border-radius: 0.25rem;
+		}
+		.keywords-input input {
+			border: none;
+			outline: none;
+			flex-grow: 1;
+		}
+		.keyword {
+			background-color: #e9ecef;
+			padding: 0.5rem;
+			margin: 0.2rem;
+			border-radius: 0.2rem;
+			display: flex;
+			align-items: center;
+		}
+		.keyword .remove-keyword {
+			margin-left: 0.5rem;
+			cursor: pointer;
+		}
+
+		.searchable-select {
+			position: relative;
+			width: 100%;
+		}
+		.searchable-select input {
+			width: 100%;
+			box-sizing: border-box;
+		}
+		.searchable-select ul,
+		.edit-searchable-select ul {
+			position: absolute;
+			top: 100%;
+			left: 0;
+			width: 100%;
+			max-height: 200px;
+			overflow-y: auto;
+			background: white;
+			border: 1px solid #ced4da;
+			border-top: none;
+			z-index: 1050; /* Plus grand que celui de la modal */
+			list-style: none;
+			padding: 0;
+			margin: 0;
+		}
+		.searchable-select ul li {
+			padding: 0.5rem;
+			cursor: pointer;
+		}
+		.searchable-select ul li:hover {
+			background-color: #EBF5FB;
+		}
+
+		.edit-searchable-select {
+			position: relative;
+			width: 100%;
+		}
+		.edit-searchable-select input {
+			width: 100%;
+			box-sizing: border-box;
+		}
+		{
+			position: absolute;
+			top: 100%;
+			left: 0;
+			width: 100%;
+			max-height: 200px;
+			overflow-y: auto;
+			background: white;
+			border: 1px solid #ced4da;
+			border-top: none;
+			z-index: 1050; /* Plus grand que celui de la modal */
+			list-style: none;
+			padding: 0;
+			margin: 0;
+		}
+		.edit-searchable-select ul li {
+			padding: 0.5rem;
+			cursor: pointer;
+		}
+		.edit-searchable-select ul li:hover {
+			background-color: #EBF5FB;
+		}
+		.hidden {
+			display: none;
 		}
 	</style>
 {% endblock %}
 
 {% block body %}
-	{{ include('layouts/partials/_logout.html.twig') }}
+	{{ include('layouts/partials/_logout-loading.html.twig') }}
 	<div class="load-div" style="display:none">
 		<div id="loading-overlay" class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="display: none; background-color: rgba(255, 255, 255, 0.8);">
 			<div class="text-center">
@@ -55,382 +148,276 @@
 			</div>
 		</div>
 	</div>
-	<div class="main-content">
-		{{ include('layouts/partials/admin/_navbar-admin.html.twig')}}
+	<div style="width:100%">
+		{{ include('layouts/partials/admin/_navbar-admin.html.twig') }}
+	</div>
 
-		<div class="header">
-			<div
-				class="container">
-				<!-- Body -->
-				<div class="header-body border-bottom mt-4 mb-4" style="border-color:rgba(18, 38, 63, 0.175)">
-					<div class="row align-items-end">
-						<div
-							class="col pb-3">
+	<!-- Conteneur principal des documents -->
+	<div class="main-content" id="folder-files-container" style="max-height:100%">
 
-							<!-- Title -->
-							<h4 class="header-title">
-								Départements
-							</h1>
+		{{ include('administrator/composants/modals/forms/_active_user.html.twig') }}
+		{{ include('administrator/composants/modals/forms/_disable_user.html.twig') }}
+		{{ include('administrator/composants/modals/forms/_create_dep_modal.html.twig') }}
+		{{ include('administrator/composants/modals/forms/_edit_dep_modal.html.twig') }}
+		{{ include('administrator/composants/modals/forms/_delete_dep_modal.html.twig') }}
 
-						</div>
-						<div
-							class="col-auto pb-3">
 
-							<!-- Button -->
-							<a href="#!" draggable="false" class="btn btn-info lift" data-bs-toggle="modal" data-bs-target="#createDEP">
-								Ajouter un département
-							</a>
-
-							<!-- Modal -->
-							<div class="modal fade" id="createDEP" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-								<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-card">
-									<div class="modal-content">
-										<div class="modal-header">
-											<h6 class="card-header-title" id="exampleModalLabel" style="font-size:15px">Editer un département</h6>
-											<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-										</div>
-										<div class="modal-body">
-											<form action="" method="post">
-												<div class="mb-3">
-													<label for="exampleFormControlInput1" class="form-label">Nom du département</label>
-													<input type="text" readonly class="form-control" id="exampleFormControlInput1" placeholder="Entrer le nom du département">
-												</div>
-
-												<div class="mb-3">
-													<label for="email1Group" class="form-label">Email</label>
-													<div class="input-group mb-3">
-														<input type="text" class="form-control" id="email1Group" placeholder="Préfixe de l'adresse" aria-label="Recipient's username" aria-describedby="basic-addon2">
-														<span class="input-group-text" id="basic-addon2">@entreprise.com</span>
-													</div>
-												</div>
-											</form>
-										</div>
-										<div class="modal-footer" style="border-top: 0;">
-											<button type="button" id="" class="btn btn-outline-info mb-2" data-bs-dismiss="modal">Annuler</button>
-											<button type="button" id="" class="btn btn-outline-primary mb-2">Enregistrer</button>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
+		<div class="container-fluid">
+			<div class="row p-3">
+				<div class="col-sm-6">
+					<div class="mb-3">
+						<label for="searchInput" class="form-label">Rechercher</label>
+						<input type="text" class="form-control" id="searchInput" autofocus placeholder="Rechercher un département">
 					</div>
-					<!-- / .row -->
 				</div>
-				<!-- / .header-body -->
+				<div class="col-sm-2">
+					<label for="nbrSelect" class="form-label">Taille du personnel</label>
+					<select id="nbrSelect" class="form-select">
+						<option selected>Choisir</option>
+						<option>0 - 50</option>
+						<option>50 - 100</option>
+						<option>Plus de 100</option>
+					</select>
+				</div>
+				<div class="col-sm-2">
+					<label for="dateMin" class="form-label">Du</label>
+					<input type="date" id="dateMin" class="form-control"/>
+				</div>
+				<div class="col-sm-2">
+					<label for="dateMax" class="form-label">Au</label>
+					<input type="date" id="dateMax" class="form-control"/>
+				</div>
+
 			</div>
 		</div>
-	</div>
-	<div class="container">
-		<div class="row mb-3">
-			<div class="col-md-12">
-				<div class="mb-3">
-					<label for="formGroupExampleInput" class="form-label autofocus">Rechercher</label>
-					<input type="search" class="form-control list-search" id="formGroupExampleInput" autofocus placeholder="Quel département recherchez-vous?">
+		<!-- / .row -->
+		<div class="row">
+			<div class="col-12 col-xl-12">
+				<div class="row mx-auto align-items-center">
+					<div class="col">
+
+						<nav>
+							<ol class="breadcrumb">
+								<li class="breadcrumb-item">
+									<span class="link-dark">Tous les départements</span>
+								</li>
+							</ol>
+						</nav>
+
+					</div>
+					<div
+						class="col-auto">
+
+						<!-- Button -->
+						<button type="button" id="newDepBtn" data-bs-target="#newDepart" class="btn btn-sm me-3 mb-2 btn-white" data-bs-toggle="modal" data-bs-title="Nouveau département">
+							Ajouter un nouveau département
+						</button>
+
+					</div>
+				</div>
+				<!-- / .row -->
+
+				<div class="table-responsive" style="overflow-x:hidden" data-list='{"valueNames": ["tables-row", "tables-first", "tables-last", "tables-handle"]}'>
+					<div class="table-wrapper" style="max-height:75vh;overflow-x:hidden;overflow-y:auto">
+						<table class="table table-sm">
+							<thead class="bg-secondary-subtle">
+								<tr>
+									<th>
+										<span class="link-dark">Département</span>
+									</th>
+									<th>
+										<span class="link-dark">Département parent</span>
+									</th>
+									<th>
+										<span class="link-dark">Taille du personnel</span>
+									</th>
+									<th>
+										<span class="link-dark">Date de création</span>
+									</th>
+									<th>
+										<span class="link-dark">Dernière modification</span>
+									</th>
+									<th class="text-end pe-5">
+										&nbsp;
+									</th>
+								</tr>
+							</thead>
+							<tbody id="body-md" class="list">
+								{% if deps is empty %}
+									<tr class="empty-list">
+										<td
+											colspan="7">
+											<!-- Title -->
+											<h4 class="mt-2 mb-2 text-center">
+												Aucun département trouvé
+											</h4>
+
+											<!-- Content -->
+											<p class="text-muted text-center">
+												Tous les départements ajoutés s'affichent ici.
+											</p>
+										</td>
+									</tr>
+								{% endif %}
+								{% for dep in deps %}
+									<tr class="item-row">
+										<td class="tables-first text-truncate" style="max-width:200px">
+											<span id="item-name" class="text-dark" title="{{ dep.libelledep }}">{{ dep.libelledep }}</span>
+										</td>
+										{% if dep.parent %}
+										<td class="tables-last">{{ dep.departementparent.libelleDep }}</td>
+										{% else %}
+										<td class="tables-last fst-italic text-secondary">Néant</td>
+										{% endif %}
+										<td class="tables-last">{{ dep.nbreUsers }}</td>
+										<td class="tables-date">{{ dep.dateCreation|date('d/m/Y', 'Africa/Abidjan') }}</td>
+										<td class="tables-date">{{ dep.dateModif|date('d/m/Y', 'Africa/Abidjan') }}</td>
+										<td class="text-end">
+											<span>
+												<button type="button" class="btn accordion-edit btn-sm rounded-circle text-end" style="font-size:13px" data-bs-placement="top" data-bs-target="#editDepart" data-bs-toggle="modal" data-bs-title="Modifier" data-id="{{ dep.id }}" data-name="{{ dep.libelledep }}" {% if dep.parent %} data-p="{{ dep.departementparent.libelledep }}" data-p-i="{{ dep.departementparent.id }}" {% endif %}>
+													<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-pen-fill" viewbox="0 0 16 16">
+														<path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001"/>
+													</svg>
+												</button>
+												<button type="button" class="btn accordion-delete btn-sm rounded-circle text-end" style="font-size:13px" data-bs-placement="top" data-bs-target="#deleteDepart" data-bs-toggle="modal" data-bs-title="Supprimer" data-id="{{ dep.id }}" data-name="{{ dep.libelledep }}">
+													<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-trash-fill" viewbox="0 0 16 16">
+														<path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0"/>
+													</svg>
+												</button>
+											</span>
+										</td>
+									</tr>
+								{% endfor %}
+							</tbody>
+						</table>
+					</div>
+					<div
+						id="flash-msgs">
+						<!-- Modals Toats -->
+						{{ include('administrator/composants/modals/toasts/_user_account.html.twig') }}
+						{{ include('administrator/composants/modals/toasts/_system.html.twig') }}
+						{{ include('administrator/composants/modals/toasts/_deps.html.twig') }}
+
+					</div>
 				</div>
 			</div>
-
 		</div>
-
-		<div class="card shadow" id="lists" data-list="">
-
-			<div
-				class="card-body">
-
-				<!-- List group -->
-				<ul class="list-group list-group-flush list my-n3">
-					<li class="list-group-item">
-						<div class="row align-items-center">
-							<div class="col-auto"></div>
-							<div
-								class="col ms-n2">
-
-								<!-- Title -->
-								<h5 class="mb-1 name">
-									<span>Comptabilité</span>
-								</h5>
-
-								<!-- Time -->
-								<p class="small mb-0">
-									Email:
-									<span style="color:blue;">compta@entreprise.com</span>
-								</p>
-								<p class="small mb-0">
-									Utilisateurs:
-									<span style="color:blue;">0</span>
-								</p>
-
-							</div>
-							<div
-								class="col-auto" id="edit">
-
-								<!-- Button -->
-								<a href="#!" class="btn btn-sm btn-light" data-bs-toggle="modal" data-bs-target="#editCOMPTA" style="border: 1px solid grey">
-									Editer
-								</a>
-
-								<!-- Modal -->
-								<div class="modal fade" id="editCOMPTA" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-									<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-card">
-										<div class="modal-content">
-											<div class="modal-header">
-												<h6 class="card-header-title" id="exampleModalLabel" style="font-size:15px">Editer un département</h6>
-												<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-											</div>
-											<div class="modal-body">
-												<form action="" method="post">
-													<div class="mb-3">
-														<label for="exampleFormControlInput1" class="form-label">Nom du département</label>
-														<input type="text" readonly class="form-control" id="exampleFormControlInput1" value="Comptabilité">
-													</div>
-
-													<div class="mb-3">
-														<label for="email1Group" class="form-label">Email</label>
-														<div class="input-group mb-3">
-															<input type="text" class="form-control" id="email1Group" value="compta1" aria-label="Recipient's username" aria-describedby="basic-addon2">
-															<span class="input-group-text" id="basic-addon2">@entreprise.com</span>
-														</div>
-													</div>
-												</form>
-											</div>
-											<div class="modal-footer" style="border-top: 0;">
-												<button type="button" id="" class="btn btn-outline-info mb-2" data-bs-dismiss="modal">Annuler</button>
-												<button type="button" id="" class="btn btn-outline-primary mb-2">Enregistrer</button>
-											</div>
-										</div>
-									</div>
-								</div>
-
-							</div>
-							<div
-								class="col-auto" id="del">
-
-								<!-- Button -->
-								<a href="#!" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#delCOMPTA" style="border: 1px solid brown">
-									Supprimer
-								</a>
-
-								<!-- Modal -->
-								<div class="modal fade" id="delCOMPTA" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-									<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-card">
-										<div class="modal-content">
-											<div class="modal-header">
-												<h6 class="card-header-title" id="exampleModalLabel" style="font-size:15px">Supprimer un département</h6>
-												<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-											</div>
-											<div class="modal-body">
-												<span>Etes-vous sûr de vouloir supprimer ce département "Comptabilité" ?</span>
-											</div>
-											<div class="modal-footer" style="border-top: 0;">
-												<button type="button" id="" class="btn btn-outline-info mb-2" data-bs-dismiss="modal">Annuler</button>
-												<button type="button" id="delete" class="btn btn-outline-danger mb-2">Supprimer</button>
-											</div>
-										</div>
-									</div>
-								</div>
-
-							</div>
-						</div>
-						<!-- / .row -->
-					</li>
-					<li class="list-group-item">
-						<div class="row align-items-center">
-							<div class="col-auto"></div>
-							<div
-								class="col ms-n2">
-
-								<!-- Title -->
-								<h5 class="mb-1 name">
-									<span>Informatique</span>
-								</h5>
-
-								<!-- Time -->
-								<p class="small mb-0">
-									Email:
-									<span style="color:blue;">infotech@entreprise.com</span>
-								</p>
-
-								<p class="small mb-0">
-									Utilisateurs:
-									<span style="color:blue;">0</span>
-								</p>
-
-							</div>
-							<div
-								class="col-auto" id="edit">
-
-								<!-- Button -->
-								<a type="button" draggable="false" href="#!" class="btn btn-sm btn-light" data-bs-toggle="modal" data-bs-target="#editINFO" style="border: 1px solid grey">
-									Editer
-								</a>
-
-								<!-- Modal -->
-								<div class="modal fade" id="editINFO" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-									<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-card">
-										<div class="modal-content">
-											<div class="modal-header">
-												<h6 class="card-header-title" id="exampleModalLabel" style="font-size:15px">Editer un département</h6>
-												<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-											</div>
-											<div class="modal-body">
-												<form action="" method="post">
-													<div class="mb-3">
-														<label for="exampleFormControlInput1" class="form-label">Nom du département</label>
-														<input type="text" readonly class="form-control" id="exampleFormControlInput1" value="Informatique">
-													</div>
-
-													<div class="mb-3">
-														<label for="email1Group" class="form-label">Email</label>
-														<div class="input-group mb-3">
-															<input type="text" class="form-control" id="email1Group" value="infotech" aria-label="Recipient's username" aria-describedby="basic-addon2">
-															<span class="input-group-text" id="basic-addon2">@entreprise.com</span>
-														</div>
-													</div>
-												</form>
-											</div>
-											<div class="modal-footer" style="border-top: 0;">
-												<button type="button" id="" class="btn btn-outline-info mb-2" data-bs-dismiss="modal">Annuler</button>
-												<button type="button" id="" class="btn btn-outline-primary mb-2">Enregistrer</button>
-											</div>
-										</div>
-									</div>
-								</div>
-
-							</div>
-							<div
-								class="col-auto" id="del">
-
-								<!-- Button -->
-								<a href="#!" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#delINFO" style="border: 1px solid brown">
-									Supprimer
-								</a>
-
-								<!-- Modal -->
-								<div class="modal fade" id="delINFO" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-									<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-card">
-										<div class="modal-content">
-											<div class="modal-header">
-												<h6 class="card-header-title" id="exampleModalLabel" style="font-size:15px">Supprimer un département</h6>
-												<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-											</div>
-											<div class="modal-body">
-												<span>Etes-vous sûr de vouloir supprimer ce département "Informatique" ?</span>
-											</div>
-											<div class="modal-footer" style="border-top: 0;">
-												<button type="button" id="" class="btn btn-outline-info" data-bs-dismiss="modal">Annuler</button>
-												<button type="button" id="" class="btn btn-outline-danger">Supprimer</button>
-											</div>
-										</div>
-									</div>
-								</div>
-
-							</div>
-						</div>
-						<!-- / .row -->
-					</li>
-					<li class="list-group-item">
-						<div class="row align-items-center">
-							<div class="col-auto"></div>
-							<div
-								class="col ms-n2">
-
-								<!-- Title -->
-								<h5 class="mb-1 name">
-									<span>Ressources Humaines</span>
-								</h5>
-
-								<!-- Email -->
-								<p class="small mb-0">
-									Email:
-									<span style="color:blue;">rh@entreprise.com</a>
-								</p>
-
-								<!-- Users -->
-								<p class="small mb-0">
-									Utilisateurs:
-									<span style="color:blue;">0</span>
-								</p>
-
-							</div>
-							<div
-								class="col-auto" id="edit">
-
-								<!-- Button -->
-								<a href="#!" class="btn btn-sm btn-light" class="btn btn-sm btn-light" data-bs-toggle="modal" data-bs-target="#editRH" style="border: 1px solid grey">
-									Editer
-								</a>
-
-								<!-- Modal -->
-								<div class="modal fade" id="editRH" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-									<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-card">
-										<div class="modal-content">
-											<div class="modal-header">
-												<h6 class="card-header-title" id="exampleModalLabel" style="font-size:15px">Editer un département</h6>
-												<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-											</div>
-											<div class="modal-body">
-												<form action="" method="post">
-													<div class="mb-3">
-														<label for="exampleFormControlInput1" class="form-label">Nom du département</label>
-														<input type="text" readonly class="form-control" id="exampleFormControlInput1" value="Ressources Humaines">
-													</div>
-
-													<div class="mb-3">
-														<label for="email1Group" class="form-label">Email</label>
-														<div class="input-group mb-3">
-															<input type="text" class="form-control" id="email1Group" value="rh@entreprise.com" aria-label="Recipient's username" aria-describedby="basic-addon2">
-															<span class="input-group-text" id="basic-addon2">@entreprise.com</span>
-														</div>
-													</div>
-												</form>
-											</div>
-											<div class="modal-footer" style="border-top: 0;">
-												<button type="button" id="" class="btn btn-outline-info mb-2" data-bs-dismiss="modal">Annuler</button>
-												<button type="button" id="" class="btn btn-outline-primary mb-2">Enregistrer</button>
-											</div>
-										</div>
-									</div>
-								</div>
-
-							</div>
-							<div
-								class="col-auto" id="del">
-
-								<!-- Button -->
-								<a href="#!" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#delRH" style="border: 1px solid brown">
-									Supprimer
-								</a>
-
-								<!-- Modal -->
-								<div class="modal fade" id="delRH" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-									<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-card">
-										<div class="modal-content">
-											<div class="modal-header">
-												<h6 class="card-header-title" id="exampleModalLabel" style="font-size:15px">Supprimer un département</h6>
-												<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-											</div>
-											<div class="modal-body">
-												<span>Etes-vous sûr de vouloir supprimer ce département "Ressources Humaines" ?</span>
-											</div>
-											<div class="modal-footer" style="border-top: 0;">
-												<button type="button" id="" class="btn btn-outline-info" data-bs-dismiss="modal">Annuler</button>
-												<button type="button" id="" class="btn btn-outline-danger">Supprimer</button>
-											</div>
-										</div>
-									</div>
-								</div>
-
-							</div>
-						</div>
-						<!-- / .row -->
-					</li>
-				</ul>
-
-			</div>
-		</div>
-
+		<!-- / .row -->
 	</div>
-	{% for flashMessage in app.flashes('success') %}
-		{{ include('layouts/partials/_success_login_flash_msg.html.twig')}}
-	{% endfor %}
+{% endblock %}
+{% block javascripts %}
+	<script src="{{ asset('assets/js/shortcodes/_cnx-statut.js')}}"></script>
+	<script src="{{ asset('assets/js/shortcodes/_search-adm-d.js')}}"></script>
+	<script>
+		document.addEventListener("DOMContentLoaded", function () {
+const notifContainer = document.querySelector(".toast-container");
 
+const es1 = new EventSource("{{ mercure('http://127.0.0.1:8000/archivists')|escape('js') }}", {withCredentials: true});
+
+es1.onmessage = function (event) {
+let data = JSON.parse(event.data);
+let toast = document.createElement('div');
+
+toast.className = 'toast bg-dark text-bg-dark flash-msg';
+toast.setAttribute('role', 'alert');
+toast.setAttribute('aria-live', 'assertive');
+toast.setAttribute('aria-atomic', 'true');
+toast.setAttribute('data-bs-delay', '10000'); // Délai de 5 secondes
+toast.setAttribute('style', 'width:450px;box-shadow:none');
+
+toast.innerHTML = `<div class="toast-header bg-dark mt-0 pb-0 border border-0">
+				    <span class="text-info me-3">
+				        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle-fill mb-1" viewBox="0 0 16 16">
+                            <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2"/>
+                        </svg>
+				    </span>
+				    <span class="text-light me-auto">Nouvelle demande d'accès</span>
+			           </div>
+			        <div class="toast-body w-auto">
+				        <span class="text-light text-truncate fs-5" style="max-width:700px">${
+data.message
+}</span>
+			        </div>`;
+
+notifContainer.appendChild(toast);
+
+const messages = $('.toast');
+let index = 0;
+
+function showNextMessage() {
+if (index < messages.length) {
+const currentToast = $(messages[index]);
+currentToast.toast('show');
+
+// Déclenche après la durée définie dans `data-bs-delay` ou ici manuellement
+currentToast.on('hidden.bs.toast', function () {
+currentToast.remove();
+index++;
+showNextMessage();
+});
+}
+}
+
+showNextMessage();
+};
+
+const es2 = new EventSource("{{ mercure('http://127.0.0.1:8000/users/' ~ app.user.id)|escape('js') }}", {withCredentials: true});
+
+es2.onmessage = function (event) {
+let data = JSON.parse(event.data);
+let toast = document.createElement('div');
+
+toast.className = 'toast bg-dark text-bg-dark flash-msg';
+toast.setAttribute('role', 'alert');
+toast.setAttribute('aria-live', 'assertive');
+toast.setAttribute('aria-atomic', 'true');
+toast.setAttribute('data-bs-delay', '10000'); // Délai de 5 secondes
+toast.setAttribute('style', 'width:450px;box-shadow:none');
+
+toast.innerHTML = `<div class="toast-body w-auto">
+					        <span class="text-success me-3">
+						        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle-fill" viewbox="0 0 16 16">
+							        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+						        </svg>
+					        </span>
+					        <span class="text-light text-truncate" style="max-width:350px">${
+data.notif
+}</span>
+				          </div>`;
+
+notifContainer.appendChild(toast);
+
+const messages = $('.toast');
+let index = 0;
+
+function showNextMessage() {
+if (index < messages.length) {
+const currentToast = $(messages[index]);
+currentToast.toast('show');
+
+// Déclenche après la durée définie dans `data-bs-delay` ou ici manuellement
+currentToast.on('hidden.bs.toast', function () {
+currentToast.remove();
+index++;
+showNextMessage();
+});
+}
+}
+
+showNextMessage();
+}
+
+window.addEventListener("beforeunload", function () {
+es1.close();
+es2.close();
+});
+
+});
+	</script>
+	<script src="{{ asset('assets/js/folders-accordion.js') }}"></script>
+	<script src="{{ asset('assets/js/shortcodes/_reset-dep-form.js') }}"></script>
+	<script src="{{ asset('assets/js/shortcodes/_form-check.js') }}"></script>
+	<script src="{{ asset('assets/js/shortcodes/_modal-get-adm-d.js') }}"></script>
+	<script src="{{ asset('assets/js/shortcodes/_toasts.js') }}"></script>
+	<script src="{{ asset('assets/js/shortcodes/_searchable-select-a.js') }}"></script>
 {% endblock %}

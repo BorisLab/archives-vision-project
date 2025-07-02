@@ -15,12 +15,35 @@
 			overflow: hidden;
 		}
 
-		.item-row:hover {
-			background-color: #F2F3F4;
+		#inputSelect {
+			color: gray;
+			font-style: italic;
+		}
+
+		#inputSelect option:nth-child(2) {
+			color: black;
+			font-style: normal;
+
+		}
+
+		#inputSelect option:nth-child(3) {
+			color: black;
+			font-style: normal;
+
+		}
+
+		#inputSelect option:nth-child(4) {
+			color: black;
+			font-style: normal;
+
 		}
 
 		.item-row #item-name:hover {
 			text-decoration: underline;
+		}
+
+		tr.item-row:hover {
+			background-color: #EBF5FB;
 		}
 
 		.breadcrumb-item + .breadcrumb-item::before {
@@ -85,7 +108,7 @@
 			cursor: pointer;
 		}
 		.searchable-select ul li:hover {
-			background-color: #f1f1f1;
+			background-color: #EBF5FB;
 		}
 
 		.edit-searchable-select {
@@ -116,7 +139,7 @@
 			cursor: pointer;
 		}
 		.edit-searchable-select ul li:hover {
-			background-color: #f1f1f1;
+			background-color: #EBF5FB;
 		}
 		.hidden {
 			display: none;
@@ -138,6 +161,25 @@
 			align-items: center;
 			overflow: hidden;
 			padding: 25px 0;
+		}
+		.search-results {
+			margin-top: 5px;
+			position: absolute;
+			background: white;
+			border: 1px solid #ddd;
+			max-height: 300px;
+			overflow-y: auto;
+			width: 48%;
+			z-index: 1000;
+		}
+
+		.search-item {
+			padding: 10px;
+			border-bottom: 1px solid #ddd;
+		}
+
+		.search-item:hover {
+			background: #EBF5FB;
 		}
 	</style>
 {% endblock %}
@@ -171,8 +213,6 @@
 				{{ include('fonds_archives/composants/modals/forms/_create_file_modal.html.twig') }}
 				{{ include('fonds_archives/composants/modals/forms/_edit_file_modal.html.twig') }}
 				{{ include('fonds_archives/composants/modals/forms/_preview_file_modal.html.twig') }}
-
-
 			</div>
 		</div>
 
@@ -181,38 +221,41 @@
 
 				<div class="col-sm-4">
 					<div class="mb-3">
-						<label for="inputSelect" class="form-label">Rechercher</label>
-						<input type="text" class="form-control" id="formGroupExampleInput" autofocus placeholder="Rechercher un dossier ou une pièce (libellé, type, mots-clés...)">
+						<label for="searchInput" class="form-label">Rechercher</label>
+						<input type="text" class="form-control" id="searchInput" autofocus placeholder="Rechercher un élément (sous-fonds, dossier, pièce...)">
 					</div>
 				</div>
 				<div class="col-sm-2">
-					<label for="inputSelect" class="form-label">Type</label>
-					<select id="inputSelect" class="form-select">
-						<option selected>---Choisir---</option>
+				    <label for="dep-select" class="form-label">Département/Division/Section</label>
+				    <select id="dep-select" class="form-select">
+						<option selected>Choisir</option>
+				        {% for dep in deps %}
+				        <option>{{ dep.libelleDep }}</option>
+				        {% endfor %}
+				    </select>
+				</div>
+				<div class="col-sm-1">
+					<label for="type-select" class="form-label">Type</label>
+					<select id="type-select" class="form-select">
+						<option selected>Choisir</option>
 						<option>Dossier</option>
 						<option>Fichier</option>
 					</select>
 				</div>
-				<div class="col-sm-2">
-					<label for="inputSelect" class="form-label">Format</label>
-					<select id="inputSelect" class="form-select">
-						<option selected>---Choisir---</option>
+				<div class="col-sm-1">
+					<label for="format-select" class="form-label">Format</label>
+					<select id="format-select" class="form-select">
+						<option selected>Choisir</option>
 						<option>Physique</option>
 						<option>Numérique</option>
 						<option>Mixte</option>
 					</select>
 				</div>
 				<div class="col-sm-2">
-					<div class="mb-3">
-						<label for="formGroupExampleInput" class="form-label">Département</label>
-						<input type="text" class="form-control" id="formGroupExampleInput" autofocus placeholder="Nom du département">
-					</div>
-				</div>
-				<div class="col-sm-1">
 					<label for="dateMin" class="form-label">Du</label>
 					<input type="date" id="dateMin" class="form-control"/>
 				</div>
-				<div class="col-sm-1">
+				<div class="col-sm-2">
 					<label for="dateMax" class="form-label">Au</label>
 					<input type="date" id="dateMax" class="form-control"/>
 				</div>
@@ -264,6 +307,115 @@
 		<!-- / .row -->
 
 	</div>
+
+	<script src="{{ asset('assets/js/shortcodes/_cnx-statut.js')}}"></script>
+	<script src="{{ asset('assets/js/shortcodes/_search-a.js')}}"></script>
+	<script>
+		document.addEventListener("DOMContentLoaded", function () {
+const notifContainer = document.querySelector(".toast-container");
+
+const es1 = new EventSource("{{ mercure('http://127.0.0.1:8000/archivists')|escape('js') }}", {withCredentials: true});
+
+es1.onmessage = function (event) {
+let data = JSON.parse(event.data);
+let toast = document.createElement('div');
+
+toast.className = 'toast bg-dark text-bg-dark flash-msg';
+toast.setAttribute('role', 'alert');
+toast.setAttribute('aria-live', 'assertive');
+toast.setAttribute('aria-atomic', 'true');
+toast.setAttribute('data-bs-delay', '10000'); // Délai de 5 secondes
+toast.setAttribute('style', 'width:450px;box-shadow:none');
+
+toast.innerHTML = `<div class="toast-header bg-dark mt-0 pb-0 border border-0">
+				    <span class="text-info me-3">
+				        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle-fill mb-1" viewBox="0 0 16 16">
+                            <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2"/>
+                        </svg>
+				    </span>
+				    <span class="text-light me-auto">Nouvelle demande d'accès</span>
+			           </div>
+			        <div class="toast-body w-auto">
+				        <span class="text-light text-truncate fs-5" style="max-width:700px">${
+data.message
+}</span>
+			        </div>`;
+
+notifContainer.appendChild(toast);
+
+const messages = $('.toast');
+let index = 0;
+
+function showNextMessage() {
+if (index < messages.length) {
+const currentToast = $(messages[index]);
+currentToast.toast('show');
+
+// Déclenche après la durée définie dans `data-bs-delay` ou ici manuellement
+currentToast.on('hidden.bs.toast', function () {
+currentToast.remove();
+index++;
+showNextMessage();
+});
+}
+}
+
+showNextMessage();
+};
+
+const es2 = new EventSource("{{ mercure('http://127.0.0.1:8000/users/' ~ app.user.id)|escape('js') }}", {withCredentials: true});
+
+es2.onmessage = function (event) {
+let data = JSON.parse(event.data);
+let toast = document.createElement('div');
+
+toast.className = 'toast bg-dark text-bg-dark flash-msg';
+toast.setAttribute('role', 'alert');
+toast.setAttribute('aria-live', 'assertive');
+toast.setAttribute('aria-atomic', 'true');
+toast.setAttribute('data-bs-delay', '10000'); // Délai de 5 secondes
+toast.setAttribute('style', 'width:450px;box-shadow:none');
+
+toast.innerHTML = `<div class="toast-body w-auto">
+					        <span class="text-success me-3">
+						        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle-fill" viewbox="0 0 16 16">
+							        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+						        </svg>
+					        </span>
+					        <span class="text-light text-truncate" style="max-width:350px">${
+data.notif
+}</span>
+				          </div>`;
+
+notifContainer.appendChild(toast);
+
+const messages = $('.toast');
+let index = 0;
+
+function showNextMessage() {
+if (index < messages.length) {
+const currentToast = $(messages[index]);
+currentToast.toast('show');
+
+// Déclenche après la durée définie dans `data-bs-delay` ou ici manuellement
+currentToast.on('hidden.bs.toast', function () {
+currentToast.remove();
+index++;
+showNextMessage();
+});
+}
+}
+
+showNextMessage();
+}
+
+window.addEventListener("beforeunload", function () {
+es1.close();
+es2.close();
+});
+});
+	</script>
+
 	<script src="{{ asset('assets/js/folders-accordion.js') }}"></script>
 	<script src="{{ asset('assets/js/shortcodes/_reset-folder-form.js') }}"></script>
 	<script src="{{ asset('assets/js/shortcodes/_reset-file-forms.js') }}"></script>
@@ -271,7 +423,7 @@
 	<script src="{{ asset('assets/js/shortcodes/_edit-folder-keywords.js') }}"></script>
 	<script src="{{ asset('assets/js/shortcodes/_edit-file-keywords.js') }}"></script>
 	<script src="{{ asset('assets/js/shortcodes/_modal-get.js') }}"></script>
-	<script src="{{ asset('assets/js/shortcodes/_preview-file.js') }}"></script>
+	<script src="{{ asset('assets/js/shortcodes/_preview-archivist-file.js') }}"></script>
 	<script src="{{ asset('assets/js/shortcodes/_file-keywords.js') }}"></script>
 	<script src="{{ asset('assets/js/shortcodes/_toasts-files.js') }}"></script>
 	<script src="{{ asset('assets/js/shortcodes/_searchable-select.js') }}"></script>

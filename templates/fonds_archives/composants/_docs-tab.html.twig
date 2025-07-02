@@ -12,22 +12,23 @@
 
 	.flash-msg.show {
 		display: block;
-		opacity: 1;
+		opacity: .9;
 	}
+	
 </style>
 
-<div class="table-wrapper" style="max-height:500px;overflow-x:hidden;overflow-y:auto">
+<div class="table-wrapper" style="max-height:75vh;overflow-x:hidden;overflow-y:auto">
 	<table class="table table-sm">
 		<thead class="bg-secondary-subtle">
 			<tr>
 				<th>
-					<span href="#" class="link-dark">Nom</span>
+					<span href="#" class="link-dark">Libellé du dossier/fichier</span>
 				</th>
 				<th>
 					<span href="#" class="link-dark">Format</span>
 				</th>
 				<th>
-					<span href="#" class="link-dark">Département</span>
+					<span href="#" class="link-dark">Dép./Div/Sect</span>
 				</th>
 				<th>
 					<span href="#" class="link-dark">Mots-clés</span>
@@ -39,7 +40,7 @@
 					<span href="#" class="link-dark">Statut</span>
 				</th>
 				<th class="text-end pe-5">
-					<span class="text-dark">Actions</span>
+                    &nbsp;
 				</th>
 			</tr>
 		</thead>
@@ -89,13 +90,13 @@
 					</td>
 				</tr>
 			{% endif %}
-			{%for dossier in dossiers %}
+			{% for dossier in dossiers %}
 				<tr class="item-row">
 					<td class="tables-first text-truncate" style="max-width:200px">
 						<svg style="padding-bottom:3px" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-folder-fill" viewbox="0 0 16 16">
 							<path d="M9.828 3h3.982a2 2 0 0 1 1.992 2.181l-.637 7A2 2 0 0 1 13.174 14H2.825a2 2 0 0 1-1.991-1.819l-.637-7a2 2 0 0 1 .342-1.31L.5 3a2 2 0 0 1 2-2h3.672a2 2 0 0 1 1.414.586l.828.828A2 2 0 0 0 9.828 3m-8.322.12q.322-.119.684-.12h5.396l-.707-.707A1 1 0 0 0 6.172 2H2.5a1 1 0 0 0-1 .981z"/>
 						</svg>
-						<a id="item-name" class="link-dark" draggable="false" title="{{ dossier.libelledossier }}" href="{{ path('app_archives_folder_content', {id: dossier.dossierId}) }}">{{ dossier.libelledossier }}</a>
+						<a id="item-name" class="text-dark" draggable="false" title="{{ dossier.libelledossier }}" href="{{ path('app_archives_folder_content', {id: dossier.dossierId}) }}">{{ dossier.libelledossier }}</a>
 					</td>
 					<td class="tables-last">{{ dossier.format }}</td>
 					<td class="tables-handle">{{ dossier.departement.libelleDep }}</td>
@@ -106,7 +107,7 @@
 					{% endif %}
 					<td class="tables-date">{{ dossier.dateCreation|date('d/m/Y') }}</td>
 					{% if dossier.statut %}
-						<td class="tables-handle text-success">Disponible</td>
+						<td class="tables-handle text-info">Disponible</td>
 					{% else %}
 						<td class="tables-handle text-danger">Indisponible</td>
 					{% endif %}
@@ -129,35 +130,31 @@
 				</tr>
 			{% endfor %}
 			{% if fichiers %}
-				{%for fichier in fichiers %}
+				{% for fichier in fichiers %}
 					<tr class="item-row">
 						<td class="tables-first text-truncate" style="max-width:200px">
 							{% if fichier.type == 'Document' %}
-								<svg class="padding-bottom:4px" xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="currentColor" class="bi bi-file-earmark-text" viewbox="0 0 16 16">
+								<svg style="padding-bottom:2px" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-file-earmark-text" viewbox="0 0 16 16">
 									<path d="M5.5 7a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1zM5 9.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5"/>
 									<path d="M9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.5zm0 1v2A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1z"/>
 								</svg>
 							{% elseif fichier.type == 'Image' %}
-								<svg class="padding-bottom:4px" xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="currentColor" class="bi bi-file-earmark-image" viewbox="0 0 16 16">
+								<svg style="padding-bottom:4px" xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-file-earmark-image" viewbox="0 0 16 16">
 									<path d="M6.502 7a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3"/>
 									<path d="M14 14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h5.5L14 4.5zM4 1a1 1 0 0 0-1 1v10l2.224-2.224a.5.5 0 0 1 .61-.075L8 11l2.157-3.02a.5.5 0 0 1 .76-.063L13 10V4.5h-2A1.5 1.5 0 0 1 9.5 3V1z"/>
 								</svg>
 							{% elseif fichier.type == 'Vidéo' %}
-								<svg class="padding-bottom:4px" xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="currentColor" class="bi bi-file-earmark-play" viewbox="0 0 16 16">
+								<svg style="padding-bottom:2px" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-file-earmark-play" viewbox="0 0 16 16">
 									<path d="M6 6.883v4.234a.5.5 0 0 0 .757.429l3.528-2.117a.5.5 0 0 0 0-.858L6.757 6.454a.5.5 0 0 0-.757.43z"/>
 									<path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z"/>
 								</svg>
 							{% elseif fichier.type == 'Audio' %}
-								<svg class="padding-bottom:4px" xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="currentColor" class="bi bi-file-earmark-music" viewbox="0 0 16 16">
+								<svg style="padding-bottom:2px" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-file-earmark-music" viewbox="0 0 16 16">
 									<path d="M11 6.64a1 1 0 0 0-1.243-.97l-1 .25A1 1 0 0 0 8 6.89v4.306A2.6 2.6 0 0 0 7 11c-.5 0-.974.134-1.338.377-.36.24-.662.628-.662 1.123s.301.883.662 1.123c.364.243.839.377 1.338.377s.974-.134 1.338-.377c.36-.24.662-.628.662-1.123V8.89l2-.5z"/>
 									<path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z"/>
 								</svg>
 							{% endif %}
-							{% if fichier.format == 'Numérique' %}
-								<a id="item-name" class="link-dark" draggable="false" title="{{ fichier.libellefichier }}" href="{{ path('app_archives_folder_content', {id: fichier.dossier.dossierId}) }}">{{ fichier.libellefichier }}</a>
-							{% elseif fichier.format == 'Physique' %}
 								<span id="item-name" class="text-dark" draggable="false" title="{{ fichier.libellefichier }}">{{ fichier.libellefichier }}</span>
-							{% endif %}
 						</td>
 						<td id="item-type" class="tables-last">{{ fichier.format }}
 							|
@@ -171,7 +168,7 @@
 						{% endif %}
 						<td class="tables-date">{{ fichier.dateCreation|date('d/m/Y') }}</td>
 						{% if fichier.statut %}
-							<td class="tables-handle text-success">Disponible</td>
+							<td class="tables-handle text-info">Disponible</td>
 						{% else %}
 							<td class="tables-handle text-danger">Indisponible</td>
 						{% endif %}
@@ -206,11 +203,9 @@
 			</tr>
 		{% endfor %}
 	{% endif %}
-</tbody>
-</table>
-</div>
-<div id="flash-msgs">
-<!-- Modals Toats -->
-{{ include('fonds_archives/composants/modals/toasts/_folders.html.twig') }}
-{{ include('fonds_archives/composants/modals/toasts/_files.html.twig') }}
-</div>
+</tbody></table></div>
+<div id="flash-msgs"><!-- Modals Toats -->
+ {{ include('fonds_archives/composants/modals/toasts/_folders.html.twig') }}
+ {{ include('fonds_archives/composants/modals/toasts/_files.html.twig') }}
+ {{ include('fonds_archives/composants/modals/toasts/_system.html.twig') }}
+ </div>

@@ -13,13 +13,18 @@
 					<a class="nav-link {{ set_active_route(['app_user_home', 'app_user_folder_content']) }}" draggable="false" href="{{ path('app_user_home') }}">Accueil</a>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link {{ set_active_route(['app_user_notifs']) }}" draggable="false" href="{{ path('app_user_notifs') }}">Notifications</a>
+					{% if nbr_notifs_unread is not same as 0 %}
+						<a class="nav-link text-danger {{ set_active_route(['app_user_notifs']) }}" draggable="false" href="{{ path('app_user_notifs') }}">Notifications <span class="badge text-bg-danger">{{ nbr_notifs_unread }}</span></a>
+                    {% else %}
+					    <a class="nav-link {{ set_active_route(['app_user_notifs']) }}" draggable="false" href="{{ path('app_user_notifs') }}">Notifications</a>
+				    {% endif %}
 				</li>
 				<li class="nav-item">
-					<a class="nav-link {{ set_active_route(['app_user_chat']) }}" draggable="false" href="{{ path('app_user_chat') }}">Messagerie</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link {{ set_active_route(['app_departements']) }}" draggable="false" href="{{ path('app_departements') }}">Historique #</a>
+					{% if nbr_msgs_unread is not same as 0 %}
+						<a class="nav-link text-danger {{ set_active_route(['app_user_chat']) }}" draggable="false" href="{{ path('app_user_chat') }}">Messagerie <span class="badge text-bg-danger">{{ nbr_msgs_unread }}</span></a>
+                    {% else %}
+					    <a class="nav-link {{ set_active_route(['app_user_chat']) }}" draggable="false" href="{{ path('app_user_chat') }}">Messagerie</a>
+					{% endif %}
 				</li>
 				<li class="nav-item">
 					<a class="nav-link {{ set_active_route(['app_user_profile']) }}" draggable="false" href="{{ path('app_user_profile') }}">Mon Profil</a>

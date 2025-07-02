@@ -1,0 +1,30 @@
+<div class="modal fade text-start" id="rejectRequest2" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-card">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h6 class="card-header-title" style="font-size:15px">Rejet de la demande</h6>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<form action="" method="post" id="rejectReqForm" style="overflow-x:hidden;overflow-y:auto">
+				<div class="modal-body">
+					<input type="hidden" name="_action" value="reject"/>
+					<input type="hidden" id="rejectReq2Id" name="reqId"/>
+					<div class="mb-3">
+						<label for="rejectCommentContainer" class="form-label">Motif</label>
+						<div id="rejectCommentContainer" class="rejectComment-input rounded-2">
+							<textarea type="text" required="required" id="rejectCommentInput" name="rejectComInput" placeholder="Saisir le motif du rejet"></textarea>
+						</div>
+					</div>
+				</div>
+				<div class="row modal-footer">
+					<div class="col" style="align-items:center">
+						<button type="button" style="display:flex;width:100%;justify-content:center" id="" class="btn btn-light mb-2" data-bs-dismiss="modal">Annuler</button>
+					</div>
+					<div class="col" style="align-items:center">
+						<button type="submit" style="display:flex;width:100%;justify-content:center" id="" class="btn btn-danger mb-2">Rejeter</button>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>

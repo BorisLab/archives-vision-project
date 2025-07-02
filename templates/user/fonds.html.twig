@@ -16,6 +16,30 @@
 			overflow: hidden;
 		}
 
+
+		#inputSelect {
+			color: gray;
+			font-style: italic;
+		}
+
+		#inputSelect option:nth-child(2) {
+			color: black;
+			font-style: normal;
+
+		}
+
+		#inputSelect option:nth-child(3) {
+			color: black;
+			font-style: normal;
+
+		}
+
+		#inputSelect option:nth-child(4) {
+			color: black;
+			font-style: normal;
+
+		}
+
 		input.form-control:focus,
 		.form-select:focus {
 			border-color: #0d6efd;
@@ -24,7 +48,7 @@
 		}
 
 		.item-row:hover {
-			background-color: #F2F3F4;
+			background-color:#EBF5FB;
 		}
 
 		.item-row #item-name:hover {
@@ -37,6 +61,27 @@
 			padding-top: 0.19rem;
 			content: url("data:image/svg+xml, %3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath d='M9.29 6.71a.996.996 0 0 0 0 1.41L13.17 12l-3.88 3.88a.996.996 0 1 0 1.41 1.41l4.59-4.59a.996.996 0 0 0 0-1.41L10.7 6.7c-.38-.38-1.02-.38-1.41.01'/%3E%3C/svg%3E");
 		}
+		.search-results {
+			margin-top: 5px;
+			position: absolute;
+			background: white;
+			border: 1px solid #ddd;
+			max-height: 300px;
+			overflow-y: auto;
+			width: 48%;
+			z-index: 1000;
+		}
+
+		.search-item {
+			padding: 10px;
+			border-bottom: 1px solid #ddd;
+		}
+
+		.search-item:hover {
+			background: #EBF5FB;
+		}
+
+		
 	</style>
 {% endblock %}
 
@@ -69,22 +114,22 @@
 		<div class="row mb-3">
 			<div class="col-md-4">
 				<div class="mb-3">
-					<label for="formGroupExampleInput" class="form-label">Rechercher</label>
-					<input type="text" class="form-control" id="formGroupExampleInput" autofocus placeholder="Quel document recherchez-vous?">
+					<label for="searchInput" class="form-label">Rechercher</label>
+					<input type="text" class="form-control" id="searchInput" autofocus placeholder="Quel document recherchez-vous?">
 				</div>
 			</div>
 			<div class="col-sm-2">
-				<label for="inputSelect" class="form-label">Type</label>
-				<select id="inputSelect" class="form-select">
-					<option selected>---Choisir---</option>
+				<label for="type-select" class="form-label">Type</label>
+				<select id="type-select" class="form-select">
+					<option selected>Choisir</option>
 					<option>Dossier</option>
 					<option>Fichier</option>
 				</select>
 			</div>
 			<div class="col-md-2">
-				<label for="inputSelect" class="form-label">Format</label>
-				<select id="inputSelect" class="form-select">
-					<option selected>--Choisir--</option>
+				<label for="format-select" class="form-label">Format</label>
+				<select id="format-select" class="form-select">
+					<option selected>Choisir</option>
 					<option>Physique</option>
 					<option>Numérique</option>
 					<option>Mixte</option>
@@ -123,8 +168,79 @@
 				<!-- / .row -->
 			</div>
 		</div>
-
+		<div
+			id="flash-msgs">
+			<!-- Modals Toats -->
+			{{ include('user/composants/modals/toasts/_system.html.twig') }}
+		</div>
 	</div>
 	<script src="{{ asset('assets/js/shortcodes/_req-folder.js') }}"></script>
 	<script src="{{ asset('assets/js/shortcodes/_req-file.js') }}"></script>
+	<script src="{{ asset('assets/js/shortcodes/_cnx-statut.js') }}"></script>
+	<script src="{{ asset('assets/js/shortcodes/_search-u.js')}}"></script>
+
+	<script>
+		const eventSource = new EventSource("{{ mercure('http://127.0.0.1:8000/users/' ~ app.user.id)|escape('js') }}", {
+            withCredentials: true
+        });
+
+eventSource.onmessage = function (event) {
+const data = JSON.parse(event.data);
+const notifContainer = document.querySelector(".toast-container");
+const toast = document.createElement('div');
+let userId = "{{ app.user.id }}";
+
+
+toast.className = 'toast bg-dark text-bg-dark flash-msg';
+toast.setAttribute('role', 'alert');
+toast.setAttribute('aria-live', 'assertive');
+toast.setAttribute('aria-atomic', 'true');
+toast.setAttribute('data-bs-delay', '10000'); // Délai de 5 secondes
+toast.setAttribute('style', 'width:450px;box-shadow:none');
+
+if(data.type == "system"){
+toast.innerHTML = `<div class="toast-header bg-dark mt-0 pb-0 border border-0">
+				    <span class="text-info me-3">
+				        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle-fill mb-1" viewBox="0 0 16 16">
+                            <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2"/>
+                        </svg>
+				    </span>
+				    <span class="text-light me-auto">Statut de demande</span>
+			           </div>
+			        <div class="toast-body w-auto">
+				        <span class="text-light text-truncate fs-5" style="max-width:700px">${data.message}</span>
+			        </div>`;
+} else if(data.type == "message"){
+			toast.innerHTML = `<div class="toast-body w-auto">
+					        <span class="text-success me-3">
+						        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle-fill" viewbox="0 0 16 16">
+							        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+						        </svg>
+					        </span>
+					        <span class="text-light text-truncate" style="max-width:350px">${data.notif}</span>
+				          </div>`;
+}
+
+notifContainer.appendChild(toast);
+
+const messages = $('.toast');
+let index = 0;
+
+function showNextMessage() {
+if (index < messages.length) {
+const currentToast = $(messages[index]);
+currentToast.toast('show');
+
+// Déclenche après la durée définie dans `data-bs-delay` ou ici manuellement
+currentToast.on('hidden.bs.toast', function () {
+currentToast.remove();
+index++;
+showNextMessage();
+});
+}
+}
+
+showNextMessage();
+}
+	</script>
 {% endblock %}

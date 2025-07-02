@@ -2,25 +2,33 @@
 
 namespace App\Entity;
 
-use App\Repository\UtilisateurRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use DateTimeInterface;
+use App\Entity\Departement;
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\StatutUtilisateur;
+use App\Entity\Traits\Horodateur;
+use App\Repository\UtilisateurRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
-use App\Entity\Traits\Horodateur;
 
 #[ORM\Entity(repositoryClass: UtilisateurRepository::class)]
 #[ORM\HasLifecycleCallbacks]
-#[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
+#[UniqueEntity(fields: ['email'], message: 'Cet email est déjà utilisé')]
 class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
 {
+
+    use Horodateur;
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id;
+
+    #[ORM\Column(type: "string", enumType: StatutUtilisateur::class, options: ['default' => 'inactive'], length: 255)]
+    private StatutUtilisateur $statut;
 
     #[ORM\Column(length: 255)]
     private ?string $nom;
@@ -34,13 +42,16 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private array $roles = [];
 
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $derniereActiv = null;
+
     /**
      * @var string The hashed password
      */
     #[ORM\Column]
     private ?string $password;
 
-    #[ORM\ManyToOne(inversedBy: 'id_dep_util')]
+    #[ORM\ManyToOne(inversedBy: 'utilisateurs')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Departement $departement = null;
 
@@ -50,15 +61,37 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'Utilisateur', targetEntity: DemandeAcces::class, orphanRemoval: true)]
     private Collection $demandeAcces;
 
+    #[ORM\OneToMany(mappedBy: 'utilisateur', targetEntity: Notification::class, orphanRemoval: true)]
+    private Collection $notifications;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $photoProfil = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?bool $isDG = null;
+
     public function __construct()
     {
         $this->dossiers = new ArrayCollection();
         $this->demandeAcces = new ArrayCollection();
+        $this->notifications = new ArrayCollection();
     }
 
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getStatut(): StatutUtilisateur
+    {
+        return $this->statut;
+    }
+
+    public function setStatut(StatutUtilisateur $statut): static
+    {
+        $this->statut = $statut;
+
+        return $this;
     }
 
     public function getNom(): ?string
@@ -83,6 +116,11 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         $this->prenoms = $prenoms;
 
         return $this;
+    }
+
+    public function getNomComplet(): ?string
+    {
+        return $this->prenoms . ' ' . $this->nom;
     }
 
     public function getEmail(): ?string
@@ -125,6 +163,17 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function getDerniereActiv(): ?DateTimeInterface
+    {
+        return $this->derniereActiv;
+    }
+
+    public function setDerniereActiv(?\DateTimeInterface $derniereActiv): self
+    {
+        $this->derniereActiv = $derniereActiv;
+        return $this;
+    }
+
     /**
      * @see PasswordAuthenticatedUserInterface
      */
@@ -154,7 +203,7 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->departement;
     }
 
-    public function setDepartement(?Departement $departement): self
+    public function setDepartement(?Departement $departement): static
     {
         $this->departement = $departement;
 
@@ -217,6 +266,60 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
                 $demandeAcce->setUtilisateur(null);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Notification>
+     */
+    public function getNotifications(): Collection
+    {
+        return $this->notifications;
+    }
+
+    public function addNotification(Notification $notification): static
+    {
+        if (!$this->notifications->contains($notification)) {
+            $this->notifications->add($notification);
+            $notification->setUtilisateur($this);
+        }
+
+        return $this;
+    }
+
+    public function removeNotification(Notification $notification): static
+    {
+        if ($this->notifications->removeElement($notification)) {
+            // set the owning side to null (unless already changed)
+            if ($notification->getUtilisateur() === $this) {
+                $notification->setUtilisateur(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getPhotoProfil(): ?string
+    {
+        return $this->photoProfil;
+    }
+
+    public function setPhotoProfil(?string $photoProfil): static
+    {
+        $this->photoProfil = $photoProfil;
+
+        return $this;
+    }
+
+    public function isDG(): ?bool
+    {
+        return $this->isDG;
+    }
+
+    public function setIsDG(?bool $isDG): static
+    {
+        $this->isDG = $isDG;
 
         return $this;
     }
