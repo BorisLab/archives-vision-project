@@ -1,0 +1,66 @@
+nelmio_security:
+    # prevents framing of the entire site
+    clickjacking:
+        paths:
+            '^/.*': DENY
+
+    # disables content type sniffing for script resources
+    content_type:
+        nosniff: true
+
+    # Send a full URL in the `Referer` header when performing a same-origin request,
+    # only send the origin of the document to secure destination (HTTPS->HTTPS),
+    # and send no header to a less secure destination (HTTPS->HTTP).
+    # If `strict-origin-when-cross-origin` is not supported, use `no-referrer` policy,
+    # no referrer information is sent along with requests.
+    referrer_policy:
+        enabled: true
+        policies:
+            - 'no-referrer'
+            - 'strict-origin-when-cross-origin'
+
+    # Force HTTPS for one year (31536000 seconds)
+    # Uncomment in production when HTTPS is properly configured
+    forced_ssl:
+        enabled: false  # Set to true in production
+        hsts_max_age: 31536000
+        hsts_subdomains: true
+        hsts_preload: true
+
+    # Content Security Policy - protection against XSS
+    csp:
+        enabled: true
+        hosts: []
+        content_types: []
+        enforce:
+            level1_fallback: true
+            browser_adaptive:
+                enabled: false
+            default-src:
+                - 'self'
+            script-src:
+                - 'self'
+                - 'unsafe-inline'  # Required for inline scripts (à sécuriser progressivement)
+                - 'unsafe-eval'    # Required for some JS libraries (à retirer si possible)
+                - 'http://localhost:3000'  # Mercure hub
+            style-src:
+                - 'self'
+                - 'unsafe-inline'  # Required for inline styles (Bootstrap, custom)
+            img-src:
+                - 'self'
+                - 'data:'  # Required for base64 images
+            font-src:
+                - 'self'
+                - 'data:'
+            connect-src:
+                - 'self'
+                - 'http://localhost:3000'  # Mercure hub
+                - 'http://localhost:7777'  # Scanner agent
+            frame-src:
+                - 'self'
+            object-src:
+                - 'none'
+            base-uri:
+                - 'self'
+            form-action:
+                - 'self'
