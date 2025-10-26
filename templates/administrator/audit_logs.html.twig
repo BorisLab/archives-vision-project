@@ -1,0 +1,191 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Journaux d'Audit - Administration{% endblock %}
+
+{% block body %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="h3 mb-4">📋 Journaux d'Audit (Audit Logs)</h1>
+
+            {# Statistics cards #}
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Total des logs</h5>
+                            <p class="h2">{{ total_logs }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% for stat in stats %}
+                <div class="col-md-2">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="card-title text-uppercase">{{ stat.action }}</h6>
+                            <p class="h3">{{ stat.count }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            {# Filters #}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Filtres</h5>
+                </div>
+                <div class="card-body">
+                    <form method="get" action="{{ path('app_admin_audit_logs') }}">
+                        <div class="row">
+                            <div class="col-md-2">
+                                <label class="form-label">Action</label>
+                                <select name="action" class="form-select">
+                                    <option value="">Toutes</option>
+                                    <option value="view" {% if filters.action == 'view' %}selected{% endif %}>View</option>
+                                    <option value="create" {% if filters.action == 'create' %}selected{% endif %}>Create</option>
+                                    <option value="update" {% if filters.action == 'update' %}selected{% endif %}>Update</option>
+                                    <option value="delete" {% if filters.action == 'delete' %}selected{% endif %}>Delete</option>
+                                    <option value="download" {% if filters.action == 'download' %}selected{% endif %}>Download</option>
+                                    <option value="approve" {% if filters.action == 'approve' %}selected{% endif %}>Approve</option>
+                                    <option value="reject" {% if filters.action == 'reject' %}selected{% endif %}>Reject</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Type d'entité</label>
+                                <select name="entity_type" class="form-select">
+                                    <option value="">Tous</option>
+                                    <option value="Dossier" {% if filters.entity_type == 'Dossier' %}selected{% endif %}>Dossier</option>
+                                    <option value="Fichier" {% if filters.entity_type == 'Fichier' %}selected{% endif %}>Fichier</option>
+                                    <option value="DemandeAcces" {% if filters.entity_type == 'DemandeAcces' %}selected{% endif %}>Demande d'Accès</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Utilisateur</label>
+                                <select name="user_id" class="form-select">
+                                    <option value="">Tous</option>
+                                    {% for user in users %}
+                                    <option value="{{ user.id }}" {% if filters.user_id == user.id %}selected{% endif %}>
+                                        {{ user.nomComplet }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Date début</label>
+                                <input type="date" name="date_from" class="form-control" value="{{ filters.date_from ? filters.date_from|date('Y-m-d') : '' }}">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Date fin</label>
+                                <input type="date" name="date_to" class="form-control" value="{{ filters.date_to ? filters.date_to|date('Y-m-d') : '' }}">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">&nbsp;</label>
+                                <button type="submit" class="btn btn-primary d-block w-100">Filtrer</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            {# Logs table #}
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Logs d'audit (Page {{ current_page }}/{{ total_pages }})</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Date/Heure</th>
+                                    <th>Action</th>
+                                    <th>Type</th>
+                                    <th>ID Entité</th>
+                                    <th>Utilisateur</th>
+                                    <th>IP</th>
+                                    <th>Détails</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for log in logs %}
+                                <tr>
+                                    <td>{{ log.id }}</td>
+                                    <td>{{ log.createdAt|date('d/m/Y H:i:s') }}</td>
+                                    <td>
+                                        <span class="badge bg-{% if log.action == 'delete' %}danger{% elseif log.action == 'create' %}success{% elseif log.action == 'update' %}warning{% else %}info{% endif %}">
+                                            {{ log.action|upper }}
+                                        </span>
+                                    </td>
+                                    <td>{{ log.entityType }}</td>
+                                    <td>{{ log.entityId ?? 'N/A' }}</td>
+                                    <td>
+                                        {% if log.userEmail %}
+                                            <small>{{ log.userEmail }}</small>
+                                        {% else %}
+                                            <em>Anonyme</em>
+                                        {% endif %}
+                                    </td>
+                                    <td><code>{{ log.ipAddress ?? 'N/A' }}</code></td>
+                                    <td>
+                                        {% if log.details %}
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#detailsModal{{ log.id }}">
+                                                Voir
+                                            </button>
+                                            <!-- Modal -->
+                                            <div class="modal fade" id="detailsModal{{ log.id }}" tabindex="-1">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title">Détails Log #{{ log.id }}</h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <pre>{{ log.details|json_encode(constant('JSON_PRETTY_PRINT')) }}</pre>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="8" class="text-center text-muted">Aucun log trouvé</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {# Pagination #}
+                    {% if total_pages > 1 %}
+                    <nav aria-label="Pagination des logs">
+                        <ul class="pagination justify-content-center mt-4">
+                            <li class="page-item {% if current_page == 1 %}disabled{% endif %}">
+                                <a class="page-link" href="{{ path('app_admin_audit_logs', filters|merge({'page': current_page - 1})) }}">Précédent</a>
+                            </li>
+                            {% for i in 1..total_pages %}
+                                {% if i == current_page or (i >= current_page - 2 and i <= current_page + 2) or i == 1 or i == total_pages %}
+                                <li class="page-item {% if i == current_page %}active{% endif %}">
+                                    <a class="page-link" href="{{ path('app_admin_audit_logs', filters|merge({'page': i})) }}">{{ i }}</a>
+                                </li>
+                                {% elseif i == current_page - 3 or i == current_page + 3 %}
+                                <li class="page-item disabled"><span class="page-link">...</span></li>
+                                {% endif %}
+                            {% endfor %}
+                            <li class="page-item {% if current_page == total_pages %}disabled{% endif %}">
+                                <a class="page-link" href="{{ path('app_admin_audit_logs', filters|merge({'page': current_page + 1})) }}">Suivant</a>
+                            </li>
+                        </ul>
+                    </nav>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

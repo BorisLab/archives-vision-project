@@ -2,12 +2,14 @@
 
 namespace App\Controller;
 
+use App\Entity\AuditLog;
 use App\Entity\Message;
 use App\Entity\Departement;
 use App\Entity\Utilisateur;
 use App\Entity\Notification;
 use App\Entity\StatutMessage;
 use App\Entity\TypeNotification;
+use App\Repository\AuditLogRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -51,5 +53,64 @@ class AuditController extends AbstractController
         ]); 
 
         return $adminAuditResponse;
+    }
+
+    #[Route('/admin/audit/logs', name: 'app_admin_audit_logs')]
+    #[IsGranted("ROLE_ADMIN")]
+    public function auditLogs(Request $request, AuditLogRepository $auditLogRepository, EntityManagerInterface $entityManager): Response
+    {
+        $nbrMsgsUnread = $entityManager->getRepository(Message::class)->count(['statut' => StatutMessage::NON_LU, 'recipient' => $this->getUser()->getId()]);
+        
+        // Get filters from request
+        $filters = [];
+        $action = $request->query->get('action');
+        $entityType = $request->query->get('entity_type');
+        $userId = $request->query->get('user_id');
+        $dateFrom = $request->query->get('date_from');
+        $dateTo = $request->query->get('date_to');
+        
+        if ($action) {
+            $filters['action'] = $action;
+        }
+        if ($entityType) {
+            $filters['entity_type'] = $entityType;
+        }
+        if ($userId) {
+            $filters['user_id'] = (int)$userId;
+        }
+        if ($dateFrom) {
+            $filters['date_from'] = new \DateTime($dateFrom);
+        }
+        if ($dateTo) {
+            $filters['date_to'] = new \DateTime($dateTo);
+        }
+
+        // Pagination
+        $page = max(1, (int)$request->query->get('page', 1));
+        $limit = 50;
+        $offset = ($page - 1) * $limit;
+
+        // Get logs and count
+        $logs = $auditLogRepository->findWithFilters($filters, $limit, $offset);
+        $totalLogs = $auditLogRepository->countWithFilters($filters);
+        $totalPages = ceil($totalLogs / $limit);
+
+        // Get all users for filter dropdown
+        $users = $entityManager->getRepository(Utilisateur::class)->findAll();
+
+        // Get statistics
+        $stats = $auditLogRepository->getStatsByAction();
+
+        return $this->render('administrator/audit_logs.html.twig', [
+            'admin_audit_logs' => 'AdminAuditLogsPage',
+            'logs' => $logs,
+            'users' => $users,
+            'stats' => $stats,
+            'filters' => $filters,
+            'current_page' => $page,
+            'total_pages' => $totalPages,
+            'total_logs' => $totalLogs,
+            'nbr_msgs_unread' => $nbrMsgsUnread,
+        ]);
     }
 }

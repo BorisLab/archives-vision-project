@@ -27,3 +27,8 @@ services:
     # please note that last definitions always *replace* previous ones
     App\Twig\Extension\DateFRExtension:
         tags: [ 'twig.extension' ]
+
+    # Audit Logger Service with dedicated Monolog channel
+    App\Service\AuditLogger:
+        arguments:
+            $auditLogger: '@monolog.logger.audit'

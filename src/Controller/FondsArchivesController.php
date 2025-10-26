@@ -16,6 +16,7 @@ use App\Form\AddFichierPhysType;
 use App\Entity\StatutNotification;
 use App\Repository\DossierRepository;
 use App\Entity\NiveauAccesNotification;
+use App\Service\AuditLogger;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\UtilisateurRepository;
 use Symfony\Component\Filesystem\Filesystem;
@@ -32,6 +33,12 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 class FondsArchivesController extends AbstractController
 {
+    private AuditLogger $auditLogger;
+
+    public function __construct(AuditLogger $auditLogger)
+    {
+        $this->auditLogger = $auditLogger;
+    }
     #[Route('/archivist/archives2', name: 'app_archives_2')]
     #[IsGranted("ROLE_ARCHIVIST")]
     public function archivmanage(): Response
@@ -135,6 +142,13 @@ class FondsArchivesController extends AbstractController
                 $entityManager->persist($dossier);
                 $entityManager->flush();
 
+                // Audit log
+                $this->auditLogger->logCreate('Dossier', $dossier->getDossierId(), [
+                    'libelle' => $dossier->getLibelleDossier(),
+                    'format' => $dossier->getFormat(),
+                    'departement_id' => $dossier->getDepartement()?->getId(),
+                ]);
+
                 $this->addFlash('folder_create_success', 'Dossier créé avec succès');
                 return $this->redirectToRoute('app_archives_folders_directory');
             }
@@ -192,6 +206,15 @@ class FondsArchivesController extends AbstractController
                     $this->updateDossierStatut($dossier, $statutDossier);
     
                     $entityManager->flush();
+                    
+                    // Audit log
+                    $this->auditLogger->logUpdate('Dossier', $dossier->getDossierId(), [
+                        'libelle' => $nomDossier,
+                        'format' => $formatDossier,
+                        'statut' => $statutDossier,
+                        'departement_id' => $depEdit->getId(),
+                    ]);
+                    
                     $this->addFlash('folder_edit_success', 'Dossier modifié avec succès');
                     return $this->redirectToRoute('app_archives_folders_directory');
                 }
@@ -223,6 +246,12 @@ class FondsArchivesController extends AbstractController
             $this->addFlash('folder_delete_error', 'Impossible de supprimer ce dossier');
             return $this->redirectToRoute('app_archives_folders_directory');
         }
+
+        // Audit log before deletion
+        $this->auditLogger->logDelete('Dossier', $dossier->getDossierId(), [
+            'libelle' => $dossier->getLibelleDossier(),
+            'format' => $dossier->getFormat(),
+        ]);
 
         $entityManager->remove($dossier);
         $entityManager->flush();
@@ -572,6 +601,14 @@ class FondsArchivesController extends AbstractController
             throw $this->createNotFoundException('The file does not exist.');
         }
 
+        // Audit log - view/download action
+        $this->auditLogger->logView('Fichier', $fichier->getFichierId(), [
+            'libelle' => $fichier->getLibelleFichier(),
+            'format' => $fichier->getFormat(),
+            'type' => $fichier->getType(),
+            'dossier_id' => $fichier->getDossier()?->getDossierId(),
+        ]);
+
         // Determine content type based on file extension
         $mimeType = mime_content_type($filePath);
 
@@ -603,6 +640,14 @@ class FondsArchivesController extends AbstractController
         if (!file_exists($filePath)) {
             throw $this->createNotFoundException('The file does not exist.');
         }
+
+        // Audit log - view/download action
+        $this->auditLogger->logView('Fichier', $fichier->getFichierId(), [
+            'libelle' => $fichier->getLibelleFichier(),
+            'format' => $fichier->getFormat(),
+            'type' => $fichier->getType(),
+            'dossier_id' => $fichier->getDossier()?->getDossierId(),
+        ]);
 
         // Determine content type based on file extension
         $mimeType = mime_content_type($filePath);

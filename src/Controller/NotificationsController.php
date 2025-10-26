@@ -11,6 +11,7 @@ use App\Entity\StatutMessage;
 use App\Entity\TypeNotification;
 use App\Entity\StatutDemandeAcces;
 use App\Entity\StatutNotification;
+use App\Service\AuditLogger;
 use Symfony\Component\Mercure\Update;
 use App\Entity\NiveauAccesNotification;
 use Doctrine\ORM\EntityManagerInterface;
@@ -25,6 +26,12 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class NotificationsController extends AbstractController
 {
+    private AuditLogger $auditLogger;
+
+    public function __construct(AuditLogger $auditLogger)
+    {
+        $this->auditLogger = $auditLogger;
+    }
     #[Route('/archivist/notifications', name: 'app_archivist_notifs')]
     #[IsGranted("ROLE_ARCHIVIST")]
     public function notifArchivist(Request $request, NotificationRepository $notificationRepository, EntityManagerInterface $entityManager, HubInterface $hub, Authorization $authorization): Response
@@ -163,6 +170,16 @@ class NotificationsController extends AbstractController
                 $userMsgToSave = "Fichier : " . $req->getFichier()->getLibelleFichier() . ", Format : " . $req->getFichier()->getFormat() . ", Type : " . $req->getFichier()->getType() . ", Motif du rejet : " . $req->getMotifRejet();           
             }
 
+            // Audit log - rejection
+            $entityType = $req->getDossier() !== NULL ? 'Dossier' : 'Fichier';
+            $entityId = $req->getDossier() !== NULL ? $req->getDossier()->getDossierId() : $req->getFichier()->getFichierId();
+            $this->auditLogger->logReject('DemandeAcces', $req->getId(), [
+                'entity_type' => $entityType,
+                'entity_id' => $entityId,
+                'motif_rejet' => $motif_rej,
+                'requester_id' => $req->getUtilisateur()->getId(),
+            ]);
+
             $this->createDemandeAccesRejectNotificationForUser($userMsgToSave, $req->getUtilisateur(), $req, $entityManager);
 
             $this->addFlash('access_request_reject_success', 'Demande d\'accès rejetée avec succès');
@@ -228,6 +245,16 @@ class NotificationsController extends AbstractController
             }
             
             $entityManager->flush();
+
+            // Audit log - approval
+            $entityType = $req->getDossier() !== NULL ? 'Dossier' : 'Fichier';
+            $entityId = $req->getDossier() !== NULL ? $req->getDossier()->getDossierId() : $req->getFichier()->getFichierId();
+            $this->auditLogger->logApprove('DemandeAcces', $req->getId(), [
+                'entity_type' => $entityType,
+                'entity_id' => $entityId,
+                'duration_hours' => $duration,
+                'requester_id' => $req->getUtilisateur()->getId(),
+            ]);
 
             $this->createDemandeAccesAgreeNotificationForUser($userMsgToSave, $req->getUtilisateur(), $req, $entityManager);
 
