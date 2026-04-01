@@ -27,13 +27,14 @@ class ScanController extends AbstractController
     public function listDevices(): JsonResponse
     {
         try {
-            $response = $this->client->request('GET', 'http://localhost:7777/devices');
+            $scannerUrl = $this->getParameter('scanner.base_url');
+            $response = $this->client->request('GET', "{$scannerUrl}/devices");
             $data = $response->toArray();
 
             return new JsonResponse($data);
         } catch (Throwable $e) {
             return new JsonResponse([
-                'error' => 'Impossible de contacter l’agent de scan local.',
+                'error' => 'Impossible de contacter l\'agent de scan local.',
                 'details' => $e->getMessage()
             ], 500);
         }
@@ -50,7 +51,8 @@ public function scanRequest(Request $request): JsonResponse
     }
 
     try {
-        $response = $this->client->request('POST', 'http://localhost:7777/scan', [
+        $scannerUrl = $this->getParameter('scanner.base_url');
+        $response = $this->client->request('POST', "{$scannerUrl}/scan", [
             'json' => ['device' => $device],
         ]);
 
@@ -63,7 +65,7 @@ public function scanRequest(Request $request): JsonResponse
     } catch (\Exception $e) {
         return $this->json([
             'success' => false,
-            'message' => 'Erreur lors de la communication avec l’agent local.',
+            'message' => 'Erreur lors de la communication avec l\'agent local.',
             'error' => $e->getMessage()
         ], 500);
     }

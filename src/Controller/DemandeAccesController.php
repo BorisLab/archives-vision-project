@@ -77,7 +77,7 @@ class DemandeAccesController extends AbstractController
             
             // Publier une notification
             $update = new Update(
-                'http://127.0.0.1:8000/archivists', 
+                $this->getParameter('app.base_url') . '/archivists', 
                 json_encode([
                     'message' => nl2br($archivistMsgToShow),
                     'unread_notifs_count' => $nbrNotifsUnread,
@@ -137,7 +137,7 @@ class DemandeAccesController extends AbstractController
             
             // Publier une notification
             $update = new Update(
-                'http://127.0.0.1:8000/archivists', 
+                $this->getParameter('app.base_url') . '/archivists', 
                 json_encode([
                     'message' => nl2br($archivistMsgToShow),
                     'unread_notifs_count' => $nbrNotifsUnread,

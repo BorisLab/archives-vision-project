@@ -1,0 +1,368 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Demandes de destruction · {{ parent() }}
+{% endblock %}
+
+{% block stylesheets %}
+	<link rel="stylesheet" href="{{ asset('assets/css/theme.bundle.css') }}">
+
+	<style>
+		body {
+			background-color: #f9fbfd;
+			overflow-x: hidden;
+		}
+	</style>
+{% endblock %}
+
+{% block body %}
+{{ include('layouts/partials/_logout-loading.html.twig') }}
+<div class="main-content">
+	{{ include('layouts/partials/admin/_navbar-admin.html.twig') }}
+
+	<div class="header">
+		<div class="container">
+			<!-- Body -->
+			<div class="header-body border-bottom mt-4 mb-4" style="border-color:rgba(18, 38, 63, 0.175)">
+				<div class="row align-items-end">
+					<div class="col pb-3">
+						<!-- Title -->
+						<h4 class="header-title">
+							<i class="bi bi-trash3"></i> Demandes de destruction
+						</h4>
+					</div>
+					<div class="col-auto pb-3">
+						<a href="{{ path('app_destruction_export_csv') }}" class="btn btn-outline-primary lift">
+							<i class="bi bi-download"></i> Export CSV
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="container">
+	{% for message in app.flashes('success') %}
+		<div class="alert alert-success alert-dismissible fade show" role="alert">
+			{{ message }}
+			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		</div>
+	{% endfor %}
+
+	{% for message in app.flashes('error') %}
+		<div class="alert alert-danger alert-dismissible fade show" role="alert">
+			{{ message }}
+			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		</div>
+	{% endfor %}
+
+	{# Statistiques #}
+	<div class="row mb-4">
+		<div class="col-md-3">
+			<div class="card border-warning">
+				<div class="card-body text-center">
+					<h3 class="mb-0">{{ stats.EN_ATTENTE ?? 0 }}</h3>
+					<small class="text-muted">En attente</small>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-3">
+			<div class="card border-success">
+				<div class="card-body text-center">
+					<h3 class="mb-0">{{ stats.APPROUVEE ?? 0 }}</h3>
+					<small class="text-muted">Approuvées</small>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-3">
+			<div class="card border-danger">
+				<div class="card-body text-center">
+					<h3 class="mb-0">{{ stats.REJETEE ?? 0 }}</h3>
+					<small class="text-muted">Rejetées</small>
+				</div>
+			</div>
+		</div>
+	</div>
+
+		{# Filtres #}
+		<div class="card shadow-sm mb-3">
+			<div class="card-body">
+				<form method="get" class="row g-3">
+					<div class="col-md-4">
+						<label class="form-label">Statut</label>
+						<select name="statut" class="form-select">
+							<option value="">Tous les statuts</option>
+							<option value="EN_ATTENTE" {% if filters.statut is defined and filters.statut == 'EN_ATTENTE' %} selected {% endif %}>En attente</option>
+							<option value="APPROUVEE" {% if filters.statut is defined and filters.statut == 'APPROUVEE' %} selected {% endif %}>Approuvée</option>
+							<option value="REJETEE" {% if filters.statut is defined and filters.statut == 'REJETEE' %} selected {% endif %}>Rejetée</option>
+						</select>
+					</div>
+					<div class="col-md-4">
+						<label class="form-label">&nbsp;</label>
+						<div>
+							<button type="submit" class="btn btn-primary">
+								<i class="bi bi-funnel"></i>
+								Filtrer
+							</button>
+							<a href="{{ path('app_destruction_liste') }}" class="btn btn-secondary">
+								<i class="bi bi-x"></i>
+								Réinitialiser
+							</a>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+
+		{# Liste des demandes #}
+		<div class="card shadow-sm">
+			<div class="card-body">
+				{% if demandes|length > 0 %}
+					<div class="table-responsive">
+						<table class="table table-hover">
+							<thead class="table-light">
+								<tr>
+									<th>ID</th>
+									<th>Type</th>
+									<th>Entité</th>
+									<th>Demandeur</th>
+									<th>Date demande</th>
+									<th>Statut</th>
+									<th>Actions</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for demande in demandes %}
+									<tr>
+										<td>
+											<strong>#{{ demande.id }}</strong>
+										</td>
+										<td>
+											{% if demande.typeEntite == 'Dossier' %}
+												<span class="badge bg-primary">
+													<i class="bi bi-folder"></i>
+													Dossier
+												</span>
+											{% else %}
+												<span class="badge bg-info">
+													<i class="bi bi-file-earmark"></i>
+													Fichier
+												</span>
+											{% endif %}
+										</td>
+										<td>
+											<strong>{{ demande.libelleEntite }}</strong>
+											<br>
+											<small class="text-muted">ID:
+												{{ demande.entiteId }}</small>
+										</td>
+										<td>
+											{{ demande.demandeur.nom }}
+											{{ demande.demandeur.prenom }}
+										</td>
+										<td>
+											{{ demande.dateDemande|date('d/m/Y H:i') }}
+										</td>
+										<td>
+											{% if demande.statut == 'EN_ATTENTE' %}
+												<span class="badge bg-warning text-dark">En attente</span>
+											{% elseif demande.statut == 'APPROUVEE' %}
+												<span class="badge bg-success">Approuvée</span>
+												{% if demande.dateExecution %}
+													<br><small class="text-muted">Exécutée le
+														{{ demande.dateExecution|date('d/m/Y') }}</small>
+												{% endif %}
+											{% elseif demande.statut == 'REJETEE' %}
+												<span class="badge bg-danger">Rejetée</span>
+											{% endif %}
+										</td>
+										<td>
+											<button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#detailsModal{{ demande.id }}">
+												<i class="bi bi-eye"></i>
+												Détails
+											</button>
+
+											{% if demande.statut == 'EN_ATTENTE' %}
+												<button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#approveModal{{ demande.id }}">
+													<i class="bi bi-check-circle"></i>
+													Approuver
+												</button>
+												<button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#rejectModal{{ demande.id }}">
+													<i class="bi bi-x-circle"></i>
+													Rejeter
+												</button>
+											{% elseif demande.statut == 'APPROUVEE' and not demande.dateExecution %}
+												<button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#executeModal{{ demande.id }}">
+													<i class="bi bi-trash"></i>
+													Exécuter
+												</button>
+											{% endif %}
+										</td>
+									</tr>
+
+									{# Modal Détails #}
+									<div class="modal fade" id="detailsModal{{ demande.id }}" tabindex="-1">
+										<div class="modal-dialog modal-lg">
+											<div class="modal-content">
+												<div class="modal-header">
+													<h5 class="modal-title">Détails de la demande #{{ demande.id }}</h5>
+													<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+												</div>
+												<div class="modal-body">
+													<dl class="row">
+														<dt class="col-sm-4">Type d'entité</dt>
+														<dd class="col-sm-8">{{ demande.typeEntite }}</dd>
+
+														<dt class="col-sm-4">Libellé</dt>
+														<dd class="col-sm-8">{{ demande.libelleEntite }}</dd>
+
+														<dt class="col-sm-4">Justification</dt>
+														<dd class="col-sm-8">{{ demande.justification }}</dd>
+
+														<dt class="col-sm-4">Demandeur</dt>
+														<dd class="col-sm-8">{{ demande.demandeur.nom }}
+															{{ demande.demandeur.prenom }}</dd>
+
+														<dt class="col-sm-4">Date demande</dt>
+														<dd class="col-sm-8">{{ demande.dateDemande|date('d/m/Y à H:i:s') }}</dd>
+
+														{% if demande.approbateur %}
+															<dt class="col-sm-4">Approbateur</dt>
+															<dd class="col-sm-8">{{ demande.approbateur.nom }}
+																{{ demande.approbateur.prenom }}</dd>
+														{% endif %}
+
+														{% if demande.dateTraitement %}
+															<dt class="col-sm-4">Date traitement</dt>
+															<dd class="col-sm-8">{{ demande.dateTraitement|date('d/m/Y à H:i:s') }}</dd>
+														{% endif %}
+
+														{% if demande.motifRejet %}
+															<dt class="col-sm-4">Motif de rejet</dt>
+															<dd class="col-sm-8 text-danger">{{ demande.motifRejet }}</dd>
+														{% endif %}
+
+														{% if demande.dateExecution %}
+															<dt class="col-sm-4">Date exécution</dt>
+															<dd class="col-sm-8">{{ demande.dateExecution|date('d/m/Y à H:i:s') }}</dd>
+														{% endif %}
+													</dl>
+												</div>
+												<div class="modal-footer">
+													<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+												</div>
+											</div>
+										</div>
+									</div>
+
+									{# Modal Approuver #}
+									{% if demande.statut == 'EN_ATTENTE' %}
+										<div class="modal fade" id="approveModal{{ demande.id }}" tabindex="-1">
+											<div class="modal-dialog">
+												<div class="modal-content">
+													<div class="modal-header">
+														<h5 class="modal-title">Approuver la demande</h5>
+														<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+													</div>
+													<div class="modal-body">
+														<p>Confirmer l'approbation de la destruction de :</p>
+														<p>
+															<strong>{{ demande.libelleEntite }}</strong>
+															({{ demande.typeEntite }})</p>
+													</div>
+													<div class="modal-footer">
+														<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+														<form method="post" action="{{ path('app_destruction_approuver', {'id': demande.id}) }}" style="display: inline;">
+															<input type="hidden" name="_token" value="{{ csrf_token('approve' ~ demande.id) }}">
+															<button type="submit" class="btn btn-success">
+																<i class="bi bi-check-circle"></i>
+																Approuver
+															</button>
+														</form>
+													</div>
+												</div>
+											</div>
+										</div>
+
+										{# Modal Rejeter #}
+										<div class="modal fade" id="rejectModal{{ demande.id }}" tabindex="-1">
+											<div class="modal-dialog">
+												<div class="modal-content">
+													<form method="post" action="{{ path('app_destruction_rejeter', {'id': demande.id}) }}">
+														<div class="modal-header">
+															<h5 class="modal-title">Rejeter la demande</h5>
+															<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+														</div>
+														<div class="modal-body">
+															<p>Rejeter la destruction de :
+																<strong>{{ demande.libelleEntite }}</strong>
+															</p>
+															<div class="mb-3">
+																<label for="motif_rejet" class="form-label">Motif du rejet
+																	<span class="text-danger">*</span>
+																</label>
+																<textarea class="form-control" id="motif_rejet" name="motif_rejet" rows="3" required placeholder="Expliquez la raison du rejet..."></textarea>
+															</div>
+															<input type="hidden" name="_token" value="{{ csrf_token('reject' ~ demande.id) }}">
+														</div>
+														<div class="modal-footer">
+															<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+															<button type="submit" class="btn btn-danger">
+																<i class="bi bi-x-circle"></i>
+																Rejeter
+															</button>
+														</div>
+													</form>
+												</div>
+											</div>
+										</div>
+									{% endif %}
+
+									{# Modal Exécuter #}
+									{% if demande.statut == 'APPROUVEE' and not demande.dateExecution %}
+										<div class="modal fade" id="executeModal{{ demande.id }}" tabindex="-1">
+											<div class="modal-dialog">
+												<div class="modal-content">
+													<div class="modal-header bg-warning">
+														<h5 class="modal-title">Exécuter la destruction</h5>
+														<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+													</div>
+													<div class="modal-body">
+														<div class="alert alert-warning">
+															<i class="bi bi-exclamation-triangle"></i>
+															<strong>Attention !</strong>
+															Cette action va marquer la destruction comme exécutée.
+														</div>
+														<p>Entité concernée :
+															<strong>{{ demande.libelleEntite }}</strong>
+														</p>
+														<p class="text-muted small">Assurez-vous que la destruction physique/numérique a bien été effectuée.</p>
+													</div>
+													<div class="modal-footer">
+														<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+														<form method="post" action="{{ path('app_destruction_executer', {'id': demande.id}) }}" style="display: inline;">
+															<input type="hidden" name="_token" value="{{ csrf_token('execute' ~ demande.id) }}">
+															<button type="submit" class="btn btn-warning">
+																<i class="bi bi-trash"></i>
+																Confirmer l'exécution
+															</button>
+														</form>
+													</div>
+												</div>
+											</div>
+										</div>
+									{% endif %}
+								{% endfor %}
+							</tbody>
+						</table>
+					</div>
+				{% else %}
+					<div class="text-center py-5">
+						<i class="bi bi-inbox" style="font-size: 3rem; color: #ccc;"></i>
+						<p class="text-muted mt-3">Aucune demande de destruction.</p>
+					</div>
+				{% endif %}
+		</div>
+	</div>
+</div>
+{% endblock %}

@@ -1,7 +1,7 @@
 <nav class="navbar navbar-expand-md p-3 border-bottom shadow-sm" id="topbar" style="background-color: #fff;">
 	<div class="container-fluid">
 		<span class="navbar-brand">
-			ARCHIVES VISION
+			ARCHIVOR
 		</span>
 		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
 			<span class="navbar-toggler-icon"></span>
@@ -13,23 +13,27 @@
 					<a class="nav-link {{ set_active_route(['app_archivist_home']) }}" draggable="false" href="{{ path('app_archivist_home') }}">Accueil</a>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link {{ set_active_route(['app_archives_folders_directory', 'app_archives_folder_content']) }}" draggable="false" href="{{ path('app_archives_folders_directory') }}">Fonds d'archives</a>
+					<a class="nav-link {{ set_active_route(['app_archives_folders_directory', 'app_archives_folder_content','app_import_export']) }}" draggable="false" href="{{ path('app_archives_folders_directory') }}">Fonds d'archives</a>
 				</li>
 				<li class="nav-item">
 					<a class="nav-link {{ set_active_route(['app_scan']) }}" draggable="false" href="{{ path('app_scan') }}">Numérisation</a>
 				</li>
 				<li class="nav-item">
 					{% if nbr_notifs_unread is not same as 0 %}
-						<a class="nav-link text-danger {{ set_active_route(['app_archivist_notifs']) }}" draggable="false" href="{{ path('app_archivist_notifs') }}">Notifications <span class="badge text-bg-danger">{{ nbr_notifs_unread }}</span></a>
-                    {% else %}
-          	            <a class="nav-link {{ set_active_route(['app_archivist_notifs']) }}" draggable="false" href="{{ path('app_archivist_notifs') }}">Notifications</a>
+						<a class="nav-link text-danger {{ set_active_route(['app_archivist_notifs']) }}" draggable="false" href="{{ path('app_archivist_notifs') }}">Notifications
+							<span class="badge text-bg-danger">{{ nbr_notifs_unread }}</span>
+						</a>
+					{% else %}
+						<a class="nav-link {{ set_active_route(['app_archivist_notifs']) }}" draggable="false" href="{{ path('app_archivist_notifs') }}">Notifications</a>
 					{% endif %}
 				</li>
 				<li class="nav-item">
 					{% if nbr_msgs_unread is not same as 0 %}
-						<a class="nav-link text-danger {{ set_active_route(['app_archivist_chat']) }}" draggable="false" href="{{ path('app_archivist_chat') }}">Messagerie <span class="badge text-bg-danger">{{ nbr_msgs_unread }}</span></a>
-                    {% else %}
-					    <a class="nav-link {{ set_active_route(['app_archivist_chat']) }}" draggable="false" href="{{ path('app_archivist_chat') }}">Messagerie</a>
+						<a class="nav-link text-danger {{ set_active_route(['app_archivist_chat']) }}" draggable="false" href="{{ path('app_archivist_chat') }}">Messagerie
+							<span class="badge text-bg-danger">{{ nbr_msgs_unread }}</span>
+						</a>
+					{% else %}
+						<a class="nav-link {{ set_active_route(['app_archivist_chat']) }}" draggable="false" href="{{ path('app_archivist_chat') }}">Messagerie</a>
 					{% endif %}
 				</li>
 				<li class="nav-item">

@@ -213,6 +213,7 @@
 				{{ include('fonds_archives/composants/modals/forms/_create_file_modal.html.twig') }}
 				{{ include('fonds_archives/composants/modals/forms/_edit_file_modal.html.twig') }}
 				{{ include('fonds_archives/composants/modals/forms/_preview_file_modal.html.twig') }}
+				{{ include('fonds_archives/composants/modals/_destruction.html.twig') }}
 			</div>
 		</div>
 
@@ -226,13 +227,13 @@
 					</div>
 				</div>
 				<div class="col-sm-2">
-				    <label for="dep-select" class="form-label">Département/Division/Section</label>
-				    <select id="dep-select" class="form-select">
+					<label for="dep-select" class="form-label">Département/Sous-niveaux</label>
+					<select id="dep-select" class="form-select">
 						<option selected>Choisir</option>
-				        {% for dep in deps %}
-				        <option>{{ dep.libelleDep }}</option>
-				        {% endfor %}
-				    </select>
+						{% for dep in deps %}
+							<option>{{ dep.libelleDep }}</option>
+						{% endfor %}
+					</select>
 				</div>
 				<div class="col-sm-1">
 					<label for="type-select" class="form-label">Type</label>
@@ -286,14 +287,22 @@
 						class="col-auto">
 
 						<!-- Button -->
-						<button type="button" data-bs-target="#addFile" class="btn btn-sm me-3 mb-2 btn-dark" data-bs-toggle="modal" data-bs-title="Nouveau dossier">
+						<button type="button" data-bs-target="#addFile" class="btn btn-sm mb-2 btn-dark" data-bs-toggle="modal" data-bs-title="Nouveau dossier">
 							Ajouter une/des pièce(s)
 						</button>
 
 						<!-- Button -->
-						<button type="button" data-bs-target="#newFolder" class="btn btn-sm me-3 mb-2 btn-white" data-bs-toggle="modal" data-bs-title="Nouveau dossier">
+						<button type="button" data-bs-target="#newFolder" class="btn btn-sm mb-2 btn-white" data-bs-toggle="modal" data-bs-title="Nouveau dossier">
 							Créer un nouveau dossier
 						</button>
+
+						<a href="" class="btn btn-sm mb-2 btn-white">
+							Voir les boîtes physiques
+						</a>
+
+						<a href="{{ path('app_import_export') }}" class="btn btn-sm mb-2 btn-white">
+							Importer | Exporter
+						</a>
 
 					</div>
 				</div>
@@ -314,7 +323,7 @@
 		document.addEventListener("DOMContentLoaded", function () {
 const notifContainer = document.querySelector(".toast-container");
 
-const es1 = new EventSource("{{ mercure('http://127.0.0.1:8000/archivists')|escape('js') }}", {withCredentials: true});
+const es1 = new EventSource("{{ mercure(base_url ~ '/archivists') }}", {withCredentials: true});
 
 es1.onmessage = function (event) {
 let data = JSON.parse(event.data);
@@ -363,7 +372,7 @@ showNextMessage();
 showNextMessage();
 };
 
-const es2 = new EventSource("{{ mercure('http://127.0.0.1:8000/users/' ~ app.user.id)|escape('js') }}", {withCredentials: true});
+const es2 = new EventSource("{{ mercure(base_url ~ '/users/' ~ app.user.id) }}", {withCredentials: true});
 
 es2.onmessage = function (event) {
 let data = JSON.parse(event.data);

@@ -232,7 +232,7 @@
 <script src="{{ asset('assets/js/shortcodes/_search-list-c.js') }}"></script>
 <script src="{{ asset('assets/js/shortcodes/_sendM.js') }}"></script>
 <script>
-const eventSource1 = new EventSource("{{ mercure('http://127.0.0.1:8000/users/' ~ app.user.id)|escape('js') }}", {withCredentials: true});
+const eventSource1 = new EventSource("{{ mercure(base_url ~ '/users/' ~ app.user.id) }}", {withCredentials: true});
 
 eventSource1.onmessage = function (event) {
 const data = JSON.parse(event.data);
@@ -303,7 +303,7 @@ showNextMessage();
 showNextMessage();
 }
 
-const eventSource2 = new EventSource("{{ mercure('http://127.0.0.1:8000/status')|escape('js') }}");
+const eventSource2 = new EventSource("{{ mercure(base_url ~ '/status') }}");
 let recipStatut = document.querySelector("#recipStatut");
 
 

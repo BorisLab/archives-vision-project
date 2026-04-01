@@ -14,7 +14,6 @@
 		display: block;
 		opacity: .9;
 	}
-	
 </style>
 
 <div class="table-wrapper" style="max-height:75vh;overflow-x:hidden;overflow-y:auto">
@@ -40,7 +39,7 @@
 					<span href="#" class="link-dark">Statut</span>
 				</th>
 				<th class="text-end pe-5">
-                    &nbsp;
+					&nbsp;
 				</th>
 			</tr>
 		</thead>
@@ -112,6 +111,19 @@
 						<td class="tables-handle text-danger">Indisponible</td>
 					{% endif %}
 					<td class="text-end">
+						{% if dossier.regleRetention %}
+							{% if dossier.isEligiblePourDestruction %}
+								<span class="badge bg-warning text-dark me-2" title="Éligible à la destruction depuis {{ dossier.dateDestructionPossible|date('d/m/Y') }}">
+									<i class="bi bi-exclamation-triangle"></i>
+									Éligible
+								</span>
+							{% else %}
+								<span class="badge bg-info text-white me-2" title="Destruction possible à partir du {{ dossier.dateDestructionPossible|date('d/m/Y') }}">
+									<i class="bi bi-calendar-check"></i>
+									Conservé
+								</span>
+							{% endif %}
+						{% endif %}
 						<span>
 							<button type="button" class="btn accordion-edit btn-sm rounded-circle text-end" style="font-size:13px" data-bs-placement="top" data-bs-target="#editFolder" data-bs-toggle="modal" data-bs-title="Modifier" data-id="{{ dossier.dossierId }}" data-name="{{ dossier.libelledossier }}" data-format="{{ dossier.format }}" data-statut="{{ dossier.statut }}" data-dep="{{ dossier.departement.libelleDep }}" data-keywords="{{ dossier.tags }}">
 								<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-pen-fill" viewbox="0 0 16 16">
@@ -126,6 +138,15 @@
 								</svg>
 							</button>
 						</span>
+						{% if is_granted('ROLE_ARCHIVIST') and dossier.isEligiblePourDestruction %}
+							<span>
+								<button type="button" class="btn btn-warning btn-sm rounded-circle text-end" style="font-size:13px" data-bs-placement="top" data-bs-target="#requestDestructionDossier" data-bs-toggle="modal" data-bs-title="Demander destruction" data-id="{{ dossier.dossierId }}" data-name="{{ dossier.libelledossier }}" data-type="Dossier">
+									<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-trash3" viewbox="0 0 16 16">
+										<path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47M8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5"/>
+									</svg>
+								</button>
+							</span>
+						{% endif %}
 					</td>
 				</tr>
 			{% endfor %}
@@ -154,7 +175,7 @@
 									<path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z"/>
 								</svg>
 							{% endif %}
-								<span id="item-name" class="text-dark" draggable="false" title="{{ fichier.libellefichier }}">{{ fichier.libellefichier }}</span>
+							<span id="item-name" class="text-dark" draggable="false" title="{{ fichier.libellefichier }}">{{ fichier.libellefichier }}</span>
 						</td>
 						<td id="item-type" class="tables-last">{{ fichier.format }}
 							|
@@ -173,6 +194,19 @@
 							<td class="tables-handle text-danger">Indisponible</td>
 						{% endif %}
 						<td class="text-end">
+							{% if fichier.regleRetention %}
+								{% if fichier.isEligiblePourDestruction %}
+									<span class="badge bg-warning text-dark me-2" title="Éligible à la destruction depuis {{ fichier.dateDestructionPossible|date('d/m/Y') }}">
+										<i class="bi bi-exclamation-triangle"></i>
+										Éligible
+									</span>
+								{% else %}
+									<span class="badge bg-info text-white me-2" title="Destruction possible à partir du {{ fichier.dateDestructionPossible|date('d/m/Y') }}">
+										<i class="bi bi-calendar-check"></i>
+										Conservé
+									</span>
+								{% endif %}
+							{% endif %}
 							<span>
 								{% if fichier.format == 'Numérique' %}
 									<button type="button" class="btn accordion-view btn-sm rounded-circle text-end" style="font-size:13px" data-bs-placement="top" data-bs-target="#previewFile" data-bs-toggle="modal" data-bs-title="Voir" data-id="{{ fichier.fichierId }}" data-name="{{ fichier.libellefichier }}">
@@ -197,15 +231,19 @@
 									</svg>
 								</button>
 							</span>
+							{% if is_granted('ROLE_ARCHIVIST') and fichier.isEligiblePourDestruction %}
+								<span>
+									<button type="button" class="btn btn-warning btn-sm rounded-circle text-end" style="font-size:13px" data-bs-placement="top" data-bs-target="#requestDestructionFichier" data-bs-toggle="modal" data-bs-title="Demander destruction" data-id="{{ fichier.fichierId }}" data-name="{{ fichier.libellefichier }}" data-type="Fichier">
+										<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-trash3" viewbox="0 0 16 16">
+											<path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47M8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5"/>
+										</svg>
+									</button>
+								</span>
+							{% endif %}
 						</td>
 					</tr>
 				</td>
 			</tr>
 		{% endfor %}
 	{% endif %}
-</tbody></table></div>
-<div id="flash-msgs"><!-- Modals Toats -->
- {{ include('fonds_archives/composants/modals/toasts/_folders.html.twig') }}
- {{ include('fonds_archives/composants/modals/toasts/_files.html.twig') }}
- {{ include('fonds_archives/composants/modals/toasts/_system.html.twig') }}
- </div>
+</tbody></table></div><divid="flash-msgs"><!-- Modals Toats -->{{ include('fonds_archives/composants/modals/toasts/_folders.html.twig') }}{{ include('fonds_archives/composants/modals/toasts/_files.html.twig') }}{{ include('fonds_archives/composants/modals/toasts/_system.html.twig') }}</div>

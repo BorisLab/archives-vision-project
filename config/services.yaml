@@ -4,31 +4,49 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
-    files_dir: '%kernel.project_dir%/public/uploads'
-    profile_pictures_directory: '%kernel.project_dir%/public/uploads/profiles'
-    profile_pictures_web_path: '/uploads/profiles'
+  # Application URLs
+  app.base_url: "%env(APP_BASE_URL)%"
+
+  # File paths
+  files_dir: "%kernel.project_dir%%env(FILES_DIRECTORY)%"
+  profile_pictures_directory: "%kernel.project_dir%%env(PROFILE_PICTURES_DIRECTORY)%"
+  profile_pictures_web_path: "%env(PROFILE_PICTURES_WEB_PATH)%"
+
+  # Scanner service
+  scanner.base_url: "%env(SCANNER_BASE_URL)%"
+
+  # ClamAV Configuration
+  clamav.enabled: "%env(bool:CLAMAV_ENABLED)%"
+  clamav.host: "%env(CLAMAV_HOST)%"
+  clamav.port: "%env(int:CLAMAV_PORT)%"
+  clamav.timeout: "%env(int:CLAMAV_TIMEOUT)%"
 
 services:
-    # default configuration for services in *this* file
-    _defaults:
-        autowire: true      # Automatically injects dependencies in your services.
-        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+  # default configuration for services in *this* file
+  _defaults:
+    autowire: true # Automatically injects dependencies in your services.
+    autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
 
-    # makes classes in src/ available to be used as services
-    # this creates a service per class whose id is the fully-qualified class name
-    App\:
-        resource: '../src/'
-        exclude:
-            - '../src/DependencyInjection/'
-            - '../src/Entity/'
-            - '../src/Kernel.php'
+  # makes classes in src/ available to be used as services
+  # this creates a service per class whose id is the fully-qualified class name
+  App\:
+    resource: "../src/"
+    exclude:
+      - "../src/DependencyInjection/"
+      - "../src/Entity/"
+      - "../src/Kernel.php"
 
-    # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
-    App\Twig\Extension\DateFRExtension:
-        tags: [ 'twig.extension' ]
+  # add more service definitions when explicit configuration is needed
+  # please note that last definitions always *replace* previous ones
+  App\Twig\Extension\DateFRExtension:
+    tags: ["twig.extension"]
 
-    # Audit Logger Service with dedicated Monolog channel
-    App\Service\AuditLogger:
-        arguments:
-            $auditLogger: '@monolog.logger.audit'
+  # Audit Logger Service with dedicated Monolog channel
+  App\Service\AuditLogger:
+    arguments:
+      $logger: "@monolog.logger.audit"
+
+  # PDF Generator Service
+  App\Service\PdfGenerator:
+    arguments:
+      $projectDir: "%kernel.project_dir%"

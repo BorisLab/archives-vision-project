@@ -181,7 +181,7 @@
 <script src="{{ asset('assets/js/shortcodes/_search-u.js')}}"></script>
 
 <script>
-	const eventSource = new EventSource("{{ mercure('http://127.0.0.1:8000/users/' ~ app.user.id)|escape('js') }}", {withCredentials: true});
+	const eventSource = new EventSource("{{ mercure(base_url ~ '/users/' ~ app.user.id) }}", {withCredentials: true});
 
 eventSource.onmessage = function (event) {
 const data = JSON.parse(event.data);

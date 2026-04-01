@@ -111,8 +111,9 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
             return $this->json(['error' => 'User not authenticated'], 401);
         }
 
+        $baseUrl = $this->params->get('app.base_url');
         $authorization->setCookie($request, [
-            "http://127.0.0.1:8000/users/{$user->getId()}" // Définit le topic auquel cet utilisateur peut s'abonner
+            "{$baseUrl}/users/{$user->getId()}" // Définit le topic auquel cet utilisateur peut s'abonner
         ]);
     }
 
@@ -124,8 +125,9 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
             return $this->json(['error' => 'User not authenticated'], 401);
         }
 
+        $baseUrl = $this->params->get('app.base_url');
         $authorization->setCookie($request, [
-            "http://127.0.0.1:8000/archivists" // Définit le topic auquel cet utilisateur peut s'abonner
+            "{$baseUrl}/archivists" // Définit le topic auquel cet utilisateur peut s'abonner
         ]);
     }
 }

@@ -12,6 +12,7 @@ use App\Entity\TypeNotification;
 use App\Entity\StatutDemandeAcces;
 use App\Entity\StatutNotification;
 use App\Service\AuditLogger;
+use App\Service\BordereauPretService;
 use Symfony\Component\Mercure\Update;
 use App\Entity\NiveauAccesNotification;
 use Doctrine\ORM\EntityManagerInterface;
@@ -27,10 +28,12 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class NotificationsController extends AbstractController
 {
     private AuditLogger $auditLogger;
+    private BordereauPretService $bordereauPretService;
 
-    public function __construct(AuditLogger $auditLogger)
+    public function __construct(AuditLogger $audit, BordereauPretService $bordereauPretService)
     {
-        $this->auditLogger = $auditLogger;
+        $this->auditLogger = $audit;
+        $this->bordereauPretService = $bordereauPretService;
     }
     #[Route('/archivist/notifications', name: 'app_archivist_notifs')]
     #[IsGranted("ROLE_ARCHIVIST")]
@@ -151,7 +154,7 @@ class NotificationsController extends AbstractController
             $userToNotif = $notif->getUtilisateur();
 
             $update = new Update(
-                'http://127.0.0.1:8000/users/' . $userToNotif->getId(), 
+                $this->getParameter('app.base_url') . '/users/' . $userToNotif->getId(), 
                 json_encode([
                     'type' => 'system',
                     'message' => "Votre dernière demande d'accès a été rejetée"
@@ -221,11 +224,26 @@ class NotificationsController extends AbstractController
             $req->setStatut(StatutDemandeAcces::APPROUVE);
 
             $req->setArchivisteId($this->getUser()->getId());
+            $req->setApprobateur($this->getUser());
+            $req->setDateTraitement(new \DateTime());
+
+            // Générer bordereau de prêt si document physique
+            try {
+                $bordereauPath = $this->bordereauPretService->generateBordereau($req);
+                if ($bordereauPath) {
+                    $req->setBordereauPret($bordereauPath);
+                }
+            } catch (\Exception $e) {
+                // Log l'erreur mais ne bloque pas l'approbation
+                $this->auditLogger->log('error', 'BordereauPret', $req->getId(), [
+                    'error' => $e->getMessage()
+                ]);
+            }
 
             $userToNotif = $notif->getUtilisateur();
 
             $update = new Update(
-                'http://127.0.0.1:8000/users/' . $userToNotif->getId(), 
+                $this->getParameter('app.base_url') . '/users/' . $userToNotif->getId(), 
                 json_encode([
                     'type' => 'system',
                     'message' => "Votre dernière demande d'accès a été accordée"
@@ -243,7 +261,25 @@ class NotificationsController extends AbstractController
             elseif($req->getFichier() !== NULL){
                 $userMsgToSave = "Fichier : " . $req->getFichier()->getLibelleFichier() . ", Format : " . $req->getFichier()->getFormat() . ", Type : " . $req->getFichier()->getType() . ", Durée d'accès : " . $duration . " heures";           
             }
-            
+
+            // Génération conditionnelle du bordereau de prêt — uniquement pour les formats physiques
+            $shouldGenerateBordereau = false;
+            if ($req->getDossier() !== null && method_exists($req->getDossier(), 'getFormat') && $req->getDossier()->getFormat() === 'Physique') {
+                $shouldGenerateBordereau = true;
+            } elseif ($req->getFichier() !== null && method_exists($req->getFichier(), 'getFormat') && $req->getFichier()->getFormat() === 'Physique') {
+                $shouldGenerateBordereau = true;
+            }
+
+            if ($shouldGenerateBordereau) {
+                try {
+                    $path = $this->bordereauPretService->generateBordereauPret($req);
+                    $req->setBordereauPret($path);
+                } catch (\Exception $e) {
+                    // Ne bloque pas l'approbation — avertir l'archiviste
+                    $this->addFlash('bordereau_error', 'Erreur lors de la génération du bordereau de prêt. Le PDF pourra être généré ultérieurement.');
+                }
+            }
+
             $entityManager->flush();
 
             // Audit log - approval
@@ -369,8 +405,9 @@ class NotificationsController extends AbstractController
             return $this->json(['error' => 'User not authenticated'], 401);
         }
 
+        $baseUrl = $this->getParameter('app.base_url');
         $authorization->setCookie($request, [
-            "http://127.0.0.1:8000/users/{$user->getId()}" // Définit le topic auquel cet utilisateur peut s'abonner
+            "{$baseUrl}/users/{$user->getId()}" // Définit le topic auquel cet utilisateur peut s'abonner
         ]);
     }
 
@@ -382,8 +419,9 @@ class NotificationsController extends AbstractController
             return $this->json(['error' => 'User not authenticated'], 401);
         }
 
+        $baseUrl = $this->getParameter('app.base_url');
         $authorization->setCookie($request, [
-            "http://127.0.0.1:8000/archivists" // Définit le topic auquel cet utilisateur peut s'abonner
+            "{$baseUrl}/archivists" // Définit le topic auquel cet utilisateur peut s'abonner
         ]);
     }
 }

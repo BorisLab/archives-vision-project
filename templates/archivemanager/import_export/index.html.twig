@@ -1,0 +1,151 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Import/Export · {{ parent() }}
+{% endblock %}
+
+{% block stylesheets %}
+	<link rel="stylesheet" href="{{ asset('assets/css/theme.bundle.css') }}">
+	<style>
+		body {
+			background-color: #F9FBFD;
+			overflow-x: hidden;
+		}
+	</style>
+{% endblock %}
+
+{% block body %}
+{{ include('layouts/partials/_logout-loading.html.twig') }}
+<div class="main-content">
+	{{ include('layouts/partials/archivman/_navbar-archivman.html.twig') }}
+
+	<div class="header">
+		<div class="container">
+			<div class="header-body border-bottom mt-4 mb-4" style="border-color:rgba(18, 38, 63, 0.175)">
+				<div class="row align-items-end">
+					<div class="col pb-3">
+						<h4 class="header-title">
+							Import / Export
+						</h4>
+						<p class="text-muted mb-0">Importez et exportez vos données d'archives en masse</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="container">
+
+	<!-- Messages flash -->
+	{% for label, messages in app.flashes %}
+		{% for message in messages %}
+			<div class="alert alert-{{ label == 'success' ? 'success' : (label == 'error' ? 'danger' : (label == 'warning' ? 'warning' : 'info')) }} alert-dismissible fade show" role="alert">
+				{{ message }}
+				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+			</div>
+		{% endfor %}
+	{% endfor %}
+
+	<div class="row g-4">
+		<!-- Section Export -->
+		<div class="col-12 col-lg-6">
+			<div class="card border-0 shadow-sm h-100">
+				<div class="card-body">
+					<!-- Export Dossiers -->
+					<div class="mb-4 p-3 rounded">
+						<h5 class="fw-bold mb-2"><i class="bi bi-folder me-1"></i> Dossiers</h5>
+						<p class="text-muted small mb-3">Exportez tous vos dossiers avec leurs métadonnées</p>
+						<div class="d-flex gap-2">
+							<a href="{{ path('app_export_dossiers', {format: 'xlsx'}) }}" class="btn btn-dark flex-fill">
+								<i class="bi bi-file-earmark-excel me-1"></i> Excel
+							</a>
+							<a href="{{ path('app_export_dossiers', {format: 'csv'}) }}" class="btn btn-dark flex-fill">
+								<i class="bi bi-filetype-csv me-1"></i> CSV
+							</a>
+						</div>
+					</div>
+
+					<!-- Export Fichiers -->
+					<div class="p-3 rounded">
+						<h5 class="fw-bold mb-2"><i class="bi bi-file-earmark me-1"></i> Fichiers</h5>
+						<p class="text-muted small mb-3">Exportez tous vos fichiers avec leurs métadonnées</p>
+						<div class="d-flex gap-2">
+							<a href="{{ path('app_export_fichiers', {format: 'xlsx'}) }}" class="btn btn-dark flex-fill">
+								<i class="bi bi-file-earmark-excel me-1"></i> Excel
+							</a>
+							<a href="{{ path('app_export_fichiers', {format: 'csv'}) }}" class="btn btn-dark flex-fill">
+								<i class="bi bi-filetype-csv me-1"></i> CSV
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Section Import -->
+		<div class="col-12 col-lg-6">
+			<div class="card border-0 shadow-sm h-100">
+				<div class="card-body">
+					<!-- Import Dossiers -->
+					<div class="mb-4 p-3 rounded">
+						<h5 class="fw-bold mb-2"><i class="bi bi-folder me-1"></i> Dossiers</h5>
+						<p class="text-muted small mb-2">Importez des dossiers en masse depuis un fichier Excel ou CSV</p>
+						<a href="{{ path('app_template_dossiers') }}" class="text-primary small mb-3 d-block">
+							<i class="bi bi-download me-1"></i> Télécharger le template d'import
+						</a>
+						<form action="{{ path('app_import_dossiers') }}" method="post" enctype="multipart/form-data">
+							<input type="hidden" name="_token" value="{{ csrf_token('import_dossiers') }}">
+							<div class="mb-3">
+								<input type="file" name="file" accept=".xlsx,.xls,.csv" required class="form-control form-control-sm">
+							</div>
+							<button type="submit" class="btn btn-sm btn-dark w-100">
+								<i class="bi bi-upload me-1"></i> Importer les dossiers
+							</button>
+						</form>
+					</div>
+
+					<!-- Import Fichiers -->
+					<div class="p-3 rounded">
+						<h5 class="fw-bold mb-2"><i class="bi bi-file-earmark me-1"></i> Fichiers</h5>
+						<p class="text-muted small mb-2">Importez des fichiers en masse depuis un fichier Excel ou CSV</p>
+						<a href="{{ path('app_template_fichiers') }}" class="text-primary small mb-3 d-block">
+							<i class="bi bi-download me-1"></i> Télécharger le template d'import
+						</a>
+						<form action="{{ path('app_import_fichiers') }}" method="post" enctype="multipart/form-data">
+							<input type="hidden" name="_token" value="{{ csrf_token('import_fichiers') }}">
+							<div class="mb-3">
+								<input type="file" name="file" accept=".xlsx,.xls,.csv" required class="form-control form-control-sm">
+							</div>
+							<button type="submit" class="btn btn-sm btn-dark w-100">
+								<i class="bi bi-upload me-1"></i> Importer les fichiers
+							</button>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Section Informations -->
+	<div class="card border-0 mt-4 mb-4">
+		<div class="card-body">
+			<div class="row">
+				<div class="col-md-6">
+					<ul class="list-unstyled mb-0">
+						<li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i><strong>Formats acceptés :</strong> Excel (.xlsx, .xls) et CSV (.csv)</li>
+						<li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i><strong>Template :</strong> Téléchargez le template pour voir la structure attendue</li>
+						<li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i><strong>Champs obligatoires :</strong> Respectez les champs marqués comme obligatoires</li>
+					</ul>
+				</div>
+				<div class="col-md-6">
+					<ul class="list-unstyled mb-0">
+						<li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i><strong>IDs de référence :</strong> Doivent correspondre à des entités existantes</li>
+						<li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i><strong>Dates :</strong> Format attendu YYYY-MM-DD</li>
+						<li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i><strong>Traçabilité :</strong> Tous les imports/exports sont enregistrés dans les logs</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}

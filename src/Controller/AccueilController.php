@@ -17,6 +17,8 @@ use Symfony\Component\Mercure\Update;
 use App\Entity\NiveauAccesNotification;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\DemandeAccesRepository;
+use App\Service\BordereauPretService;
+use App\Service\AuditLogger;
 use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\Authorization;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,9 +26,23 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Knp\Component\Pager\PaginatorInterface;
 
 class AccueilController extends AbstractController
 {
+    private PaginatorInterface $paginator;
+    private BordereauPretService $bordereauPretService;
+    private AuditLogger $auditLogger;
+
+    public function __construct(
+        PaginatorInterface $paginator,
+        BordereauPretService $bordereauPretService,
+        AuditLogger $auditLogger
+    ) {
+        $this->paginator = $paginator;
+        $this->bordereauPretService = $bordereauPretService;
+        $this->auditLogger = $auditLogger;
+    }
 
     #[Route(['/user/home'], name: 'app_user_home')]
     #[IsGranted("ROLE_USER")]
@@ -38,12 +54,28 @@ class AccueilController extends AbstractController
         $user = $this->getUser();
 
         $userDep = $user->getDepartement();
+        
+        // Build query for fonds with pagination
         if($user->isDG()){
-            $fonds = $dossierRepository->findBy(['parent' => false], ['date_creation' => 'DESC']); 
+            $queryBuilder = $dossierRepository->createQueryBuilder('d')
+                ->where('d.parent = :parent')
+                ->setParameter('parent', false)
+                ->orderBy('d.date_creation', 'DESC');
         }
         else{
-            $fonds = $dossierRepository->findBy(['parent' => false, 'departement' => $userDep], ['date_creation' => 'DESC']); 
+            $queryBuilder = $dossierRepository->createQueryBuilder('d')
+                ->where('d.parent = :parent')
+                ->andWhere('d.departement = :departement')
+                ->setParameter('parent', false)
+                ->setParameter('departement', $userDep)
+                ->orderBy('d.date_creation', 'DESC');
         }
+
+        $fonds = $this->paginator->paginate(
+            $queryBuilder,
+            $request->query->getInt('page', 1),
+            20 // Items per page
+        );
 
         $dossiers = $entityManager->getRepository(Dossier::class)->findAll();
 
@@ -90,18 +122,8 @@ class AccueilController extends AbstractController
             }
         }
 
-        if($user->isDG()){
-            $dossiers_accessibles = $fonds;
-        }
-        else {
-            $dossiers_accessibles = array_filter($fonds, function ($dossier) use ($user) {
-                $departementDossier = $dossier->getDepartement(); // supposons que chaque dossier est lié à un département
-                return $departementDossier->estDansDepartementOuSousDepartement($user);
-            });
-        }
-
         $userHomeResponse = $this->render('user/fonds.html.twig', [
-            'dossiers' => $dossiers_accessibles,
+            'dossiers' => $fonds,
             'fichiers' => [],
             'dossier_courant' => null,
             'nbr_notifs_unread' => $nbrNotifsUnread,
@@ -336,9 +358,16 @@ class AccueilController extends AbstractController
             $filteredDemandes[] = $demande;
         }
 
+        // Paginate filtered results
+        $pagination = $this->paginator->paginate(
+            $filteredDemandes,
+            $request->query->getInt('page', 1),
+            15 // Items per page
+        );
+
         $archivistHomeResponse = $this->render('archivemanager/index.html.twig', [
             'archivist_home' => 'ArchivistHomePage',
-            'demandes' => $filteredDemandes,
+            'demandes' => $pagination,
             'nbr_notifs_unread' => $nbrNotifsUnread,
             'nbr_msgs_unread' => $nbrMsgsUnread
         ]);
@@ -423,7 +452,7 @@ class AccueilController extends AbstractController
             $userToNotif = $req->getUtilisateur();
 
             $update = new Update(
-                'http://127.0.0.1:8000/users/' . $userToNotif->getId(), 
+                $this->getParameter('app.base_url') . '/users/' . $userToNotif->getId(), 
                 json_encode([
                     'type' => 'system',
                     'message' => "Votre dernière demande d'accès a été rejetée"
@@ -481,11 +510,26 @@ class AccueilController extends AbstractController
             $req->setStatut(StatutDemandeAcces::APPROUVE);
 
             $req->setArchivisteId($this->getUser()->getId());
+            $req->setApprobateur($this->getUser());
+            $req->setDateTraitement(new \DateTime());
+
+            // Générer bordereau de prêt si document physique
+            try {
+                $bordereauPath = $this->bordereauPretService->generateBordereau($req);
+                if ($bordereauPath) {
+                    $req->setBordereauPret($bordereauPath);
+                }
+            } catch (\Exception $e) {
+                // Log l'erreur mais ne bloque pas l'approbation
+                $this->auditLogger->log('error', 'BordereauPret', $req->getId(), [
+                    'error' => $e->getMessage()
+                ]);
+            }
 
             $userToNotif = $req->getUtilisateur();
 
             $update = new Update(
-                'http://127.0.0.1:8000/users/' . $userToNotif->getId(), 
+                $this->getParameter('app.base_url') . '/users/' . $userToNotif->getId(), 
                 json_encode([
                     'type' => 'system',
                     'message' => "Votre dernière demande d'accès a été accordée"
@@ -536,7 +580,7 @@ class AccueilController extends AbstractController
             $userToNotif = $req->getUtilisateur();
 
             $update = new Update(
-                'http://127.0.0.1:8000/users/' . $userToNotif->getId(), 
+                $this->getParameter('app.base_url') . '/users/' . $userToNotif->getId(), 
                 json_encode([
                     'type' => 'system',
                     'message' => "Une de vos demandes d'accès approuvée a été révoquée"
@@ -668,9 +712,10 @@ class AccueilController extends AbstractController
             return $this->json(['error' => 'Utilisateur non authentifié'], 401);
         }
 
+        $baseUrl = $this->getParameter('app.base_url');
         $authorization->setCookie($request, [
-            "http://127.0.0.1:8000/users/{$user->getId()}",
-            "http://127.0.0.1:8000/status"
+            "{$baseUrl}/users/{$user->getId()}",
+            "{$baseUrl}/status"
         ]);
     }
 
@@ -682,10 +727,11 @@ class AccueilController extends AbstractController
             return $this->json(['error' => 'Utilisateur non authentifié'], 401);
         }
 
+        $baseUrl = $this->getParameter('app.base_url');
         $authorization->setCookie($request, [
-            "http://127.0.0.1:8000/archivists",
-            "http://127.0.0.1:8000/users/{$user->getId()}",
-            "http://127.0.0.1:8000/status"
+            "{$baseUrl}/archivists",
+            "{$baseUrl}/users/{$user->getId()}",
+            "{$baseUrl}/status"
         ]);
     }
 
@@ -697,9 +743,53 @@ class AccueilController extends AbstractController
             return $this->json(['error' => 'Utilisateur non authentifié'], 401);
         }
 
+        $baseUrl = $this->getParameter('app.base_url');
         $authorization->setCookie($request, [
-            "http://127.0.0.1:8000/users/{$user->getId()}",
-            "http://127.0.0.1:8000/status"
+            "{$baseUrl}/users/{$user->getId()}",
+            "{$baseUrl}/status"
         ]);
+    }
+
+    #[Route('/demande-acces/{id}/bordereau', name: 'app_demande_acces_bordereau')]
+    #[IsGranted("ROLE_USER")]
+    public function telechargerBordereau(DemandeAcces $demandeAcces, EntityManagerInterface $entityManager): Response
+    {
+        $user = $this->getUser();
+
+        // Vérifier que l'utilisateur a le droit de télécharger (soit l'emprunteur, soit un archiviste)
+        if ($demandeAcces->getUtilisateur() !== $user && !in_array('ROLE_ARCHIVIST', $user->getRoles()) && !in_array('ROLE_ADMIN', $user->getRoles())) {
+            throw $this->createAccessDeniedException('Vous n\'avez pas accès à ce bordereau');
+        }
+
+        // Vérifier que la demande est approuvée
+        if ($demandeAcces->getStatut() !== StatutDemandeAcces::APPROUVE) {
+            $this->addFlash('error', 'La demande d\'accès doit être approuvée pour télécharger le bordereau');
+            return $this->redirectToRoute('app_user_home');
+        }
+
+        // Vérifier qu'un bordereau existe
+        $bordereauPath = $demandeAcces->getBordereauPret();
+        if (!$bordereauPath) {
+            $this->addFlash('error', 'Aucun bordereau disponible pour cette demande');
+            return $this->redirectToRoute('app_user_home');
+        }
+
+        // Construire le chemin complet
+        $fullPath = $this->getParameter('kernel.project_dir') . '/public' . $bordereauPath;
+
+        // Vérifier que le fichier existe
+        if (!file_exists($fullPath)) {
+            $this->addFlash('error', 'Le bordereau est introuvable');
+            return $this->redirectToRoute('app_user_home');
+        }
+
+        // Log de téléchargement
+        $this->auditLogger->log('download', 'BordereauPret', $demandeAcces->getId(), [
+            'utilisateur' => $user->getEmail(),
+            'fichier' => $bordereauPath
+        ]);
+
+        // Retourner le fichier PDF
+        return $this->file($fullPath, 'bordereau_pret_' . $demandeAcces->getId() . '.pdf');
     }
 }

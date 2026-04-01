@@ -10,6 +10,7 @@ use App\Entity\Notification;
 use App\Entity\StatutMessage;
 use App\Entity\TypeNotification;
 use App\Repository\AuditLogRepository;
+use App\Service\AuditLogger;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

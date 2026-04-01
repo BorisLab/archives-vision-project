@@ -232,7 +232,7 @@
 					</div>
 				</div>
 				<div class="col-sm-2">
-				    <label for="dep-select" class="form-label">Département/Division/Section</label>
+				    <label for="dep-select" class="form-label">Département/Sous-niveaux</label>
 				    <select id="dep-select" class="form-select">
 						<option selected>Choisir</option>
 				        {% for dep in deps %}
@@ -289,9 +289,17 @@
 						class="col-auto">
 
 						<!-- Button -->
-						<button type="button" id="newFolderBtn" data-bs-target="#newFolder" class="btn btn-sm me-3 mb-2 btn-white" data-bs-toggle="modal" data-bs-title="Nouveau dossier">
+						<button type="button" id="newFolderBtn" data-bs-target="#newFolder" class="btn btn-sm mb-2 btn-dark" data-bs-toggle="modal" data-bs-title="Nouveau dossier">
 							Créer un nouveau dossier
 						</button>
+
+						<a href="" class="btn btn-sm mb-2 btn-white">
+							Voir les boîtes physiques
+						</a>
+
+						<a href="{{ path('app_import_export') }}" class="btn btn-sm mb-2 btn-white">
+							Importer | Exporter
+						</a>
 
 					</div>
 				</div>
@@ -313,7 +321,7 @@
 		document.addEventListener("DOMContentLoaded", function () {
 const notifContainer = document.querySelector(".toast-container");
 
-const es1 = new EventSource("{{ mercure('http://127.0.0.1:8000/archivists')|escape('js') }}", {withCredentials: true});
+const es1 = new EventSource("{{ mercure(base_url ~ '/archivists') }}", {withCredentials: true});
 
 es1.onmessage = function (event) {
 let data = JSON.parse(event.data);
@@ -362,7 +370,7 @@ showNextMessage();
 showNextMessage();
 };
 
-const es2 = new EventSource("{{ mercure('http://127.0.0.1:8000/users/' ~ app.user.id)|escape('js') }}", {withCredentials: true});
+const es2 = new EventSource("{{ mercure(base_url ~ '/users/' ~ app.user.id) }}", {withCredentials: true});
 
 es2.onmessage = function (event) {
 let data = JSON.parse(event.data);

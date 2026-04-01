@@ -1,39 +1,45 @@
 <nav class="navbar navbar-expand-md p-3 border-bottom shadow-sm" id="topbar" style="background-color: #fff;">
-    <div class="container-fluid">
-      <a class="navbar-brand" draggable="false" href="#">
-        ARCHIVES VISION
-      </a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-     
-      <div class=" collapse navbar-collapse" id="navbarNavDropdown">
-        <ul class="navbar-nav ms-auto ">
-          <li class="nav-item">
-            <a class="nav-link {{ set_active_route(['app_admin_home']) }}" draggable="false" href="{{ path('app_admin_home') }}">Accueil</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link {{ set_active_route(['app_admin_departements']) }}" draggable="false" href="{{ path('app_admin_departements') }}">Départements</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link {{ set_active_route(['app_admin_users','app_admin_register']) }}" draggable="false" href="{{ path('app_admin_users') }}">Utilisateurs</a>
-          </li>
-          <li class="nav-item">
+	<div class="container-fluid">
+		<a class="navbar-brand" draggable="false" href="#">
+			ARCHIVOR
+		</a>
+		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+
+		<div class=" collapse navbar-collapse" id="navbarNavDropdown">
+			<ul class="navbar-nav ms-auto ">
+				<li class="nav-item">
+					<a class="nav-link {{ set_active_route(['app_admin_home']) }}" draggable="false" href="{{ path('app_admin_home') }}">Accueil</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link {{ set_active_route(['app_dashboard']) }}" draggable="false" href="{{ path('app_dashboard') }}">Dashboard</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link {{ set_active_route(['app_admin_departements']) }}" draggable="false" href="{{ path('app_admin_departements') }}">Départements</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link {{ set_active_route(['app_admin_users','app_admin_register']) }}" draggable="false" href="{{ path('app_admin_users') }}">Utilisateurs</a>
+				</li>
+				<li class="nav-item">
 					{% if nbr_msgs_unread is not same as 0 %}
-						<a class="nav-link text-danger {{ set_active_route(['app_admin_chat']) }}" draggable="false" href="{{ path('app_admin_chat') }}">Messagerie <span class="badge text-bg-danger">{{ nbr_msgs_unread }}</span></a>
-                    {% else %}
-					    <a class="nav-link {{ set_active_route(['app_admin_chat']) }}" draggable="false" href="{{ path('app_admin_chat') }}">Messagerie</a>
-					{% endif %}          </li>
-          <li class="nav-item">
-            <a class="nav-link {{ set_active_route(['app_admin_audit']) }} " draggable="false" href="{{ path('app_admin_audit') }}">Audit & Suivi</a>
-          </li>
+						<a class="nav-link text-danger {{ set_active_route(['app_admin_chat']) }}" draggable="false" href="{{ path('app_admin_chat') }}">Messagerie
+							<span class="badge text-bg-danger">{{ nbr_msgs_unread }}</span>
+						</a>
+					{% else %}
+						<a class="nav-link {{ set_active_route(['app_admin_chat']) }}" draggable="false" href="{{ path('app_admin_chat') }}">Messagerie</a>
+					{% endif %}
+				</li>
+				<li class="nav-item">
+					<a class="nav-link {{ set_active_route(['app_admin_audit']) }} " draggable="false" href="{{ path('app_admin_audit') }}">Audit & Suivi</a>
+				</li>
 				<li class="nav-item">
 					<a class="nav-link {{ set_active_route(['app_admin_profile']) }}" draggable="false" href="{{ path('app_admin_profile') }}">Mon Profil</a>
 				</li>
-          <li class="nav-item">
-            <a class="nav-link mx-2 {{ set_active_route(['app_logout']) }}" draggable="false" href="{{ path('app_logout') }}">Déconnexion</a>
-          </li>
-        </ul>
-      </div>
-    </div>
-    </nav>
+				<li class="nav-item">
+					<a class="nav-link mx-2 {{ set_active_route(['app_logout']) }}" draggable="false" href="{{ path('app_logout') }}">Déconnexion</a>
+				</li>
+			</ul>
+		</div>
+	</div>
+</nav>

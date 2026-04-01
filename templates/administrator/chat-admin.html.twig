@@ -225,7 +225,7 @@
 	<!-- Modals Toats -->
 	{{ include('administrator/composants/modals/toasts/_system.html.twig') }}
 </div></div><script src="{{ asset('assets/js/chat.js') }}"></script><script src="{{ asset('assets/js/shortcodes/_cnx-statut.js') }}"></script><script src="{{ asset('assets/js/shortcodes/_load-msgs.js') }}"></script><script src="{{ asset('assets/js/shortcodes/_search-list-c.js') }}"></script><script src="{{ asset('assets/js/shortcodes/_sendM.js') }}"></script><script>
-const es1 = new EventSource("{{ mercure('http://127.0.0.1:8000/users/' ~ app.user.id)|escape('js') }}", {withCredentials: true});
+const es1 = new EventSource("{{ mercure(base_url ~ '/users/' ~ app.user.id) }}", {withCredentials: true});
 
 es1.onmessage = function (event) {
 const data = JSON.parse(event.data);
@@ -296,7 +296,7 @@ showNextMessage();
 showNextMessage();
 }
 
-const es2 = new EventSource("{{ mercure('http://127.0.0.1:8000/status')|escape('js') }}");
+const es2 = new EventSource("{{ mercure(base_url ~ '/status') }}");
 let recipStatut = document.querySelector("#recipStatut");
 
 

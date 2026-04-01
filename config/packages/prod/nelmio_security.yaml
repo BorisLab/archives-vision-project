@@ -1,0 +1,7 @@
+nelmio_security:
+  # Force HTTPS (HSTS) - Activé uniquement en production
+  forced_ssl:
+    enabled: true
+    hsts_max_age: 31536000 # 1 an
+    hsts_subdomains: true
+    hsts_preload: false

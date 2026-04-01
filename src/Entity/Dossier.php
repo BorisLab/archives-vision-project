@@ -15,6 +15,16 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 #[ORM\Entity(repositoryClass: DossierRepository::class)]
 #[UniqueEntity('libelle_dossier')]
 #[ORM\HasLifecycleCallbacks]
+#[ORM\Index(columns: ['libelle_dossier'], name: 'idx_dossier_libelle')]
+#[ORM\Index(columns: ['tags'], name: 'idx_dossier_tags')]
+#[ORM\Index(columns: ['date_creation'], name: 'idx_dossier_date_creation')]
+#[ORM\Index(columns: ['departement_id'], name: 'idx_dossier_departement')]
+#[ORM\Index(columns: ['format'], name: 'idx_dossier_format')]
+#[ORM\Index(columns: ['statut'], name: 'idx_dossier_statut')]
+#[ORM\Index(columns: ['date_debut'], name: 'idx_dossier_date_debut')]
+#[ORM\Index(columns: ['date_fin'], name: 'idx_dossier_date_fin')]
+#[ORM\Index(columns: ['typologie_documentaire'], name: 'idx_dossier_typologie')]
+#[ORM\Index(columns: ['utilisateur_id'], name: 'idx_dossier_utilisateur')]
 class Dossier
 {
 
@@ -59,6 +69,19 @@ class Dossier
 
     #[ORM\OneToMany(mappedBy: 'dossier', targetEntity: DemandeAcces::class)]
     private Collection $demandeAcces;
+
+    #[ORM\ManyToOne(targetEntity: RegleRetention::class)]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?RegleRetention $regle_retention = null;
+
+    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $date_debut = null;
+
+    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $date_fin = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $typologie_documentaire = null;
 
     public function __construct()
     {
@@ -291,6 +314,84 @@ class Dossier
             }
         }
 
+        return $this;
+    }
+
+    public function getRegleRetention(): ?RegleRetention
+    {
+        return $this->regle_retention;
+    }
+
+    public function setRegleRetention(?RegleRetention $regle_retention): static
+    {
+        $this->regle_retention = $regle_retention;
+        return $this;
+    }
+
+    /**
+     * Vérifie si le dossier est éligible à la destruction
+     * basé sur la règle de rétention et la date de création
+     */
+    public function isEligiblePourDestruction(): bool
+    {
+        if (!$this->regle_retention) {
+            return false;
+        }
+        
+        if (!$this->getCreatedAt()) {
+            return false;
+        }
+        
+        $dateDestructionPossible = $this->getDateDestructionPossible();
+        return $dateDestructionPossible && new \DateTime() >= $dateDestructionPossible;
+    }
+
+    /**
+     * Calcule la date à partir de laquelle le dossier peut être détruit
+     */
+    public function getDateDestructionPossible(): ?\DateTime
+    {
+        if (!$this->regle_retention || !$this->getCreatedAt()) {
+            return null;
+        }
+        
+        $dateCreation = clone $this->getCreatedAt();
+        $dureeConservation = $this->regle_retention->getDureeConservation();
+        $dateCreation->modify("+{$dureeConservation} years");
+        
+        return $dateCreation;
+    }
+
+    public function getDateDebut(): ?\DateTimeInterface
+    {
+        return $this->date_debut;
+    }
+
+    public function setDateDebut(?\DateTimeInterface $date_debut): static
+    {
+        $this->date_debut = $date_debut;
+        return $this;
+    }
+
+    public function getDateFin(): ?\DateTimeInterface
+    {
+        return $this->date_fin;
+    }
+
+    public function setDateFin(?\DateTimeInterface $date_fin): static
+    {
+        $this->date_fin = $date_fin;
+        return $this;
+    }
+
+    public function getTypologieDocumentaire(): ?string
+    {
+        return $this->typologie_documentaire;
+    }
+
+    public function setTypologieDocumentaire(?string $typologie_documentaire): static
+    {
+        $this->typologie_documentaire = $typologie_documentaire;
         return $this;
     }
 }

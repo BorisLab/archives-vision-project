@@ -11,6 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Index(columns: ['entity_type'], name: 'idx_audit_entity_type')]
 #[ORM\Index(columns: ['user_id'], name: 'idx_audit_user')]
 #[ORM\Index(columns: ['created_at'], name: 'idx_audit_created_at')]
+#[ORM\Index(columns: ['action', 'created_at'], name: 'idx_audit_action_date')]
 #[ORM\HasLifecycleCallbacks]
 class AuditLog
 {

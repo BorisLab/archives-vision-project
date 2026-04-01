@@ -239,7 +239,7 @@
 <script>
 	const notifContainer = document.querySelector(".toast-container");
 
-const es1 = new EventSource("{{ mercure('http://127.0.0.1:8000/archivists')|escape('js') }}", {withCredentials: true});
+const es1 = new EventSource("{{ mercure(base_url ~ '/archivists') }}", {withCredentials: true});
 
 es1.onmessage = function (event) {
 let data = JSON.parse(event.data);
@@ -289,7 +289,7 @@ showNextMessage();
 showNextMessage();
 };
 
-const es2 = new EventSource("{{ mercure('http://127.0.0.1:8000/users/' ~ app.user.id)|escape('js') }}", {withCredentials: true});
+const es2 = new EventSource("{{ mercure(base_url ~ '/users/' ~ app.user.id) }}", {withCredentials: true});
 
 es2.onmessage = function (event) {
 const data = JSON.parse(event.data);
@@ -320,7 +320,7 @@ messagesList.innerHTML += `${msgBox}`;
 }
 }
 
-const es3 = new EventSource("{{ mercure('http://127.0.0.1:8000/status')|escape('js') }}");
+const es3 = new EventSource("{{ mercure(base_url ~ '/status') }}");
 let recipStatut = document.querySelector("#recipStatut");
 
 

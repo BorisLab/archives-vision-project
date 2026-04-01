@@ -7,25 +7,25 @@ use App\Entity\Utilisateur;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class AuditLogger
 {
     private EntityManagerInterface $entityManager;
     private LoggerInterface $logger;
     private RequestStack $requestStack;
-    private ?Security $security;
+    private TokenStorageInterface $tokenStorage;
 
     public function __construct(
         EntityManagerInterface $entityManager,
-        LoggerInterface $auditLogger,
+        LoggerInterface $logger,
         RequestStack $requestStack,
-        ?Security $security = null
+        TokenStorageInterface $tokenStorage
     ) {
         $this->entityManager = $entityManager;
-        $this->logger = $auditLogger;
+        $this->logger = $logger;
         $this->requestStack = $requestStack;
-        $this->security = $security;
+        $this->tokenStorage = $tokenStorage;
     }
 
     /**
@@ -40,7 +40,13 @@ class AuditLogger
     public function log(string $action, string $entityType, ?int $entityId = null, array $details = []): void
     {
         $request = $this->requestStack->getCurrentRequest();
-        $user = $this->security ? $this->security->getUser() : null;
+        
+        // Get user from token storage
+        $user = null;
+        $token = $this->tokenStorage->getToken();
+        if ($token) {
+            $user = $token->getUser();
+        }
 
         // Create audit log entry
         $auditLog = new AuditLog();
@@ -81,7 +87,7 @@ class AuditLogger
 
         // Log to file (Monolog audit channel)
         $this->logger->info(sprintf(
-            '[%s] %s on %s #%s by user #%s (%s) from IP %s',
+            '[%s] %s #%s by user #%s (%s) from IP %s',
             strtoupper($action),
             $entityType,
             $entityId ?? 'N/A',

@@ -1,0 +1,405 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}Dashboard Statistiques - Archives Vision
+{% endblock %}
+
+{% block stylesheets %}
+	<link rel="stylesheet" href="{{ asset('assets/css/theme.bundle.css') }}">
+
+	<style>
+		body {
+			background-color: #f9fbfd;
+			overflow-x: hidden;
+		}
+	</style>
+{% endblock %}
+
+{% block body %}
+{{ include('layouts/partials/_logout-loading.html.twig') }}
+<div class="main-content">
+	{{ include('layouts/partials/admin/_navbar-admin.html.twig') }}
+
+	<div class="header">
+		<div class="container">
+			<!-- Body -->
+			<div class="header-body border-bottom mt-4 mb-4" style="border-color:rgba(18, 38, 63, 0.175)">
+				<div class="row align-items-end">
+					<div class="col pb-3">
+						<!-- Title -->
+						<h4 class="header-title">
+							Dashboard Statistiques
+						</h4>
+						<p class="text-muted mb-0">Vue d'ensemble de l'activité et des archives</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="container">
+
+		<!-- KPI Cards - Statistiques globales -->
+		<div class="row g-3 mb-4">
+			<div class="col-12 col-sm-6 col-lg-3">
+				<div class="card border-0 shadow-sm h-100">
+					<div class="card-body">
+						<div class="d-flex justify-content-between align-items-start">
+							<div>
+								<p class="text-muted mb-1 small">Total Dossiers</p>
+								<h3 class="mb-0">{{ global_stats.total_dossiers }}</h3>
+								<small class="text-success">{{ global_stats.dossiers_actifs }}
+									actifs</small>
+							</div>
+							<div class="bg-primary bg-opacity-10 p-3 rounded">
+								<i class="bi bi-folder-fill text-primary fs-4"></i>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-12 col-sm-6 col-lg-3">
+				<div class="card border-0 shadow-sm h-100">
+					<div class="card-body">
+						<div class="d-flex justify-content-between align-items-start">
+							<div>
+								<p class="text-muted mb-1 small">Total Fichiers</p>
+								<h3 class="mb-0">{{ global_stats.total_fichiers }}</h3>
+								<small class="text-info">{{ global_stats.fichiers_numeriques }}
+									numériques</small>
+							</div>
+							<div class="bg-success bg-opacity-10 p-3 rounded">
+								<i class="bi bi-file-earmark-text-fill text-success fs-4"></i>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-12 col-sm-6 col-lg-3">
+				<div class="card border-0 shadow-sm h-100">
+					<div class="card-body">
+						<div class="d-flex justify-content-between align-items-start">
+							<div>
+								<p class="text-muted mb-1 small">Utilisateurs</p>
+								<h3 class="mb-0">{{ global_stats.total_utilisateurs }}</h3>
+								<small class="text-secondary">{{ global_stats.total_departements }}
+									départements</small>
+							</div>
+							<div class="bg-warning bg-opacity-10 p-3 rounded">
+								<i class="bi bi-people-fill text-warning fs-4"></i>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-12 col-sm-6 col-lg-3">
+				<div class="card border-0 shadow-sm h-100">
+					<div class="card-body">
+						<div class="d-flex justify-content-between align-items-start">
+							<div>
+								<p class="text-muted mb-1 small">Demandes d'Accès</p>
+								<h3 class="mb-0">{{ demandes_stats.total }}</h3>
+								<small class="text-danger">{{ demandes_stats.en_attente }}
+									en attente</small>
+							</div>
+							<div class="bg-danger bg-opacity-10 p-3 rounded">
+								<i class="bi bi-key-fill text-danger fs-4"></i>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Graphiques -->
+		<div
+			class="row g-3 mb-4">
+			<!-- Évolution des créations -->
+			<div class="col-12 col-lg-8">
+				<div class="card border-0 shadow-sm h-100">
+					<div class="card-header bg-white border-0 py-3">
+						<h5 class="card-title mb-0">Évolution des Créations (6 derniers mois)</h5>
+					</div>
+					<div class="card-body">
+						<canvas id="creationsChart" height="80"></canvas>
+					</div>
+				</div>
+			</div>
+
+			<!-- Distribution des formats -->
+			<div class="col-12 col-lg-4">
+				<div class="card border-0 shadow-sm h-100">
+					<div class="card-header bg-white border-0 py-3">
+						<h5 class="card-title mb-0">Formats de Fichiers</h5>
+					</div>
+					<div class="card-body">
+						<canvas id="formatChart"></canvas>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Statistiques par département -->
+		<div class="row g-3 mb-4">
+			<div class="col-12 col-lg-8">
+				<div class="card border-0 shadow-sm">
+					<div class="card-header bg-white border-0 py-3">
+						<h5 class="card-title mb-0">Statistiques par Département</h5>
+					</div>
+					<div class="card-body">
+						<canvas id="departementChart" height="80"></canvas>
+					</div>
+				</div>
+			</div>
+
+			<!-- Utilisateurs actifs -->
+			<div class="col-12 col-lg-4">
+				<div class="card border-0 shadow-sm">
+					<div class="card-header bg-white border-0 py-3">
+						<h5 class="card-title mb-0">Utilisateurs Actifs (30j)</h5>
+					</div>
+					<div class="card-body">
+						{% if top_active_users|length > 0 %}
+							<div class="list-group list-group-flush">
+								{% for user in top_active_users %}
+									<div class="list-group-item px-0 d-flex justify-content-between align-items-center">
+										<div>
+											<strong>{{ user.prenoms }}
+												{{ user.nom }}</strong>
+											<br>
+											<small class="text-muted">{{ user.email }}</small>
+										</div>
+										<span class="badge bg-primary rounded-pill">{{ user.total_actions }}</span>
+									</div>
+								{% endfor %}
+							</div>
+						{% else %}
+							<p class="text-muted mb-0">Aucune activité récente</p>
+						{% endif %}
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Consultations récentes et Alertes destruction -->
+		<div
+			class="row g-3 mb-4">
+			<!-- Consultations récentes -->
+			<div class="col-12 col-lg-6">
+				<div class="card border-0 shadow-sm">
+					<div class="card-header bg-white border-0 py-3">
+						<h5 class="card-title mb-0">Consultations Récentes</h5>
+					</div>
+					<div class="card-body">
+						{% if recent_consultations|length > 0 %}
+							<div class="table-responsive">
+								<table class="table table-hover table-sm mb-0">
+									<thead>
+										<tr>
+											<th>Type</th>
+											<th>ID</th>
+											<th>Utilisateur</th>
+											<th>Date</th>
+										</tr>
+									</thead>
+									<tbody>
+										{% for consultation in recent_consultations %}
+											<tr>
+												<td>
+													<span class="badge bg-info">{{ consultation.entity_type }}</span>
+												</td>
+												<td>#{{ consultation.entity_id }}</td>
+												<td>{{ consultation.user_email ?? 'N/A' }}</td>
+												<td class="text-muted small">
+													{{ consultation.created_at|date('d/m/Y H:i') }}
+												</td>
+											</tr>
+										{% endfor %}
+									</tbody>
+								</table>
+							</div>
+						{% else %}
+							<p class="text-muted mb-0">Aucune consultation récente</p>
+						{% endif %}
+					</div>
+				</div>
+			</div>
+
+			<!-- Alertes destruction -->
+			<div class="col-12 col-lg-6">
+				<div class="card border-0 shadow-sm">
+					<div class="card-header bg-white border-0 py-3">
+						<h5 class="card-title mb-0">Alertes Destruction (30 jours)</h5>
+					</div>
+					<div class="card-body">
+						{% if upcoming_destructions|length > 0 %}
+							<div class="table-responsive">
+								<table class="table table-hover table-sm mb-0">
+									<thead>
+										<tr>
+											<th>Dossier</th>
+											<th>Département</th>
+											<th>Date Fin</th>
+										</tr>
+									</thead>
+									<tbody>
+										{% for dossier in upcoming_destructions %}
+											<tr>
+												<td>{{ dossier.libelle_dossier|slice(0, 30) }}...</td>
+												<td>{{ dossier.departement }}</td>
+												<td class="text-danger small">
+													{{ dossier.date_fin|date('d/m/Y') }}
+												</td>
+											</tr>
+										{% endfor %}
+									</tbody>
+								</table>
+							</div>
+						{% else %}
+							<p class="text-muted mb-0">Aucune destruction à venir</p>
+						{% endif %}
+					</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script>
+		document.addEventListener('DOMContentLoaded', function () { // 1. Graphique Évolution des créations
+const creationsCtx = document.getElementById('creationsChart');
+if (creationsCtx) {
+const creationsData = {{ creations_by_month|json_encode|raw }};
+console.log('Créations data:', creationsData);
+const labels = creationsData.map(item => {
+const [year, month] = item.mois.split('-');
+return new Date(year, month - 1).toLocaleDateString('fr-FR', {
+month: 'short',
+year: 'numeric'
+});
+});
+const values = creationsData.map(item => parseInt(item.total));
+
+new Chart(creationsCtx, {
+type: 'line',
+data: {
+labels: labels,
+datasets: [
+{
+label: 'Dossiers créés',
+data: values,
+borderColor: 'rgb(13, 110, 253)',
+backgroundColor: 'rgba(13, 110, 253, 0.1)',
+tension: 0.4,
+fill: true
+}
+]
+},
+options: {
+responsive: true,
+maintainAspectRatio: true,
+plugins: {
+legend: {
+display: true,
+position: 'top'
+}
+},
+scales: {
+y: {
+beginAtZero: true,
+ticks: {
+stepSize: 1
+}
+}
+}
+}
+});
+}
+
+// 2. Graphique Formats de fichiers (Doughnut)
+const formatCtx = document.getElementById('formatChart');
+if (formatCtx) {
+const formatData = {{ file_format_distribution|json_encode|raw }};
+const formatLabels = formatData.map(item => item.format || 'Non défini');
+const formatValues = formatData.map(item => parseInt(item.total));
+
+new Chart(formatCtx, {
+type: 'doughnut',
+data: {
+labels: formatLabels,
+datasets: [
+{
+data: formatValues,
+backgroundColor: ['rgba(13, 110, 253, 0.8)', 'rgba(25, 135, 84, 0.8)', 'rgba(255, 193, 7, 0.8)', 'rgba(220, 53, 69, 0.8)']
+}
+]
+},
+options: {
+responsive: true,
+maintainAspectRatio: true,
+plugins: {
+legend: {
+position: 'bottom'
+}
+}
+}
+});
+}
+
+// 3. Graphique Statistiques par département (Bar)
+const departementCtx = document.getElementById('departementChart');
+if (departementCtx) {
+const deptData = {{ departement_stats|json_encode|raw }};
+const deptLabels = deptData.map(item => item.departement);
+const deptDossiers = deptData.map(item => parseInt(item.total_dossiers));
+const deptFichiers = deptData.map(item => parseInt(item.total_fichiers));
+
+new Chart(departementCtx, {
+type: 'bar',
+data: {
+labels: deptLabels,
+datasets: [
+{
+label: 'Dossiers',
+data: deptDossiers,
+backgroundColor: 'rgba(13, 110, 253, 0.7)',
+borderColor: 'rgb(13, 110, 253)',
+borderWidth: 1
+}, {
+label: 'Fichiers',
+data: deptFichiers,
+backgroundColor: 'rgba(25, 135, 84, 0.7)',
+borderColor: 'rgb(25, 135, 84)',
+borderWidth: 1
+}
+]
+},
+options: {
+responsive: true,
+maintainAspectRatio: true,
+plugins: {
+legend: {
+display: true,
+position: 'top'
+}
+},
+scales: {
+y: {
+beginAtZero: true,
+ticks: {
+stepSize: 1
+}
+}
+}
+}
+});
+}
+});
+	</script>
+{% endblock %}

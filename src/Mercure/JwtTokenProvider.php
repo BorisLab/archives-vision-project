@@ -25,7 +25,7 @@ final class JwtTokenProvider implements TokenProviderInterface
         return $config->builder()
             ->withClaim('mercure', [
                 'publish' => ['*'], // Autorise la publication sur tous les topics
-                'subscribe' => ['https://127.0.0.1:8000/users/{id}'], // Autorise l'abonnement à des topics spécifiques
+                'subscribe' => ['*'], // Autorise l'abonnement à tous les topics
             ])
             ->getToken($config->signer(), $config->signingKey())
             ->toString();

@@ -18,16 +18,24 @@
                         </div>
                     </div>
                 </div>
-                {% for stat in stats %}
-                <div class="col-md-2">
-                    <div class="card">
-                        <div class="card-body">
-                            <h6 class="card-title text-uppercase">{{ stat.action }}</h6>
-                            <p class="h3">{{ stat.count }}</p>
+                {% if stats is not empty %}
+                    {% for stat in stats %}
+                    <div class="col-md-2">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-title text-uppercase">{{ stat['action'] }}</h6>
+                                <p class="h3">{{ stat['count'] }}</p>
+                            </div>
                         </div>
                     </div>
-                </div>
-                {% endfor %}
+                    {% endfor %}
+                {% else %}
+                    <div class="col-md-9">
+                        <div class="alert alert-info mb-0">
+                            <i class="bi bi-info-circle"></i> Aucune statistique disponible. Effectuez des actions pour générer des logs d'audit.
+                        </div>
+                    </div>
+                {% endif %}
             </div>
 
             {# Filters #}
@@ -42,22 +50,22 @@
                                 <label class="form-label">Action</label>
                                 <select name="action" class="form-select">
                                     <option value="">Toutes</option>
-                                    <option value="view" {% if filters.action == 'view' %}selected{% endif %}>View</option>
-                                    <option value="create" {% if filters.action == 'create' %}selected{% endif %}>Create</option>
-                                    <option value="update" {% if filters.action == 'update' %}selected{% endif %}>Update</option>
-                                    <option value="delete" {% if filters.action == 'delete' %}selected{% endif %}>Delete</option>
-                                    <option value="download" {% if filters.action == 'download' %}selected{% endif %}>Download</option>
-                                    <option value="approve" {% if filters.action == 'approve' %}selected{% endif %}>Approve</option>
-                                    <option value="reject" {% if filters.action == 'reject' %}selected{% endif %}>Reject</option>
+                                    <option value="view" {% if filters.action is defined and filters.action == 'view' %}selected{% endif %}>View</option>
+                                    <option value="create" {% if filters.action is defined and filters.action == 'create' %}selected{% endif %}>Create</option>
+                                    <option value="update" {% if filters.action is defined and filters.action == 'update' %}selected{% endif %}>Update</option>
+                                    <option value="delete" {% if filters.action is defined and filters.action == 'delete' %}selected{% endif %}>Delete</option>
+                                    <option value="download" {% if filters.action is defined and filters.action == 'download' %}selected{% endif %}>Download</option>
+                                    <option value="approve" {% if filters.action is defined and filters.action == 'approve' %}selected{% endif %}>Approve</option>
+                                    <option value="reject" {% if filters.action is defined and filters.action == 'reject' %}selected{% endif %}>Reject</option>
                                 </select>
                             </div>
                             <div class="col-md-2">
                                 <label class="form-label">Type d'entité</label>
                                 <select name="entity_type" class="form-select">
                                     <option value="">Tous</option>
-                                    <option value="Dossier" {% if filters.entity_type == 'Dossier' %}selected{% endif %}>Dossier</option>
-                                    <option value="Fichier" {% if filters.entity_type == 'Fichier' %}selected{% endif %}>Fichier</option>
-                                    <option value="DemandeAcces" {% if filters.entity_type == 'DemandeAcces' %}selected{% endif %}>Demande d'Accès</option>
+                                    <option value="Dossier" {% if filters.entity_type is defined and filters.entity_type == 'Dossier' %}selected{% endif %}>Dossier</option>
+                                    <option value="Fichier" {% if filters.entity_type is defined and filters.entity_type == 'Fichier' %}selected{% endif %}>Fichier</option>
+                                    <option value="DemandeAcces" {% if filters.entity_type is defined and filters.entity_type == 'DemandeAcces' %}selected{% endif %}>Demande d'Accès</option>
                                 </select>
                             </div>
                             <div class="col-md-2">
@@ -65,7 +73,7 @@
                                 <select name="user_id" class="form-select">
                                     <option value="">Tous</option>
                                     {% for user in users %}
-                                    <option value="{{ user.id }}" {% if filters.user_id == user.id %}selected{% endif %}>
+                                    <option value="{{ user.id }}" {% if filters.user_id is defined and filters.user_id == user.id %}selected{% endif %}>
                                         {{ user.nomComplet }}
                                     </option>
                                     {% endfor %}
@@ -73,11 +81,11 @@
                             </div>
                             <div class="col-md-2">
                                 <label class="form-label">Date début</label>
-                                <input type="date" name="date_from" class="form-control" value="{{ filters.date_from ? filters.date_from|date('Y-m-d') : '' }}">
+                                <input type="date" name="date_from" class="form-control" value="{{ filters.date_from is defined ? filters.date_from|date('Y-m-d') : '' }}">
                             </div>
                             <div class="col-md-2">
                                 <label class="form-label">Date fin</label>
-                                <input type="date" name="date_to" class="form-control" value="{{ filters.date_to ? filters.date_to|date('Y-m-d') : '' }}">
+                                <input type="date" name="date_to" class="form-control" value="{{ filters.date_to is defined ? filters.date_to|date('Y-m-d') : '' }}">
                             </div>
                             <div class="col-md-2">
                                 <label class="form-label">&nbsp;</label>

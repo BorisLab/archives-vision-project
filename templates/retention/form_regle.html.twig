@@ -1,0 +1,125 @@
+{% extends 'layouts/base.html.twig' %}
+
+{% block title %}
+	{{ is_edit ? 'Modifier' : 'Créer' }} une règle de rétention · {{ parent() }}
+{% endblock %}
+
+{% block stylesheets %}
+	<link rel="stylesheet" href="{{ asset('assets/css/theme.bundle.css') }}">
+
+	<style>
+		body {
+			background-color: #f9fbfd;
+			overflow-x: hidden;
+		}
+	</style>
+{% endblock %}
+
+{% block body %}
+{{ include('layouts/partials/_logout-loading.html.twig') }}
+<div class="main-content">
+	{{ include('layouts/partials/admin/_navbar-admin.html.twig') }}
+
+	<div class="header">
+		<div class="container">
+			<div class="header-body border-bottom mt-4 mb-4" style="border-color:rgba(18, 38, 63, 0.175)">
+				<div class="row align-items-end">
+					<div class="col pb-3">
+						<h4 class="header-title">
+							{% if is_edit %}
+								<i class="bi bi-pencil"></i> Modifier la règle de rétention
+							{% else %}
+								<i class="bi bi-plus-circle"></i> Nouvelle règle de rétention
+							{% endif %}
+						</h4>
+					</div>
+					<div class="col-auto pb-3">
+						<a href="{{ path('app_retention_regles') }}" class="btn btn-outline-secondary lift">
+							<i class="bi bi-arrow-left"></i> Retour
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="container">
+	<div class="row">
+		<div class="col-lg-8 offset-lg-2">
+
+				<div class="card shadow-sm">
+					<div class="card-body">
+						{{ form_start(form) }}
+						<div class="mb-3">
+							{{ form_label(form.libelle) }}
+							{{ form_widget(form.libelle) }}
+							{{ form_errors(form.libelle) }}
+							<small class="form-text text-muted">
+								Nom court identifiant la règle (ex: "Archives comptables", "Documents RH")
+							</small>
+						</div>
+
+						<div class="mb-3">
+							{{ form_label(form.duree_conservation) }}
+							{{ form_widget(form.duree_conservation) }}
+							{{ form_errors(form.duree_conservation) }}
+							<small class="form-text text-muted">
+								Durée en années pendant laquelle les archives doivent être conservées
+							</small>
+						</div>
+
+						<div class="mb-3">
+							{{ form_label(form.base_legale) }}
+							{{ form_widget(form.base_legale) }}
+							{{ form_errors(form.base_legale) }}
+							<small class="form-text text-muted">
+								Référence légale justifiant cette durée (ex: "Article L123-22 du Code de commerce")
+							</small>
+						</div>
+
+						<div class="mb-4">
+							{{ form_label(form.description) }}
+							{{ form_widget(form.description) }}
+							{{ form_errors(form.description) }}
+							<small class="form-text text-muted">
+								Description complémentaire (optionnel)
+							</small>
+						</div>
+
+						<div class="d-flex justify-content-between">
+							<a href="{{ path('app_retention_regles') }}" class="btn btn-secondary">
+								<i class="bi bi-x-circle"></i>
+								Annuler
+							</a>
+							<button type="submit" class="btn btn-primary">
+								{% if is_edit %}
+									<i class="bi bi-check-circle"></i>
+									Enregistrer les modifications
+								{% else %}
+									<i class="bi bi-plus-circle"></i>
+									Créer la règle
+								{% endif %}
+							</button>
+						</div>
+						{{ form_end(form) }}
+					</div>
+				</div>
+
+				{% if is_edit %}
+					<div class="alert alert-info mt-3">
+						<i class="bi bi-info-circle"></i>
+						<strong>Note :</strong>
+						Cette règle a été créée le
+						{{ regle.createdAt|date('d/m/Y à H:i') }}.
+						{% if regle.updatedAt %}
+							Dernière modification le
+							{{ regle.updatedAt|date('d/m/Y à H:i') }}.
+						{% endif %}
+					</div>
+				{% endif %}
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}

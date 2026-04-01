@@ -1,0 +1,168 @@
+{# Modal pour demander la destruction d'un dossier #}
+<div class="modal fade" id="requestDestructionDossier" tabindex="-1">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header bg-warning">
+				<h5 class="modal-title">Demander la destruction</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+			</div>
+			<div class="modal-body">
+				<p>Vous êtes sur le point de demander la destruction de :</p>
+				<p>
+					<strong id="destruction-dossier-name"></strong>
+					(Dossier)</p>
+				<div class="mb-3">
+					<label for="destruction-dossier-justification" class="form-label">Justification
+						<span class="text-danger">*</span>
+					</label>
+					<textarea class="form-control" id="destruction-dossier-justification" rows="4" required placeholder="Ex: Délai de conservation dépassé selon la règle de rétention applicable..."></textarea>
+				</div>
+				<div class="alert alert-info">
+					<i class="bi bi-info-circle"></i>
+					<small>Cette demande sera envoyée à l'administrateur pour approbation.</small>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+				<button type="button" class="btn btn-warning" id="confirm-destruction-dossier">
+					<i class="bi bi-trash3"></i>
+					Soumettre la demande
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+{# Modal pour demander la destruction d'un fichier #}
+<div class="modal fade" id="requestDestructionFichier" tabindex="-1">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header bg-warning">
+				<h5 class="modal-title">Demander la destruction</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+			</div>
+			<div class="modal-body">
+				<p>Vous êtes sur le point de demander la destruction de :</p>
+				<p>
+					<strong id="destruction-fichier-name"></strong>
+					(Fichier)</p>
+				<div class="mb-3">
+					<label for="destruction-fichier-justification" class="form-label">Justification
+						<span class="text-danger">*</span>
+					</label>
+					<textarea class="form-control" id="destruction-fichier-justification" rows="4" required placeholder="Ex: Délai de conservation dépassé selon la règle de rétention applicable..."></textarea>
+				</div>
+				<div class="alert alert-info">
+					<i class="bi bi-info-circle"></i>
+					<small>Cette demande sera envoyée à l'administrateur pour approbation.</small>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+				<button type="button" class="btn btn-warning" id="confirm-destruction-fichier">
+					<i class="bi bi-trash3"></i>
+					Soumettre la demande
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	// Script pour gérer les demandes de destruction
+document.addEventListener('DOMContentLoaded', function () {
+let currentEntityId = null;
+let currentEntityType = null;
+let currentEntityName = null;
+
+// Gestion du modal Dossier
+const requestDestructionDossierModal = document.getElementById('requestDestructionDossier');
+if (requestDestructionDossierModal) {
+requestDestructionDossierModal.addEventListener('show.bs.modal', function (event) {
+const button = event.relatedTarget;
+currentEntityId = button.getAttribute('data-id');
+currentEntityType = button.getAttribute('data-type');
+currentEntityName = button.getAttribute('data-name');
+
+document.getElementById('destruction-dossier-name').textContent = currentEntityName;
+document.getElementById('destruction-dossier-justification').value = '';
+});
+}
+
+// Gestion du modal Fichier
+const requestDestructionFichierModal = document.getElementById('requestDestructionFichier');
+if (requestDestructionFichierModal) {
+requestDestructionFichierModal.addEventListener('show.bs.modal', function (event) {
+const button = event.relatedTarget;
+currentEntityId = button.getAttribute('data-id');
+currentEntityType = button.getAttribute('data-type');
+currentEntityName = button.getAttribute('data-name');
+
+document.getElementById('destruction-fichier-name').textContent = currentEntityName;
+document.getElementById('destruction-fichier-justification').value = '';
+});
+}
+
+// Soumission demande Dossier
+const confirmButtonDossier = document.getElementById('confirm-destruction-dossier');
+if (confirmButtonDossier) {
+confirmButtonDossier.addEventListener('click', function () {
+const justification = document.getElementById('destruction-dossier-justification').value;
+
+if (! justification.trim()) {
+alert('La justification est obligatoire');
+return;
+}
+
+sendDestructionRequest('Dossier', currentEntityId, currentEntityName, justification);
+});
+}
+
+// Soumission demande Fichier
+const confirmButtonFichier = document.getElementById('confirm-destruction-fichier');
+if (confirmButtonFichier) {
+confirmButtonFichier.addEventListener('click', function () {
+const justification = document.getElementById('destruction-fichier-justification').value;
+
+if (! justification.trim()) {
+alert('La justification est obligatoire');
+return;
+}
+
+sendDestructionRequest('Fichier', currentEntityId, currentEntityName, justification);
+});
+}
+
+// Fonction pour envoyer la demande
+function sendDestructionRequest(type, id, name, justification) {
+const formData = new FormData();
+formData.append('type_entite', type);
+formData.append('entite_id', id);
+formData.append('justification', justification);
+
+fetch('{{ path("app_destruction_demander") }}', {
+method: 'POST',
+body: formData
+}).then(response => response.json()).then(data => {
+if (data.success) { // Fermer le modal
+if (type === 'Dossier') {
+bootstrap.Modal.getInstance(requestDestructionDossierModal).hide();
+} else {
+bootstrap.Modal.getInstance(requestDestructionFichierModal).hide();
+}
+
+// Afficher un message de succès
+alert('Demande de destruction soumise avec succès !');
+
+// Recharger la page pour actualiser l'affichage
+location.reload();
+} else {
+alert('Erreur : ' + data.message);
+}
+}).catch(error => {
+console.error('Erreur:', error);
+alert('Une erreur est survenue lors de l\'envoi de la demande');
+});
+}
+});
+</script>

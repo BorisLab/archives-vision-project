@@ -128,7 +128,7 @@
 	   document.addEventListener("DOMContentLoaded", function() {
 		const notifContainer = document.querySelector(".toast-container");
 
-		const es1 = new EventSource("{{ mercure('http://127.0.0.1:8000/archivists')|escape('js') }}", {
+		const es1 = new EventSource("{{ mercure(base_url ~ '/archivists') }}", {
             withCredentials: true
         });
 
@@ -177,7 +177,7 @@ showNextMessage();
 showNextMessage();
 };
 
-		const es2 = new EventSource("{{ mercure('http://127.0.0.1:8000/users/' ~ app.user.id)|escape('js') }}", {
+		const es2 = new EventSource("{{ mercure(base_url ~ '/users/' ~ app.user.id) }}", {
             withCredentials: true
         });
 

@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\Dossier;
 use App\Entity\Departement;
+use App\Entity\RegleRetention;
 use App\Entity\Utilisateur;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\CallbackTransformer;
@@ -18,6 +19,7 @@ use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class DossierType extends AbstractType
@@ -81,6 +83,49 @@ class DossierType extends AbstractType
                 'attr' => [
                     'class' => 'dossier-tags-input',
                     'mapped' => true
+                ],
+            ])
+            ->add('regle_retention', EntityType::class, [
+                'class' => RegleRetention::class,
+                'choice_label' => 'libelle',
+                'label' => 'Règle de rétention',
+                'required' => false,
+                'placeholder' => 'Aucune règle (optionnel)',
+                'attr' => [
+                    'class' => 'form-select',
+                ],
+            ])
+            ->add('date_debut', DateType::class, [
+                'widget' => 'single_text',
+                'label' => 'Date de début',
+                'required' => false,
+                'attr' => [
+                    'class' => 'form-control',
+                ],
+            ])
+            ->add('date_fin', DateType::class, [
+                'widget' => 'single_text',
+                'label' => 'Date de fin',
+                'required' => false,
+                'attr' => [
+                    'class' => 'form-control',
+                ],
+            ])
+            ->add('typologie_documentaire', ChoiceType::class, [
+                'label' => 'Typologie documentaire',
+                'required' => false,
+                'placeholder' => 'Sélectionner un type (optionnel)',
+                'choices' => [
+                    'Administratif' => 'Administratif',
+                    'Financier' => 'Financier',
+                    'Juridique' => 'Juridique',
+                    'Technique' => 'Technique',
+                    'Historique' => 'Historique',
+                    'Personnel' => 'Personnel',
+                    'Autre' => 'Autre',
+                ],
+                'attr' => [
+                    'class' => 'form-select',
                 ],
             ])
             //->add('date_creation', DateType::class, [

@@ -17,6 +17,8 @@ use App\Entity\StatutNotification;
 use App\Repository\DossierRepository;
 use App\Entity\NiveauAccesNotification;
 use App\Service\AuditLogger;
+use App\Service\FileIntegrityService;
+use App\Service\AntivirusService;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\UtilisateurRepository;
 use Symfony\Component\Filesystem\Filesystem;
@@ -30,14 +32,25 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Knp\Component\Pager\PaginatorInterface;
 
 class FondsArchivesController extends AbstractController
 {
     private AuditLogger $auditLogger;
+    private FileIntegrityService $fileIntegrityService;
+    private AntivirusService $antivirusService;
+    private PaginatorInterface $paginator;
 
-    public function __construct(AuditLogger $auditLogger)
-    {
-        $this->auditLogger = $auditLogger;
+    public function __construct(
+        AuditLogger $audit,
+        FileIntegrityService $fileIntegrityService,
+        AntivirusService $antivirusService,
+        PaginatorInterface $paginator
+    ) {
+        $this->auditLogger = $audit;
+        $this->fileIntegrityService = $fileIntegrityService;
+        $this->antivirusService = $antivirusService;
+        $this->paginator = $paginator;
     }
     #[Route('/archivist/archives2', name: 'app_archives_2')]
     #[IsGranted("ROLE_ARCHIVIST")]
@@ -95,10 +108,19 @@ class FondsArchivesController extends AbstractController
         $formats = '[{"name": "--Choisir--", "value": ""}, {"name": "Physique", "value": "Physique"}, {"name": "Numérique", "value": "Numérique"}, {"name": "Mixte", "value": "Mixte"}]';
         $statuts = '[{"name": "Disponible", "value": 1}, {"name": "Indisponible", "value": null}]';
 
-        $dossiers_parents = $dossierRepository->findBy(['parent' => false], ['date_creation' => 'DESC']); 
+        $queryBuilder = $dossierRepository->createQueryBuilder('d')
+            ->where('d.parent = :parent')
+            ->setParameter('parent', false)
+            ->orderBy('d.date_creation', 'DESC');
+
+        $pagination = $this->paginator->paginate(
+            $queryBuilder,
+            $request->query->getInt('page', 1),
+            20 // Items per page
+        );
 
         $fonds = $this->render('fonds_archives/fonds.html.twig', [
-            'dossiers' => $dossiers_parents,
+            'dossiers' => $pagination,
             'deps' => $deps,
             'formats' => json_decode($formats, true),
             'statuts' => json_decode($statuts, true),
@@ -122,6 +144,9 @@ class FondsArchivesController extends AbstractController
     }
 
     private function handleCreateDossier(Request $request, EntityManagerInterface $entityManager) : Response {
+        // Vérifier permission de création
+        $this->denyAccessUnlessGranted('DOSSIER_CREATE');
+
         $dossier = new Dossier();
         $formCreate = $this->createForm(DossierType::class, $dossier);
         $formCreate->handleRequest($request);
@@ -182,8 +207,11 @@ class FondsArchivesController extends AbstractController
             $this->addFlash('folder_edit_error', 'Dossier introuvable');
             return $this->redirectToRoute('app_archives_folders_directory');
         }
-        else {
-            $nomDossier = $request->request->get('libelle_dossier');
+
+        // Vérifier les permissions
+        $this->denyAccessUnlessGranted('DOSSIER_EDIT', $dossier);
+
+        $nomDossier = $request->request->get('libelle_dossier');
             $formatDossier = $request->request->get('format_dossier');
             $statutDossier = $request->request->get('statut_dossier');
             $depInput = $request->request->get('departement_dossier');
@@ -223,26 +251,28 @@ class FondsArchivesController extends AbstractController
                     return $this->redirectToRoute('app_archives_folders_directory');
                 }
             }
-        }
     }
 
     private function handleDeleteDossier(Request $request, EntityManagerInterface $entityManager) {
         $id = $request->request->get('folderId');
         $dossier = $entityManager->getRepository(Dossier::class)->find($id);
 
-        $demandeAccesDossier = $entityManager->getRepository(DemandeAcces::class)->findBy(['dossier' => $dossier->getDossierId()]);
-
         if(!$dossier) {
             $this->addFlash('folder_delete_error', 'Dossier introuvable');
             return $this->redirectToRoute('app_archives_folders_directory');
         }
 
-        else if(!$dossier->getDossiers()->isEmpty() || !$dossier->getFichiers()->isEmpty()){
+        // Vérifier les permissions
+        $this->denyAccessUnlessGranted('DOSSIER_DELETE', $dossier);
+
+        $demandeAccesDossier = $entityManager->getRepository(DemandeAcces::class)->findBy(['dossier' => $dossier->getDossierId()]);
+
+        if(!$dossier->getDossiers()->isEmpty() || !$dossier->getFichiers()->isEmpty()){
             $this->addFlash('folder_delete_error', 'Ce dossier n\'est pas vide');
             return $this->redirectToRoute('app_archives_folders_directory');
         }
 
-        else if($demandeAccesDossier){
+        if($demandeAccesDossier){
             $this->addFlash('folder_delete_error', 'Impossible de supprimer ce dossier');
             return $this->redirectToRoute('app_archives_folders_directory');
         }
@@ -262,6 +292,9 @@ class FondsArchivesController extends AbstractController
     #[Route('/archivist/{id<[0-9]+>}/sous-fonds', name: 'app_archives_folder_content')]
     #[IsGranted("ROLE_ARCHIVIST")]
     public function sousFondsContent(Request $request, SluggerInterface $slugger, EntityManagerInterface $entityManager, int $id, Authorization $authorization) {
+        // Vérifier permission de création de fichiers
+        $this->denyAccessUnlessGranted('FICHIER_CREATE');
+
         $nbrNotifsUnread = $entityManager->getRepository(Notification::class)->count(['statut' => StatutNotification::NON_LU, 'niveau_acces' => NiveauAccesNotification::ARCHIVISTE]);
         $nbrMsgsUnread = $entityManager->getRepository(Message::class)->count(['statut' => StatutMessage::NON_LU, 'recipient' => $this->getUser()->getId()]);
         
@@ -416,6 +449,19 @@ class FondsArchivesController extends AbstractController
                         );
 
                         $filePath = $this->getParameter('files_dir') . '/'. $newNomFichier;
+
+                        // Scan for viruses if ClamAV is enabled
+                        $scanResult = $this->antivirusService->scanFile($filePath);
+                        if (!$scanResult['clean']) {
+                            // Delete the infected file
+                            @unlink($filePath);
+                            
+                            $virusName = $scanResult['virus'] ?? 'Unknown virus';
+                            $this->addFlash('add_soft_file_error', "Fichier infecté détecté et supprimé: $virusName");
+                            $upload_success = false;
+                            continue; // Skip this file
+                        }
+
                         $uploadedFile = new Fichier();
                         $format = "Numérique";
                         $uploadedFile->setLibelleFichier($originalNomFichier);
@@ -423,6 +469,9 @@ class FondsArchivesController extends AbstractController
                         $uploadedFile->setType($typeFic);
                         $dossierCourant->addFichier($uploadedFile);
                         $uploadedFile->setCheminAcces($filePath);
+
+                        // Calculate and store SHA-256 checksum
+                        $this->fileIntegrityService->calculateAndStoreChecksum($uploadedFile, $filePath);
     
                         $entityManager->persist($uploadedFile);
                         $uploadedFiles[] = $uploadedFile;
@@ -436,6 +485,17 @@ class FondsArchivesController extends AbstractController
                 }
             if($upload_success) {
                 $entityManager->flush();
+                
+                // Audit logs for created files
+                foreach ($uploadedFiles as $uploadedFile) {
+                    $this->auditLogger->logCreate('Fichier', $uploadedFile->getFichierId(), [
+                        'libelle' => $uploadedFile->getLibelleFichier(),
+                        'format' => $uploadedFile->getFormat(),
+                        'type' => $uploadedFile->getType(),
+                        'dossier_id' => $dossierCourant->getDossierId(),
+                    ]);
+                }
+                
                 $this->addFlash('add_soft_file_success', 'Importation effectuée avec succès');
                 return $this->redirectToRoute('app_archives_folder_content', ['id' => $id]);
             }
@@ -464,6 +524,13 @@ class FondsArchivesController extends AbstractController
             $entityManager->persist($fichierPhys);
             $entityManager->flush();
 
+            // Audit log
+            $this->auditLogger->logCreate('Fichier', $fichierPhys->getFichierId(), [
+                'libelle' => $fichierPhys->getLibelleFichier(),
+                'format' => $fichierPhys->getFormat(),
+                'type' => $fichierPhys->getType(),
+                'dossier_id' => $dossierCourant->getDossierId(),
+            ]);
 
             $this->addFlash('add_hard_file_success', 'Pièce ajoutée avec succès');
             return $this->redirectToRoute('app_archives_folder_content', ['id' => $id]);
@@ -523,6 +590,12 @@ class FondsArchivesController extends AbstractController
                     $this->addFlash('file_delete_error', 'Impossible de supprimer ce fichier');
                     return $this->redirectToRoute('app_archives_folder_content', ['id' => $id]);
                 }
+
+                // Audit log before deletion
+                $this->auditLogger->logDelete('Fichier', $fichier->getFichierId(), [
+                    'nom' => $fichier->getLibelleFichier(),
+                    'format' => $fichier->getFormat(),
+                ]);
 
                 // Supprimer le fichier du répertoire
                 if($fichier->getFormat() == "Numérique")
@@ -594,6 +667,9 @@ class FondsArchivesController extends AbstractController
             throw $this->createNotFoundException('File not found or is not a digital file.');
         }
 
+        // Vérifier les permissions avec le Voter
+        $this->denyAccessUnlessGranted('FICHIER_VIEW', $fichier);
+
         $filePath = $fichier->getCheminAcces();
         $fileExtension = pathinfo($filePath, PATHINFO_EXTENSION);
 
@@ -634,6 +710,9 @@ class FondsArchivesController extends AbstractController
             throw $this->createNotFoundException('File not found or is not a digital file.');
         }
 
+        // Vérifier les permissions avec le Voter (USER doit avoir une demande approuvée)
+        $this->denyAccessUnlessGranted('FICHIER_VIEW', $fichier);
+
         $filePath = $fichier->getCheminAcces();
         $fileExtension = pathinfo($filePath, PATHINFO_EXTENSION);
 
@@ -670,6 +749,7 @@ class FondsArchivesController extends AbstractController
         $format = $request->query->get('format');
         $dateMin = $request->query->get('dateMin');
         $dateMax = $request->query->get('dateMax');
+        $typologie = $request->query->get('typologie');
     
         $qb = $em->createQueryBuilder();
         $motsClesD = explode(',', str_replace(' ', ',', $query)); // Séparer par virgules ou espaces
@@ -698,6 +778,11 @@ class FondsArchivesController extends AbstractController
         if ($format && $format !== 'Choisir') {
             $qb->andWhere('d.format = :format')
                ->setParameter('format', $format);
+        }
+
+        if ($typologie && $typologie !== 'Choisir') {
+            $qb->andWhere('d.typologie_documentaire = :typologie')
+               ->setParameter('typologie', $typologie);
         }
     
         if ($dateMin) {
@@ -746,6 +831,11 @@ class FondsArchivesController extends AbstractController
             $qb->andWhere('f.type = :type')
                ->setParameter('type', $type);
         }
+
+        if ($typologie && $typologie !== 'Choisir') {
+            $qb->andWhere('f.typologie_documentaire = :typologie')
+               ->setParameter('typologie', $typologie);
+        }
     
         if ($dateMin) {
             $qb->andWhere('f.date_creation >= :dateMin')
@@ -787,6 +877,7 @@ class FondsArchivesController extends AbstractController
         $format = $request->query->get('format');
         $dateMin = $request->query->get('dateMin');
         $dateMax = $request->query->get('dateMax');
+        $typologie = $request->query->get('typologie');
     
         $qb = $em->createQueryBuilder();
         $motsClesD = explode(',', str_replace(' ', ',', $query)); // Séparer par virgules ou espaces
@@ -813,6 +904,11 @@ class FondsArchivesController extends AbstractController
         if ($type && $type !== 'Choisir' && $type !== 'Dossier') {
             $qb->andWhere('d.format = :format')
                ->setParameter('format', $format);
+        }
+
+        if ($typologie && $typologie !== 'Choisir') {
+            $qb->andWhere('d.typologie_documentaire = :typologie')
+               ->setParameter('typologie', $typologie);
         }
     
         if ($dateMin) {
@@ -853,6 +949,11 @@ class FondsArchivesController extends AbstractController
         if ($type && $type !== 'Choisir' && $type !== 'Fichier') {
             $qb->andWhere('f.format = :format')
                ->setParameter('format', $format);
+        }
+
+        if ($typologie && $typologie !== 'Choisir') {
+            $qb->andWhere('f.typologie_documentaire = :typologie')
+               ->setParameter('typologie', $typologie);
         }
     
         if ($dateMin) {
@@ -904,8 +1005,9 @@ class FondsArchivesController extends AbstractController
             return $this->json(['error' => 'User not authenticated'], 401);
         }
 
+        $baseUrl = $this->getParameter('app.base_url');
         $authorization->setCookie($request, [
-            "http://127.0.0.1:8000/archivists" // Définit le topic auquel cet utilisateur peut s'abonner
+            "{$baseUrl}/archivists" // Définit le topic auquel cet utilisateur peut s'abonner
         ]);
     }
 }

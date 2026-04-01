@@ -13,6 +13,11 @@ use App\Repository\DemandeAccesRepository;
 
 #[ORM\Entity(repositoryClass: DemandeAccesRepository::class)]
 #[ORM\HasLifecycleCallbacks]
+#[ORM\Index(columns: ['statut'], name: 'idx_demande_acces_statut')]
+#[ORM\Index(columns: ['date_creation'], name: 'idx_demande_acces_date')]
+#[ORM\Index(columns: ['utilisateur_id'], name: 'idx_demande_acces_utilisateur')]
+#[ORM\Index(columns: ['dossier_id'], name: 'idx_demande_acces_dossier')]
+#[ORM\Index(columns: ['fichier_id'], name: 'idx_demande_acces_fichier')]
 class DemandeAcces
 {
 
@@ -47,6 +52,16 @@ class DemandeAcces
 
     #[ORM\Column(nullable: true)]
     private ?int $archiviste_id = null;
+
+    #[ORM\ManyToOne(targetEntity: Utilisateur::class)]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?Utilisateur $approbateur = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $date_traitement = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $bordereau_pret = null;
 
     public function __construct()
     {
@@ -168,6 +183,42 @@ class DemandeAcces
     public function setExpiration(?\DateTimeInterface $expiration): static
     {
         $this->expiration = $expiration;
+
+        return $this;
+    }
+
+    public function getApprobateur(): ?Utilisateur
+    {
+        return $this->approbateur;
+    }
+
+    public function setApprobateur(?Utilisateur $approbateur): static
+    {
+        $this->approbateur = $approbateur;
+
+        return $this;
+    }
+
+    public function getDateTraitement(): ?\DateTimeInterface
+    {
+        return $this->date_traitement;
+    }
+
+    public function setDateTraitement(?\DateTimeInterface $date_traitement): static
+    {
+        $this->date_traitement = $date_traitement;
+
+        return $this;
+    }
+
+    public function getBordereauPret(): ?string
+    {
+        return $this->bordereau_pret;
+    }
+
+    public function setBordereauPret(?string $bordereau_pret): static
+    {
+        $this->bordereau_pret = $bordereau_pret;
 
         return $this;
     }

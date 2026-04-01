@@ -17,6 +17,10 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 #[ORM\Entity(repositoryClass: UtilisateurRepository::class)]
 #[ORM\HasLifecycleCallbacks]
 #[UniqueEntity(fields: ['email'], message: 'Cet email est déjà utilisé')]
+#[ORM\Index(columns: ['email'], name: 'idx_utilisateur_email')]
+#[ORM\Index(columns: ['departement_id'], name: 'idx_utilisateur_departement')]
+#[ORM\Index(columns: ['statut'], name: 'idx_utilisateur_statut')]
+#[ORM\Index(columns: ['nom'], name: 'idx_utilisateur_nom')]
 class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
 {
 

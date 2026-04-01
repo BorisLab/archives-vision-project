@@ -180,7 +180,7 @@ class ChatController extends AbstractController
         $nbrMsgsUnread = $entityManager->getRepository(Message::class)->count(['statut' => StatutMessage::NON_LU, 'recipient' => $recipient->getId()]);
 
         $update = new Update(
-            'http://127.0.0.1:8000/users/' . $recipient->getId(),
+            $this->getParameter('app.base_url') . '/users/' . $recipient->getId(),
             json_encode([
                 'type' => 'message',
                 'notif' => 'Vous avez un nouveau message',
@@ -286,7 +286,7 @@ class ChatController extends AbstractController
         $entityManager->flush();
 
         $update = new Update(
-            'http://127.0.0.1:8000/status', 
+            $this->getParameter('app.base_url') . '/status', 
             json_encode([
                 'userId' => $user->getId(),
                 'statut' => $status

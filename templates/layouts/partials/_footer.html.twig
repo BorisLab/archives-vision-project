@@ -1,15 +1,17 @@
 {% block stylesheets %}
-<style>
+	<style>
 
-   footer p a {
-    text-decoration: none;
-   }
-
-</style>
+		footer p a {
+			text-decoration: none;
+		}
+	</style>
 {% endblock %}
 
 <div>
-    <footer class="py-3 my-1">
-         <p class="text-center text-muted">&copy; <a class="link-dark"href="#" draggable="false">{{ project.name }}</a> &middot; {{ 'now'|date('Y') }}</p>
-    </footer>
+	<footer class="py-3 my-1">
+		<p class="text-center text-muted">&copy;
+			<a class="link-dark" href="#" draggable="false">{{ project.name }}</a>
+			&middot;
+			{{ 'now'|date('YYYY') }}</p>
+	</footer>
 </div>
